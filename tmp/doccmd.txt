@@ -1,0 +1,33 @@
+c:\Rml\Bin>dumpcpp -h
+dumpcpp Version1.0
+
+Generate a C++ namespace from a type library.
+
+Usage:
+dumpcpp input [-[-n <namespace>] [-o <filename>]
+
+   input:     A type library file, type library ID, ProgID or CLSID
+
+Optional parameters:
+   namespace: The name of the generated C++ namespace
+   filename:  The file name (without extension) of the generated files
+
+Other parameters:
+   -nometaobject Don't generate meta object information (no .cpp file)
+   -impl Only generate the .cpp file
+   -decl Only generate the .h file
+   -compat Treat all coclass parameters as IDispatch
+
+Examples:
+   dumpcpp Outlook.Application -o outlook
+   dumpcpp {3B756301-0075-4E40-8BE8-5A81DE2426B7}
+
+
+
+c:\Rml\Bin>dumpcpp Lemmatizer.tlb -o Lemmatizer
+
+c:\Rml\Bin>dumpcpp agramtab.tlb -o agramtab
+
+c:\Rml\Bin>c:\Qt\4.8.4\tools\activeqt\dumpdoc\debug\dumpdoc Lemmatizer.tlb Lemmatizer.LemmatizerRussian >LemmatizerRussian.html
+
+c:\Rml\Bin>c:\Qt\4.8.4\tools\activeqt\dumpdoc\debug\dumpdoc AGramTab.tlb AGramTab.RusGramTab >RusGramTab.html

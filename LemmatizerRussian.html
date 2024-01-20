@@ -1,0 +1,172 @@
+<h1 align=center> Reference</h1>
+<p>The  COM object is a QAxObject with the CLSID {6b23250f-1816-11d3-9cc6-00105a68baf2}.</p>
+<h3>Interfaces</h3>
+<ul>
+<li>ILemmatizer
+</ul>
+<h3>Event Interfaces</h3>
+<ul>
+</ul>
+<h2>Public Slots:</h2>
+<ul>
+<li>int <a href="#CheckABC"><b>CheckABC</b></a>(QString Word);</li>
+<li>IDispatch* <a href="#CreateParadigmCollectionFromForm"><b>CreateParadigmCollectionFromForm</b></a>(QString Form, int capital, int UsePrediction);</li>
+<li>IDispatch* <a href="#CreateParadigmCollectionFromNorm"><b>CreateParadigmCollectionFromNorm</b></a>(QString Norm, int capital, int UsePrediction);</li>
+<li>IDispatch* <a href="#CreateParadigmFromID"><b>CreateParadigmFromID</b></a>(int id);</li>
+<li>void <a href="#LoadDictionariesRegistry"><b>LoadDictionariesRegistry</b></a>();</li>
+<li>void <a href="#LoadStatisticRegistry"><b>LoadStatisticRegistry</b></a>(__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);</li>
+<li>void <a href="#SetMaximalPrediction"><b>SetMaximalPrediction</b></a>(int MaximalPrediction);</li>
+<li>void <a href="#SetUseStatistic"><b>SetUseStatistic</b></a>(int UseStatistic);</li>
+</ul>
+<h2>Signals:</h2>
+<ul>
+<li>void <a href="#exception"><b>exception</b></a>(int code, QString source, QString disc, QString help);</li>
+<li>void <a href="#propertyChanged"><b>propertyChanged</b></a>(QString name);</li>
+<li>void <a href="#signal"><b>signal</b></a>(QString name, int argc, void* argv);</li>
+</ul>
+<h2>Properties:</h2>
+<ul>
+<li>QString <a href="#objectName"><b>objectName</b></a>;</li>
+<li>int <a href="#MaximalPrediction"><b>MaximalPrediction</b></a>;</li>
+<li>int <a href="#UseStatistic"><b>UseStatistic</b></a>;</li>
+<li>QString <a href="#control"><b>control</b></a>;</li>
+</ul>
+<hr><h2>Member Type Documentation</h2>
+<h3><a name=__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001></a>__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001</h3>
+<ul>
+<li>idlFinance	=1</li>
+<li>idlComputer	=2</li>
+<li>idlLiterature	=4</li>
+</ul>
+<hr><h2>Member Function Documentation</h2>
+<h3><a name=CheckABC></a>int CheckABC (QString Word)<tt> [slot]</tt></h3>
+<p>method CheckABC
+
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(QString)), object, SLOT(CheckABC(QString)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	int result = object->dynamicCall("CheckABC(QString)", params).toInt();</pre>
+
+<h3><a name=CreateParadigmCollectionFromForm></a>IDispatch* CreateParadigmCollectionFromForm (QString Form, int capital, int UsePrediction)<tt> [slot]</tt></h3>
+<p>method CreateParadigmCollectionFromForm
+
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(QString, int, int)), object, SLOT(CreateParadigmCollectionFromForm(QString, int, int)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	QAxObject * result = object->querySubObject("CreateParadigmCollectionFromForm(QString, int, int)", params);</pre>
+
+<h3><a name=CreateParadigmCollectionFromNorm></a>IDispatch* CreateParadigmCollectionFromNorm (QString Norm, int capital, int UsePrediction)<tt> [slot]</tt></h3>
+<p>method CreateParadigmCollectionFromNorm
+
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(QString, int, int)), object, SLOT(CreateParadigmCollectionFromNorm(QString, int, int)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	QAxObject * result = object->querySubObject("CreateParadigmCollectionFromNorm(QString, int, int)", params);</pre>
+
+<h3><a name=CreateParadigmFromID></a>IDispatch* CreateParadigmFromID (int id)<tt> [slot]</tt></h3>
+<p>method CreateParadigmFromID
+
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(int)), object, SLOT(CreateParadigmFromID(int)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	QAxObject * result = object->querySubObject("CreateParadigmFromID(int)", params);</pre>
+
+<h3><a name=LoadDictionariesRegistry></a>void LoadDictionariesRegistry ()<tt> [slot]</tt></h3>
+<p>method LoadDictionariesRegistry
+
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal()), object, SLOT(LoadDictionariesRegistry()));</pre>
+<p>Or call the function directly:<pre>
+	object->dynamicCall("LoadDictionariesRegistry()");</pre>
+
+<h3><a name=LoadStatisticRegistry></a>void LoadStatisticRegistry (__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)<tt> [slot]</tt></h3>
+<p>method LoadStatisticRegistry
+
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001)), object, SLOT(LoadStatisticRegistry(__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	object->dynamicCall("LoadStatisticRegistry(__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001)", params);</pre>
+
+<h3><a name=SetMaximalPrediction></a>void SetMaximalPrediction (int MaximalPrediction)<tt> [slot]</tt></h3>
+<p>
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(int)), object, SLOT(SetMaximalPrediction(int)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	object->dynamicCall("SetMaximalPrediction(int)", params);</pre>
+
+<h3><a name=SetUseStatistic></a>void SetUseStatistic (int UseStatistic)<tt> [slot]</tt></h3>
+<p>
+<p>Connect a signal to this slot:<pre>
+	QObject::connect(sender, SIGNAL(someSignal(int)), object, SLOT(SetUseStatistic(int)));</pre>
+<p>Or call the function directly:<pre>
+	QVariantList params = ...
+	object->dynamicCall("SetUseStatistic(int)", params);</pre>
+
+<h3><a name=exception></a>void exception (int code, QString source, QString disc, QString help)<tt> [signal]</tt></h3>
+<p>
+<p>Connect a slot to this signal:<pre>
+	QObject::connect(object, SIGNAL(exception(int, QString, QString, QString)), receiver, SLOT(someSlot(int, QString, QString, QString)));</pre>
+
+<h3><a name=propertyChanged></a>void propertyChanged (QString name)<tt> [signal]</tt></h3>
+<p>
+<p>Connect a slot to this signal:<pre>
+	QObject::connect(object, SIGNAL(propertyChanged(QString)), receiver, SLOT(someSlot(QString)));</pre>
+
+<h3><a name=signal></a>void signal (QString name, int argc, void* argv)<tt> [signal]</tt></h3>
+<p>
+<p>Connect a slot to this signal:<pre>
+	QObject::connect(object, SIGNAL(signal(QString, int, void*)), receiver, SLOT(someSlot(QString, int, void*)));</pre>
+
+<hr><h2>Property Documentation</h2>
+<h3><a name=objectName></a>QString objectName</h3>
+<p>
+<p>Read this property's value using QObject::property:<pre>
+	QString val = object->property("objectName").toString();
+</pre>
+Set this property' value using QObject::setProperty:<pre>
+	QString newValue = ...
+	object->setProperty("objectName", newValue);
+</pre>
+Or using the <a href="#setObjectName">setObjectName</a> slot.
+
+<h3><a name=MaximalPrediction></a>int MaximalPrediction</h3>
+<p>property MaximalPrediction
+
+<p>Read this property's value using QObject::property:<pre>
+	int val = object->property("MaximalPrediction").toInt();
+</pre>
+Set this property' value using QObject::setProperty:<pre>
+	int newValue = ...
+	object->setProperty("MaximalPrediction", newValue);
+</pre>
+Or using the <a href="#SetMaximalPrediction">SetMaximalPrediction</a> slot.
+
+<h3><a name=UseStatistic></a>int UseStatistic</h3>
+<p>property UseStatistic
+
+<p>Read this property's value using QObject::property:<pre>
+	int val = object->property("UseStatistic").toInt();
+</pre>
+Set this property' value using QObject::setProperty:<pre>
+	int newValue = ...
+	object->setProperty("UseStatistic", newValue);
+</pre>
+Or using the <a href="#SetUseStatistic">SetUseStatistic</a> slot.
+
+<h3><a name=control></a>QString control</h3>
+<p>
+<p>Read this property's value using QObject::property:<pre>
+	QString val = object->property("control").toString();
+</pre>
+Set this property' value using QObject::setProperty:<pre>
+	QString newValue = ...
+	object->setProperty("control", newValue);
+</pre>
+Or using the <a href="#setControl">setControl</a> slot.
+
