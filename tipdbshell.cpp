@@ -361,133 +361,121 @@ bool TIPDBShell::CopyItemBetweenDatabases(TIPInfo *item, QSqlDatabase *sourceDB,
 
     try
     {
-        // 1. Copy data from ip_portrait
-        sourceQuery.prepare("SELECT * FROM ip_portrait WHERE id = :id");
-        sourceQuery.bindValue(":id", QVariant::fromValue(item->id));
-
         destinationQuery.exec("SELECT nextval('ip_portret_id_seq')");
         if (destinationQuery.first() && destinationQuery.seek(0, false))
         {
             folderid newid = destinationQuery.value(0).toInt();
-            if (sourceQuery.exec() && sourceQuery.next())
-            {
-                destinationQuery.prepare("INSERT INTO ip_portrait (id, object_id, aspect_id, attribute_id, norm_id, creator_id, "
-                                         "comment, ids_list, date_add, req_from, req_till, source_text, words, abbreviations, shingles) "
-                                         "VALUES (:id, :object_id, :aspect_id, :attribute_id, :norm_id, :creator_id, "
-                                         ":comment, :ids_list, :date_add, :req_from, :req_till, :source_text, :words, :abbreviations, :shingles)");
-                destinationQuery.bindValue(":id", QVariant::fromValue(newid));
-                destinationQuery.bindValue(":object_id", sourceQuery.value("object_id"));
-                destinationQuery.bindValue(":aspect_id", sourceQuery.value("aspect_id"));
-                destinationQuery.bindValue(":attribute_id", sourceQuery.value("attribute_id"));
-                destinationQuery.bindValue(":norm_id", sourceQuery.value("norm_id"));
-                destinationQuery.bindValue(":creator_id", sourceQuery.value("creator_id"));
-                destinationQuery.bindValue(":comment", sourceQuery.value("comment"));
-                destinationQuery.bindValue(":ids_list", sourceQuery.value("ids_list"));
-                destinationQuery.bindValue(":date_add", sourceQuery.value("date_add"));
-                destinationQuery.bindValue(":req_from", sourceQuery.value("req_from"));
-                destinationQuery.bindValue(":req_till", sourceQuery.value("req_till"));
-                destinationQuery.bindValue(":source_text", sourceQuery.value("source_text"));
-                destinationQuery.bindValue(":words", sourceQuery.value("words"));
-                destinationQuery.bindValue(":abbreviations", sourceQuery.value("abbreviations"));
-                destinationQuery.bindValue(":shingles", sourceQuery.value("shingles"));
 
-                if (!destinationQuery.exec())
+            // 1. Copy data from ip_portrait
+            sourceQuery.prepare("SELECT * FROM ip_portrait WHERE id = :id");
+            sourceQuery.bindValue(":id", QVariant::fromValue(item->id));
+            if (sourceQuery.exec())
+            {
+                while (sourceQuery.next())
                 {
-                    throw std::runtime_error("Failed to insert into ip_portrait");
+                    destinationQuery.prepare("INSERT INTO ip_portrait (id, object_id, aspect_id, attribute_id, norm_id, creator_id, "
+                                             "comment, ids_list, date_add, req_from, req_till, source_text, words, abbreviations, shingles) "
+                                             "VALUES (:id, :object_id, :aspect_id, :attribute_id, :norm_id, :creator_id, "
+                                             ":comment, :ids_list, :date_add, :req_from, :req_till, :source_text, :words, :abbreviations, :shingles)");
+                    destinationQuery.bindValue(":id", QVariant::fromValue(newid));
+                    destinationQuery.bindValue(":object_id", sourceQuery.value("object_id"));
+                    destinationQuery.bindValue(":aspect_id", sourceQuery.value("aspect_id"));
+                    destinationQuery.bindValue(":attribute_id", sourceQuery.value("attribute_id"));
+                    destinationQuery.bindValue(":norm_id", sourceQuery.value("norm_id"));
+                    destinationQuery.bindValue(":creator_id", sourceQuery.value("creator_id"));
+                    destinationQuery.bindValue(":comment", sourceQuery.value("comment"));
+                    destinationQuery.bindValue(":ids_list", sourceQuery.value("ids_list"));
+                    destinationQuery.bindValue(":date_add", sourceQuery.value("date_add"));
+                    destinationQuery.bindValue(":req_from", sourceQuery.value("req_from"));
+                    destinationQuery.bindValue(":req_till", sourceQuery.value("req_till"));
+                    destinationQuery.bindValue(":source_text", sourceQuery.value("source_text"));
+                    destinationQuery.bindValue(":words", sourceQuery.value("words"));
+                    destinationQuery.bindValue(":abbreviations", sourceQuery.value("abbreviations"));
+                    destinationQuery.bindValue(":shingles", sourceQuery.value("shingles"));
+
+                    if (!destinationQuery.exec())
+                    {
+                        throw std::runtime_error("Failed to insert into ip_portrait");
+                    }
                 }
             }
             else
             {
                 throw std::runtime_error("Failed to fetch data from ip_portrait in sourceQuery");
             }
-        }
-        else
-        {
-            throw std::runtime_error("Error getting new ID from sequence:");
-        }
 
-        // 2. Copy data from ip_term
-        sourceQuery.prepare("SELECT * FROM ip_term WHERE ip_id = :id");
-        sourceQuery.bindValue(":id", QVariant::fromValue(item->id));
+            // 2. Copy data from ip_term
+            sourceQuery.prepare("SELECT * FROM ip_term WHERE ip_id = :id");
+            sourceQuery.bindValue(":id", QVariant::fromValue(item->id));
 
-        destinationQuery.exec("SELECT nextval('ip_portret_id_seq')");
-        if (destinationQuery.first() && destinationQuery.seek(0, false))
-        {
-            folderid newid = destinationQuery.value(0).toInt();
-            if (sourceQuery.exec() && sourceQuery.next())
+            if (sourceQuery.exec())
             {
-                destinationQuery.prepare("INSERT INTO ip_term (id, ip_id, term, weight, occurences, times) "
-                                         "VALUES (:id, :ip_id, :term, :weight, :occurences, :times)");
-                destinationQuery.bindValue(":id", QVariant::fromValue(newid));
-                destinationQuery.bindValue(":ip_id", sourceQuery.value("ip_id"));
-                destinationQuery.bindValue(":term", sourceQuery.value("term"));
-                destinationQuery.bindValue(":weight", sourceQuery.value("weight"));
-                destinationQuery.bindValue(":occurences", sourceQuery.value("occurences"));
-                destinationQuery.bindValue(":times", sourceQuery.value("times"));
-
-                if (!destinationQuery.exec())
+                while (sourceQuery.next())
                 {
-                    throw std::runtime_error("Failed to insert into ip_term");
+                    destinationQuery.prepare("INSERT INTO ip_term (id, ip_id, term, weight, occurences, times) "
+                                             "VALUES (:id, :ip_id, :term, :weight, :occurences, :times)");
+                    destinationQuery.bindValue(":id", QVariant::fromValue(newid));
+                    destinationQuery.bindValue(":ip_id", sourceQuery.value("ip_id"));
+                    destinationQuery.bindValue(":term", sourceQuery.value("term"));
+                    destinationQuery.bindValue(":weight", sourceQuery.value("weight"));
+                    destinationQuery.bindValue(":occurences", sourceQuery.value("occurences"));
+                    destinationQuery.bindValue(":times", sourceQuery.value("times"));
+
+                    if (!destinationQuery.exec())
+                    {
+                        throw std::runtime_error("Failed to insert into ip_term");
+                    }
                 }
             }
             else
             {
                 throw std::runtime_error("Failed to fetch data from ip_term in sourceQuery");
             }
-        }
-        else
-        {
-            throw std::runtime_error("Error getting new ID from sequence:");
-        }
 
-        // 3. Copy data from ip_term_shingles
-        sourceQuery.prepare("SELECT * FROM ip_term_shingles WHERE ip_id = :id");
-        sourceQuery.bindValue(":id", QVariant::fromValue(item->id));
+            // 3. Copy data from ip_term_shingles
+            sourceQuery.prepare("SELECT * FROM ip_term_shingles WHERE ip_id = :id");
+            sourceQuery.bindValue(":id", QVariant::fromValue(item->id));
 
-        destinationQuery.exec("SELECT nextval('ip_portret_id_seq')");
-        if (destinationQuery.first() && destinationQuery.seek(0, false))
-        {
-            if (sourceQuery.exec() && sourceQuery.next())
+            if (sourceQuery.exec())
             {
-                destinationQuery.prepare("INSERT INTO ip_term_shingles (id, ip_id, term, weight, occurences, times, size, shows) "
-                                         "VALUES (:id, :ip_id, :term, :weight, :occurences, :times, :size, :shows)");
-                destinationQuery.bindValue(":id", sourceQuery.value("id"));
-                destinationQuery.bindValue(":ip_id", sourceQuery.value("ip_id"));
-                destinationQuery.bindValue(":term", sourceQuery.value("term"));
-                destinationQuery.bindValue(":weight", sourceQuery.value("weight"));
-                destinationQuery.bindValue(":occurences", sourceQuery.value("occurences"));
-                destinationQuery.bindValue(":times", sourceQuery.value("times"));
-                destinationQuery.bindValue(":size", sourceQuery.value("size"));
-                destinationQuery.bindValue(":shows", sourceQuery.value("shows"));
-
-                if (!destinationQuery.exec())
+                while (sourceQuery.next())
                 {
-                    throw std::runtime_error("Failed to insert into ip_term_shingles");
+                    destinationQuery.prepare("INSERT INTO ip_term_shingles (id, ip_id, term, weight, occurences, times, size, shows) "
+                                             "VALUES (:id, :ip_id, :term, :weight, :occurences, :times, :size, :shows)");
+                    destinationQuery.bindValue(":id", sourceQuery.value("id"));
+                    destinationQuery.bindValue(":ip_id", sourceQuery.value("ip_id"));
+                    destinationQuery.bindValue(":term", sourceQuery.value("term"));
+                    destinationQuery.bindValue(":weight", sourceQuery.value("weight"));
+                    destinationQuery.bindValue(":occurences", sourceQuery.value("occurences"));
+                    destinationQuery.bindValue(":times", sourceQuery.value("times"));
+                    destinationQuery.bindValue(":size", sourceQuery.value("size"));
+                    destinationQuery.bindValue(":shows", sourceQuery.value("shows"));
+
+                    if (!destinationQuery.exec())
+                    {
+                        throw std::runtime_error("Failed to insert into ip_term_shingles");
+                    }
                 }
             }
             else
             {
                 throw std::runtime_error("Failed to fetch data from ip_term_shingles in sourceQuery");
             }
-        }
-        else
-        {
-            throw std::runtime_error("Error getting new ID from sequence");
-        }
 
-        // 4. Copy data to in_doc_collections
-        destinationQuery.prepare("INSERT INTO in_doc_collections (doc_id, coll_id) VALUES (:doc_id, :coll_id)");
-        destinationQuery.bindValue(":doc_id", QVariant::fromValue(item->id));
-        destinationQuery.bindValue(":coll_id", QVariant::fromValue(destination));
+            // 4. Copy data to in_doc_collections
+            destinationQuery.prepare("INSERT INTO in_doc_collections (doc_id, coll_id) VALUES (:doc_id, :coll_id)");
+            destinationQuery.bindValue(":doc_id", QVariant::fromValue(newid));
+            destinationQuery.bindValue(":coll_id", QVariant::fromValue(destination));
 
-        if (!destinationQuery.exec())
-        {
-            throw std::runtime_error("Failed to insert into in_doc_collections");
+            if (!destinationQuery.exec())
+            {
+                throw std::runtime_error("Failed to insert into in_doc_collections");
+            }
+
+            // Commit transactions
+            sourceDB->commit();
+            destinationDB->commit();
         }
-
-        // Commit transactions
-        sourceDB->commit();
-        destinationDB->commit();
     }
     catch (const std::exception &e)
     {
