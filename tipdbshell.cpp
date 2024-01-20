@@ -413,9 +413,8 @@ bool TIPDBShell::CopyItemBetweenDatabases(TIPInfo *item, QSqlDatabase *sourceDB,
                 while (sourceQuery.next())
                 {
                     destinationQuery.prepare("INSERT INTO ip_term (id, ip_id, term, weight, occurences, times) "
-                                             "VALUES (:id, :ip_id, :term, :weight, :occurences, :times)");
-                    destinationQuery.bindValue(":id", QVariant::fromValue(newid));
-                    destinationQuery.bindValue(":ip_id", sourceQuery.value("ip_id"));
+                                             "VALUES (nextval('ipterm_id_seq'), :ip_id, :term, :weight, :occurences, :times)");
+                    destinationQuery.bindValue(":ip_id", QVariant::fromValue(newid));
                     destinationQuery.bindValue(":term", sourceQuery.value("term"));
                     destinationQuery.bindValue(":weight", sourceQuery.value("weight"));
                     destinationQuery.bindValue(":occurences", sourceQuery.value("occurences"));
@@ -441,9 +440,8 @@ bool TIPDBShell::CopyItemBetweenDatabases(TIPInfo *item, QSqlDatabase *sourceDB,
                 while (sourceQuery.next())
                 {
                     destinationQuery.prepare("INSERT INTO ip_term_shingles (id, ip_id, term, weight, occurences, times, size, shows) "
-                                             "VALUES (:id, :ip_id, :term, :weight, :occurences, :times, :size, :shows)");
-                    destinationQuery.bindValue(":id", sourceQuery.value("id"));
-                    destinationQuery.bindValue(":ip_id", sourceQuery.value("ip_id"));
+                                             "VALUES (nextval('ipterm_id_seq'), :ip_id, :term, :weight, :occurences, :times, :size, :shows)");
+                    destinationQuery.bindValue(":ip_id", QVariant::fromValue(newid));
                     destinationQuery.bindValue(":term", sourceQuery.value("term"));
                     destinationQuery.bindValue(":weight", sourceQuery.value("weight"));
                     destinationQuery.bindValue(":occurences", sourceQuery.value("occurences"));
