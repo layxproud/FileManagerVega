@@ -1,21 +1,24 @@
 #include "workspace.h"
 
-Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem):isLeftCurrent(true)
+Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem) :
+    isLeftCurrent{true}
 {
     this->left = left;
     this->right = right;
     this->filesystem = filesystem;
     this->left->setFocus();
     this->left->setCurrentIndex(this->left->currentIndex());
-    connect (left, SIGNAL(updateInfo(bool, bool, QModelIndex)), this, SLOT(updateInfo(bool, bool, QModelIndex)));
-    connect (right, SIGNAL(updateInfo(bool, bool, QModelIndex)), this, SLOT(updateInfo(bool, bool, QModelIndex)));
-    connect(left, SIGNAL(changeFolder(bool, QModelIndex)), this, SLOT(indexToString(bool, QModelIndex)));
-    connect(right, SIGNAL(changeFolder(bool, QModelIndex)), this, SLOT(indexToString(bool, QModelIndex)));
+
+    connect(left, &Panel::updateInfo, this, &Workspace::updateInfo);
+    connect(right, &Panel::updateInfo, this, &Workspace::updateInfo);
+    connect(left, &Panel::changeFolder, this, &Workspace::indexToString);
+    connect(right, &Panel::changeFolder, this, &Workspace::indexToString);
 
 }
+
 void Workspace::choose()
 {
-    if(isLeftCurrent)
+    if (isLeftCurrent)
     {
         left->chooseButton();
     }
@@ -24,10 +27,12 @@ void Workspace::choose()
         right->chooseButton();
     }
 }
+
 bool Workspace:: getIsLeftCurrent()
 {
-    return this->isLeftCurrent;
+    return isLeftCurrent;
 }
+
 void Workspace::remove()
 {
     if (isLeftCurrent)
@@ -92,6 +97,7 @@ void Workspace::remove()
     if (right->getIfDB())
         right->refreshDB();
 }
+
 void Workspace::copy()
 {
     if (isLeftCurrent)
@@ -347,6 +353,7 @@ void Workspace::move()
     if (right->getIfDB())
         right->refreshDB();
 }
+
 void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
 {
     if (filesystem->fileName(index) == "..")
@@ -457,6 +464,7 @@ void Workspace::changeSelectionMode()
         right->changeSelectionMode();
     }
 }
+
 void Workspace::changeCurrentPanel()
 {
     if (isLeftCurrent)
@@ -464,16 +472,17 @@ void Workspace::changeCurrentPanel()
         isLeftCurrent = false;
         right->setFocus();
         if (!right->currentIndex().isValid())
-            right->setCurrentIndex(right->rootIndex().child(0,0));
+             right->setCurrentIndex(right->model()->index(0, 0, right->rootIndex()));
     }
     else
     {
         isLeftCurrent = true;
         left->setFocus();
         if (!left->currentIndex().isValid())
-            left->setCurrentIndex(left->rootIndex().child(0,0));
+             left->setCurrentIndex(left->model()->index(0, 0, left->rootIndex()));
     }
 }
+
 void Workspace::createDir()
 {
     if (isLeftCurrent && !left->getIfDB())
@@ -522,13 +531,14 @@ void Workspace::createDir()
     if (right->getIfDB())
         right->refreshDB();
 }
+
 void Workspace::changeDir()
 {
     if(isLeftCurrent)
     {
         left->changeDirectory(left->currentIndex());
         left->setFocus();
-        left->setCurrentIndex(left->rootIndex().child(0,0));
+        left->setCurrentIndex(left->model()->index(0, 0, left->rootIndex()));
     }
     else
     {

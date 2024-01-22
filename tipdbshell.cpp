@@ -1025,7 +1025,7 @@ bool TIPDBShell::saveToFile(TIPFullInfo *full, QString filename)
     root->SetAttribute("abbreviations", full->abbreviations.toStdString().c_str());
     root->SetAttribute("shingles", (int)full->shingle_count);
 
-    for(int i=0; i<full->terms.size(); i++)
+    for(size_t i = 0; i < full->terms.size(); i++)
     {
         tinyxml2::XMLElement *element = doc.NewElement("term");
         element->SetAttribute("id", (int)full->terms[i]->id);
@@ -1036,7 +1036,7 @@ bool TIPDBShell::saveToFile(TIPFullInfo *full, QString filename)
         root->InsertEndChild(element);
     }
 
-    for(int i=0; i<full->shingles.size(); i++)
+    for(size_t i = 0; i < full->shingles.size(); i++)
     {
         tinyxml2::XMLElement *element = doc.NewElement("shingle");
         element->SetAttribute("id", (int)full->shingles[i]->id);
@@ -1116,13 +1116,19 @@ TIPInfo *TIPDBShell::CopyFileToDB(QString filename, folderid destination)
 
         bool res = loadFromFile(filename, info, full);
         if (!res)
+        {
+            delete full;
             return nullptr;
+        }
 
         full->id = 0; // сохранять будем под новым ID
         res = saveToDB(full);
     }
     else
+    {
+        delete info;
         return nullptr;
+    }
 
     // добавление ip в папку
     bool res = dbq.exec(QString("insert into in_doc_collections (doc_id, coll_id) values (%1, %2)").arg(full->id).arg(destination));

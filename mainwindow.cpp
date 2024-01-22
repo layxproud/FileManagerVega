@@ -21,6 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem);
     workspace->updateFolder(true, QDir::drives().at(0).path());
     workspace->updateFolder(false, QDir::drives().at(0).path());
+
+    initShortcuts();
+    initButtons();
 }
 
 MainWindow::~MainWindow()
@@ -93,6 +96,7 @@ void MainWindow::initButtons()
 
     ui->deleteButton->setShortcut(Qt::Key_F8);
     connect(ui->deleteButton, &QPushButton::clicked, workspace, &Workspace::remove);
+    // TODO: DELETING FILES CRASHES PROGRAM
 
     ui->sortButton->setShortcut(Qt::Key_F12);
     // TODO: IMPLEMENT SORT BUTTON

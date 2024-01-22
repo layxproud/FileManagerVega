@@ -3,12 +3,8 @@
 
 #include <QMainWindow>
 #include "workspace.h"
-#include "panel.h"
 #include "filesystem.h"
 #include "inifile.h"
-#include <QSettings>
-#include "tipdbshell.h"
-#include <QHeaderView>
 
 namespace Ui {
 class MainWindow;
@@ -34,7 +30,6 @@ private:
     QShortcut *enter;
     QShortcut *up;
     QShortcut *down;
-    QSettings *settings;
 
 private:
     void initDrivesComboBoxes();

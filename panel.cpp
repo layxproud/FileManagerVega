@@ -283,61 +283,69 @@ void Panel::ChangeFolderDB(folderid folder)
     folders.clear();
     chosenItems.clear();
     chosenFolders.clear();
+
     functions_of_current_BD->GetFolderContents(folder, items, folders);
     functions_of_current_BD->ChangeFolder(folder);
     int allCount = items.size() + folders.size();
     DBmodel->removeRows(0, DBmodel->rowCount());
     this->update();
-
-    //ui->labelRightPath->setText(right_BD_path);
-
-    //count_of_right_elements_DB = Current_Right_Folders.size() + Current_Right_Items.size();
     DBmodel->insertRows(0, allCount);
-//    for (int i = 0; i < 10; i++)
-//    {
-//        items.push_back(new TIPInfo);
-//        //folders.push_back(new TIPInfo);
-//    }
     QStringList Coloumns_value;
-    for (unsigned int i = 0; i < allCount; i++) {
-        if (i < folders.size()) {
-            Coloumns_value << folders[i]->second << " " << QString::number(folders[i]->first) << " " << " " << " " << " " << " ";
+
+    for (unsigned int i = 0; i < allCount; i++)
+    {
+        if (i < folders.size())
+        {
+            Coloumns_value << folders[i]->second << " "
+                           << QString::number(folders[i]->first)
+                           << " " << " " << " " << " " << " ";
         }
         else
         {
             countFiles++;
             Coloumns_value << items[i % items.size()]->name << QString::number(items[i % items.size()]->sizeInTerms) << QString::number(items[i % items.size()]->id)  << items[i % items.size()]->ownerName << items[i % items.size()]->creationTime.toString();
 
-                  if (items[i % items.size()]->compData1 == 0) {
-                      Coloumns_value << " ";
-                  }
-                  else {
-                      Coloumns_value << QString::number(items[i % items.size()]->compData1);
-                  }
+            if (items[i % items.size()]->compData1 == 0)
+            {
+                Coloumns_value << " ";
+            }
+            else
+            {
+                Coloumns_value << QString::number(items[i % items.size()]->compData1);
+            }
 
-                  if (items[i % items.size()]->compData2 == 0) {
-                      Coloumns_value << " ";
-                  }
-                  else {
-                      Coloumns_value << QString::number(items[i % items.size()]->compData2);
-                  }
+            if (items[i % items.size()]->compData2 == 0)
+            {
+                Coloumns_value << " ";
+            }
+            else
+            {
+                Coloumns_value << QString::number(items[i % items.size()]->compData2);
+            }
 
-                  if (items[i% items.size()]->compData3 == 0) {
-                      Coloumns_value << " ";
-                  }
-                  else {
-                      Coloumns_value << QString::number(items[i % items.size()]->compData3);
-                  }
-          }
+            if (items[i% items.size()]->compData3 == 0)
+            {
+                Coloumns_value << " ";
+            }
+            else
+            {
+                Coloumns_value << QString::number(items[i % items.size()]->compData3);
+            }
+        }
+
         int j = 0;
-        foreach (QString it, Coloumns_value) {
+        foreach (QString it, Coloumns_value)
+        {
             QStandardItem *item = new QStandardItem(it);
             DBmodel->setItem(i, j, item);
-            if(j == 3) {
-                if(DBmodel->item(i, 3)->text() == " ") {
+            if (j == 3)
+            {
+                if (DBmodel->item(i, 3)->text() == " ")
+                {
                     DBmodel->item(i, 0)->setIcon(QIcon("resources/folder.png"));
                 }
-                else {
+                else
+                {
                     DBmodel->item(i, 0)->setIcon(QIcon("resources/dbf.png"));
                 }
             }
@@ -354,7 +362,7 @@ void Panel::ChangeFolderDB(folderid folder)
 
     this->setModel(DBmodel);
     this->currentDirSize = 0;
-    for (int i = 0; i < items.size(); i++)
+    for (size_t i = 0; i < items.size(); i++)
     {
         this->currentDirSize += items[i]->sizeInBytes / 1024;
     }
@@ -444,23 +452,23 @@ QString Panel::cdUp(QString path)
 
 TIPInfo* Panel::findItem(folderid item)
 {
-    for (int i = 0; i < items.size(); i++)
+    for (size_t i = 0; i < items.size(); i++)
     {
         if (items[i]->id == item)
             return items[i];
     }
-    cout << "ERROR" << endl;
+    qDebug() << "ERROR";
     return nullptr;
 }
 
 folderinfo* Panel::findFolder(folderid folder)
 {
-    for (int i = 0; i < folders.size(); i++)
+    for (size_t i = 0; i < folders.size(); i++)
     {
         if (folders[i]->first == folder)
             return folders[i];
     }
-    cout << "ERROR" << endl;
+    qDebug() << "ERROR";
     return nullptr;
 }
 
@@ -544,38 +552,52 @@ void Panel::arrowUp()
 {
     if (!currentIndex().isValid())
     {
-        setCurrentIndex(rootIndex().child(0,0));
+        setCurrentIndex(model()->index(0, 0, rootIndex()));
     }
+
     if (selectionMode() == QAbstractItemView::SingleSelection)
     {
         selectionModel()->clearSelection();
         clearInfo();
         InfoToString();
         setSelectionMode(QAbstractItemView::NoSelection);
-        if ((currentIndex().row()- 1) >= 0)
-            setCurrentIndex(rootIndex().child(currentIndex().row()- 1,0));
+
+        if ((currentIndex().row() - 1) >= 0)
+        {
+            setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
+        }
         else
-            setCurrentIndex(rootIndex().child(model()->rowCount(currentIndex().parent()) - 1,0));
+        {
+            int lastRow = model()->rowCount(currentIndex().parent()) - 1;
+            setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
+        }
     }
     else if (selectionMode() == QAbstractItemView::NoSelection)
     {
         selectionModel()->clearSelection();
         getList().clear();
-        if ((currentIndex().row()- 1) >= 0)
-            setCurrentIndex(rootIndex().child(currentIndex().row()- 1,0));
+
+        if ((currentIndex().row() - 1) >= 0)
+        {
+            setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
+        }
         else
-            setCurrentIndex(rootIndex().child(model()->rowCount(currentIndex().parent()) - 1,0));
+        {
+            int lastRow = model()->rowCount(currentIndex().parent()) - 1;
+            setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
+        }
     }
     else if (selectionMode() == QAbstractItemView::MultiSelection)
     {
-        if(currentIndex().row() - 1 >= 0)
+        if (currentIndex().row() - 1 >= 0)
         {
-            setCurrentIndex(rootIndex().child(currentIndex().row()- 1,0));
+            setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
             setCurrentIndex(currentIndex());
         }
         else
         {
-            setCurrentIndex(rootIndex().child(model()->rowCount(currentIndex().parent()) - 1,0));
+            int lastRow = model()->rowCount(currentIndex().parent()) - 1;
+            setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
             setCurrentIndex(currentIndex());
         }
     }
@@ -585,42 +607,47 @@ void Panel::arrowDown()
 {
     if (!currentIndex().isValid())
     {
-        setCurrentIndex(rootIndex().child(0,0));
+        setCurrentIndex(model()->index(0, 0, rootIndex()));
     }
+
     if (selectionMode() == QAbstractItemView::SingleSelection)
     {
         selectionModel()->clearSelection();
         clearInfo();
         InfoToString();
         setSelectionMode(QAbstractItemView::NoSelection);
+
         if ((currentIndex().row() + 1) < model()->rowCount(currentIndex().parent()))
-            setCurrentIndex(rootIndex().child(currentIndex().row()+ 1,0));
+            setCurrentIndex(model()->index(currentIndex().row() + 1, 0, currentIndex().parent()));
         else
-            setCurrentIndex(rootIndex().child(0,0));
+            setCurrentIndex(model()->index(0, 0, currentIndex().parent()));
     }
     else if (selectionMode() == QAbstractItemView::NoSelection)
     {
         selectionModel()->clearSelection();
         getList().clear();
+
         if ((currentIndex().row() + 1) < model()->rowCount(currentIndex().parent()))
-            setCurrentIndex(rootIndex().child(currentIndex().row()+ 1,0));
+            setCurrentIndex(model()->index(currentIndex().row() + 1, 0, currentIndex().parent()));
         else
-            setCurrentIndex(rootIndex().child(0,0));
+            setCurrentIndex(model()->index(0, 0, currentIndex().parent()));
     }
     else if (selectionMode() == QAbstractItemView::MultiSelection)
     {
         if ((currentIndex().row() + 1) < model()->rowCount(currentIndex().parent()))
         {
-            setCurrentIndex(rootIndex().child(currentIndex().row()+ 1,0));
+            setCurrentIndex(model()->index(currentIndex().row() + 1, 0, currentIndex().parent()));
             setCurrentIndex(currentIndex());
         }
         else
         {
-            setCurrentIndex(rootIndex().child(0,0));
+            setCurrentIndex(model()->index(0, 0, currentIndex().parent()));
             setCurrentIndex(currentIndex());
         }
     }
 }
+
+
 void Panel::refreshDB()
 {
     this->ChangeFolderDB(current_folder_id);
