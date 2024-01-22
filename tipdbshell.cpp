@@ -118,7 +118,7 @@ QSqlDatabase *TIPDBShell::getDataBase()
 
 folderid TIPDBShell::getFolderIdByName(QString newFolder)
 {
-    QStringList sl = newFolder.split('/', QString::SkipEmptyParts);
+    QStringList sl = newFolder.split('/', Qt::SkipEmptyParts);
 
     folderid cur = 1;
     int i = 0;
