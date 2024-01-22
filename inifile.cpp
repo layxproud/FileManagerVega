@@ -14,17 +14,17 @@
 #include <cstdlib>
 
 #ifndef _WIN32
-    #include <unistd.h>
+#include <unistd.h>
 #else
-    #include <io.h>
+#include <io.h>
 #endif
 
 // QNX и MSVS 2008 - не поддерживают семантику переноса (C++11)
 // MSVS 2010 поддерживает по-умолчанию, Linux - если включить флаг
 #if defined(__QNX__) || (defined(_MSC_VER) && _MSC_VER < 1600)
-    #define move(a) a
+#define move(a) a
 #elif defined(__linux__) && (__cplusplus < 201103L)
-    #error add QMAKE_CXXFLAGS += -std=c++11 to project file
+#error add QMAKE_CXXFLAGS += -std=c++11 to project file
 #endif
 
 using namespace std;
@@ -746,8 +746,8 @@ uint64_t TIniFile::ReadBitSet(string section, string key, uint64_t defval)
 
     for (int i = 0; i < 8; ++i)
     {
-       bitset<8> part(bits.substr(i * 8, 8));
-       tmp[7 - i] = part.to_ulong();
+        bitset<8> part(bits.substr(i * 8, 8));
+        tmp[7 - i] = part.to_ulong();
     }
     return res;
 #else
