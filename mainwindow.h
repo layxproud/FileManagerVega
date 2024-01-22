@@ -8,7 +8,6 @@
 #include "inifile.h"
 #include <QSettings>
 #include "tipdbshell.h"
-#include "vector"
 #include <QHeaderView>
 
 namespace Ui {
@@ -23,21 +22,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
-
-    void on_leftBox_activated(const QString &arg1);
-
-    void on_rightBox_activated(const QString &arg1);
-
-    void on_exitButton_clicked();
-
 private:
     Ui::MainWindow *ui;
     Workspace *workspace;
-    int leftCountChosenFiles, leftCountChosenFolders;
-    int rightCountChosenFiles, rightCountChosenFolders;
-    int long long leftSize, rightSize;
-    FileSystem *filesystem;
+    FileSystem *fileSystem;
+    TIniFile *iniFile;
+
     QShortcut *tab;
     QShortcut *backspace;
     QShortcut *insert;
@@ -45,7 +35,16 @@ private:
     QShortcut *up;
     QShortcut *down;
     QSettings *settings;
-    TIniFile *inifile;
+
+private:
+    void initDrivesComboBoxes();
+    void initShortcuts();
+    void initButtons();
+
+    void setPathLabels(QLabel *label, const QString& arg, bool isDriveDatabase);
+
+private slots:
+    void onDriveChanged(const QString &arg);
 };
 
 #endif // MAINWINDOW_H

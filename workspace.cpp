@@ -32,7 +32,7 @@ void Workspace::remove()
 {
     if (isLeftCurrent)
     {
-        if (!left->getIfBD())
+        if (!left->getIfDB())
         {
             for(auto i = left->getList().begin(); i != left->getList().end(); i++)
             {
@@ -57,7 +57,7 @@ void Workspace::remove()
     }
     else
     {
-        if (!right->getIfBD())
+        if (!right->getIfDB())
         {
             for(auto i = right->getList().begin(); i != right->getList().end(); i++)
             {
@@ -87,18 +87,18 @@ void Workspace::remove()
     right->setSelectionMode(QAbstractItemView::NoSelection);
     left->update();
     right->update();
-    if (left->getIfBD())
+    if (left->getIfDB())
         left->refreshDB();
-    if (right->getIfBD())
+    if (right->getIfDB())
         right->refreshDB();
 }
 void Workspace::copy()
 {
     if (isLeftCurrent)
     {
-        if (!left->getIfBD())
+        if (!left->getIfDB())
         {
-            if(right->getIfBD())
+            if(right->getIfDB())
             {
                 QModelIndexList il = left->getList();
                 for(auto i = il.begin(); i != il.end(); i++)
@@ -117,7 +117,7 @@ void Workspace::copy()
         }
         else
         {
-            if (right->getIfBD())
+            if (right->getIfDB())
             {
                 if (left->getFunctionsDB()->getDataBase()->databaseName() != right->getFunctionsDB()->getDataBase()->databaseName())
                 {
@@ -164,10 +164,10 @@ void Workspace::copy()
     }
     else
     {
-        if (!right->getIfBD())
+        if (!right->getIfDB())
         {
 
-            if(left->getIfBD())
+            if(left->getIfDB())
             {
                 QModelIndexList il = right->getList();
                 for(auto i = il.begin(); i != il.end(); i++)
@@ -186,7 +186,7 @@ void Workspace::copy()
         }
         else
         {
-            if (left->getIfBD())
+            if (left->getIfDB())
             {
                 for (auto i = right->getChosenItems().begin(); i != right->getChosenItems().end(); i++)
                 {
@@ -216,19 +216,19 @@ void Workspace::copy()
     }
     left->update();
     right->update();
-    if (left->getIfBD())
+    if (left->getIfDB())
         left->refreshDB();
-    if (right->getIfBD())
+    if (right->getIfDB())
         right->refreshDB();
 }
 void Workspace::move()
 {
     if (isLeftCurrent)
     {
-        if (!left->getIfBD())
+        if (!left->getIfDB())
         {
 
-            if(right->getIfBD())
+            if(right->getIfDB())
             {
                 for(auto i = left->getList().begin(); i != left->getList().end(); i++)
                 {
@@ -248,7 +248,7 @@ void Workspace::move()
         }
         else
         {
-            if (right->getIfBD())
+            if (right->getIfDB())
             {
                 for (auto i = left->getChosenItems().begin(); i != left->getChosenItems().end(); i++)
                 {
@@ -282,10 +282,10 @@ void Workspace::move()
     }
     else
     {
-        if (!right->getIfBD())
+        if (!right->getIfDB())
         {
 
-            if(left->getIfBD())
+            if(left->getIfDB())
             {
                 for(auto i = right->getList().begin(); i != right->getList().end(); i++)
                 {
@@ -304,7 +304,7 @@ void Workspace::move()
         }
         else
         {
-            if (left->getIfBD())
+            if (left->getIfDB())
             {
                 for (auto i = right->getChosenItems().begin(); i != right->getChosenItems().end(); i++)
                 {
@@ -342,9 +342,9 @@ void Workspace::move()
     right->changeDirectory(right->rootIndex());
     left->update();
     right->update();
-    if (left->getIfBD())
+    if (left->getIfDB())
         left->refreshDB();
-    if (right->getIfBD())
+    if (right->getIfDB())
         right->refreshDB();
 }
 void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
@@ -354,7 +354,7 @@ void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
     if (isLeft)
     {
         isLeftCurrent = true;
-        if (!left->getIfBD())
+        if (!left->getIfDB())
         {
         if (filesystem->isDir(index))
         {
@@ -376,7 +376,7 @@ void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
     else
     {
         isLeftCurrent = false;
-        if (!right->getIfBD())
+        if (!right->getIfDB())
         {
         if (filesystem->isDir(index))
         {
@@ -398,11 +398,11 @@ void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
 }
 void Workspace::indexToString(bool isLeft, QModelIndex index)
 {
-    if (isLeft && left->getIfBD())
+    if (isLeft && left->getIfDB())
     {
         return;
     }
-    else if (!isLeft && right->getIfBD())
+    else if (!isLeft && right->getIfDB())
     {
         return;
     }
@@ -476,17 +476,17 @@ void Workspace::changeCurrentPanel()
 }
 void Workspace::createDir()
 {
-    if (isLeftCurrent && !left->getIfBD())
+    if (isLeftCurrent && !left->getIfDB())
     {
         QString newCatalog = QInputDialog::getText(0, "New catalog", "Edit new catalog name: ", QLineEdit::Normal, "");
         filesystem->mkdir(left->rootIndex(), newCatalog);
     }
-    else if (!isLeftCurrent && !right->getIfBD())
+    else if (!isLeftCurrent && !right->getIfDB())
     {
         QString newCatalog = QInputDialog::getText(0, "New catalog", "Edit new catalog name: ", QLineEdit::Normal, "");
         filesystem->mkdir(right->rootIndex(), newCatalog);
     }
-    else if (isLeftCurrent && left->getIfBD())
+    else if (isLeftCurrent && left->getIfDB())
     {
         QString newCatalog = QInputDialog::getText(0, "New catalog", "Edit new catalog name: ", QLineEdit::Normal, "");
         int new_id = left->getFunctionsDB()->NewFolder(newCatalog);
@@ -500,7 +500,7 @@ void Workspace::createDir()
         fold->second = newCatalog;
         left->getFolders()->push_back(fold);
     }
-     else if (!isLeftCurrent && right->getIfBD())
+    else if (!isLeftCurrent && right->getIfDB())
     {
         QString newCatalog = QInputDialog::getText(0, "New catalog", "Edit new catalog name: ", QLineEdit::Normal, "");
         int new_id = right->getFunctionsDB()->NewFolder(newCatalog);
@@ -517,9 +517,9 @@ void Workspace::createDir()
 
     left->update();
     right->update();
-    if (left->getIfBD())
+    if (left->getIfDB())
         left->refreshDB();
-    if (right->getIfBD())
+    if (right->getIfDB())
         right->refreshDB();
 }
 void Workspace::changeDir()

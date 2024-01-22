@@ -1,7 +1,7 @@
 #include "panel.h"
 
-Panel::Panel(QWidget *parent)
-    : QTreeView(parent),
+Panel::Panel(QWidget *parent) :
+    QTreeView(parent),
     info(""),
     countChosenFolders(0),
     countChosenFiles(0),
@@ -11,10 +11,6 @@ Panel::Panel(QWidget *parent)
     currentDirSize(0),
     current_folder_id(0)
 {
-    this->setItemsExpandable(false);
-    this->setRootIsDecorated(false);
-    this->setAllColumnsShowFocus(true);
-    this->setSelectionMode(QAbstractItemView::NoSelection);
     DBmodel = new QStandardItemModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
@@ -26,6 +22,53 @@ Panel::Panel(QWidget *parent)
         i++;
     }
     functions_of_current_BD = new TIPDBShell;
+}
+
+void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool ifDB)
+{
+    setFileSystem(fileSystem);
+    this->ifDB = ifDB;
+    this->isLeft = isLeft;
+
+    setItemsExpandable(false);
+    setRootIsDecorated(false);
+    setAllColumnsShowFocus(true);
+    setSelectionMode(QAbstractItemView::NoSelection);
+
+    connect(this, &QTreeView::clicked, this, &Panel::choose);
+    connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
+}
+
+void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
+{
+    if (isDriveDatabase)
+    {
+        getFunctionsDB()->Init(arg);
+        setPath("/");
+        setIfDB(true);
+        ChangeFolderDB(1);
+        header()->setSectionResizeMode(0, QHeaderView::Stretch);
+        header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+        setColumnWidth(3, 90);
+        setColumnWidth(4, 220);
+        header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+    }
+    else
+    {
+        setIfDB(false);
+        setFileSystem(fileSystem);
+        setRootIndex(fileSystem->index(arg));
+        update();
+        header()->setSectionResizeMode(0, QHeaderView::Stretch);
+        header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(3, QHeaderView::Custom);
+    }
+
+    clearPanel();
 }
 
 QString Panel::getPath()
@@ -51,7 +94,7 @@ void Panel::chooseButton()
     this->choose(this->currentIndex());
 }
 
-void Panel::choose(QModelIndex index)
+void Panel::choose(const QModelIndex &index)
 {
     if (!index.isValid())
         return;
@@ -114,7 +157,7 @@ void Panel::choose(QModelIndex index)
     info.clear();
 }
 
-void Panel:: changeDirectory(QModelIndex index)
+void Panel::changeDirectory(const QModelIndex &index)
 {
     if (!index.isValid())
         return;
@@ -150,15 +193,15 @@ void Panel:: changeDirectory(QModelIndex index)
     }
     else
     {
-        if (this->filesystem->fileInfo(index).fileName() == "..")
+        if (this->fileSystem->fileInfo(index).fileName() == "..")
         {
-            this->setRootIndex(filesystem->index(filesystem->filePath(index)));
+             this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
             this->changeFolder(isLeft, index);
         }
         else
         {
             this->setRootIndex(index);
-            this->setPath(filesystem->filePath(index));
+            this->setPath(fileSystem->filePath(index));
             this->changeFolder(isLeft, index);
         }
     }
@@ -322,16 +365,16 @@ void Panel::ChangeFolderDB(folderid folder)
 void Panel::setFileSystem(FileSystem * filesystem)
 {
     this->setModel(filesystem);
-    this->filesystem = filesystem;
+    this->fileSystem = filesystem;
     this->update();
 }
 
-bool Panel::getIfBD()
+bool Panel::getIfDB()
 {
     return ifDB;
 }
 
-void Panel::setIfBD(bool ifDB)
+void Panel::setIfDB(bool ifDB)
 {
     this->ifDB = ifDB;
 }
@@ -478,7 +521,7 @@ std::list <folderinfo*> &Panel::getChosenFolders()
 
 FileSystem* Panel::getFilesystem()
 {
-    return this->filesystem;
+    return this->fileSystem;
 }
 
 void Panel::InfoToString()

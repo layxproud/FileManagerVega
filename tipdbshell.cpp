@@ -349,7 +349,6 @@ bool TIPDBShell::CopyItemWithinDatabase(TIPInfo *item, folderid source, folderid
 
 bool TIPDBShell::CopyItemBetweenDatabases(TIPInfo *item, QSqlDatabase *sourceDB, QSqlDatabase *destinationDB, folderid destination)
 {
-    qDebug() << "DESTINATION" << destination;
     if (!item || !item->id || !destination)
         return false;
 
@@ -470,7 +469,7 @@ bool TIPDBShell::CopyItemBetweenDatabases(TIPInfo *item, QSqlDatabase *sourceDB,
                 throw std::runtime_error("Failed to insert into in_doc_collections");
             }
 
-            // Commit transactions
+            // 5. Commit transactions
             sourceDB->commit();
             destinationDB->commit();
         }
@@ -1195,7 +1194,7 @@ TIPFullInfo::TIPFullInfo(IPPortrait *ip)
     creator_id = ip->ulCreatorId;
     comment = ip->sComment;
     QStringList sl;
-    for(int i=0; i<ip->vObjectIds.size(); i++)
+    for(size_t i=0; i < ip->vObjectIds.size(); i++)
         sl.append(QString("%1").arg(ip->vObjectIds[i]));
     ids_list = sl.join(",");
     date_add = ip->dtCreateTime;

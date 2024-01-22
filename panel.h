@@ -12,10 +12,18 @@
 #include "tipdbshell.h"
 #include <filesystem.h>
 #include <iostream>
+#include <QHeaderView>
 
 class Panel : public QTreeView
 {
     Q_OBJECT
+
+public:
+    Panel(QWidget *parent);
+
+    void initPanel(FileSystem *fileSystem, bool isLeft, bool ifDB);
+    void populatePanel(const QString &arg, bool isDriveDatabase);
+
 private:
     QString path; // путь, который отображает панель
     bool ifDB;
@@ -26,7 +34,7 @@ private:
     long long int size; // размер выбранных файлов. Тоже нужно для информации под панелью
     bool isLeft;
     long long int currentDirSize;
-    FileSystem *filesystem;
+    FileSystem *fileSystem;
     QStandardItemModel *DBmodel;
     std::vector <TIPInfo*> items;
     std::vector <folderinfo*> folders;
@@ -36,21 +44,23 @@ private:
     TIPDBShell *functions_of_current_BD;
     folderid current_folder_id;
     std::list<folderid> pathID;
+
 signals:
     void updateInfo(bool isLeft, bool ifPlus, QModelIndex index);
-    void showInfo(QString);
-    void showPath(QString);
+    void showInfo(const QString &);
+    void showPath(const QString &);
     void changeFolder(bool isLeft, QModelIndex index);
     void createDir(bool, QString);
-public:
-    Panel(QWidget *parent); // Конструктор
+
 public slots:
     QString getPath(); // получаем путь
     QString getInfo(); // получаем информацию под панелью
     QModelIndexList getList(); // получаем список выбранных индексов
+    FileSystem* getFilesystem();
+
     void chooseButton ();
-    void choose(QModelIndex index); // в этом методе определяем выбран
-    void changeDirectory(QModelIndex index); // меняем директорию на панели
+    void choose(const QModelIndex &index); // в этом методе определяем выбран
+    void changeDirectory(const QModelIndex &index); // меняем директорию на панели
     void changeSelectionMode(); //меняем режим выбора на панели(один элемент или несколько)
     void changeCountChosenFiles(bool isPlus);
     void changeCountChosenFolders(bool isPlus);
@@ -60,8 +70,8 @@ public slots:
     void setPath(QString path);
     void setFileSystem(FileSystem *filesystem);
     void ChangeFolderDB(folderid folder);
-    bool getIfBD();
-    void setIfBD(bool ifDB);
+    bool getIfDB();
+    void setIfDB(bool ifDB);
     TIPDBShell* getFunctionsDB();
     std::vector<TIPInfo*>* getItems();
     std::vector<folderinfo*>* getFolders();
@@ -76,7 +86,7 @@ public slots:
     void RemoveDB(QModelIndex index);
     std::list <TIPInfo*> &getChosenItems();
     std::list <folderinfo*> &getChosenFolders();
-    FileSystem* getFilesystem();
+
     void InfoToString();
     void clearInfo();
     void arrowUp();

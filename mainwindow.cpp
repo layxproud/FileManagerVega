@@ -2,223 +2,134 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow{parent},
+    ui{new Ui::MainWindow},
+    fileSystem{new FileSystem(this)},
+    iniFile{new TIniFile("db.ini")}
 {
-    int leftCountChosenFiles = 0, leftCountChosenFolders = 0;
-    int rightCountChosenFiles = 0, rightCountChosenFolders = 0;
-    int long long leftSize = 0, rightSize = 0;
-
     ui->setupUi(this);
-    filesystem = new FileSystem(this);
-    filesystem->setFilter(QDir::NoDot | QDir::AllEntries | QDir::System);
-    filesystem->setRootPath("");
-    filesystem->setReadOnly(false);
-    QFileInfoList drives = QDir::drives();
-    QFileInfo firstDrive = drives[0];
-    ui->leftPanel->setIfBD(false);
-    ui->rightPanel->setIfBD(false);
-    std::vector<string> DBnamespace;
-    inifile = new TIniFile("db.ini");
-    foreach (QFileInfo drive, drives)
-    {
-            ui->leftBox->addItem(drive.filePath());
-            ui->rightBox->addItem(drive.filePath());
-    }
 
-    ui->labelLeftPath->setText("  " + firstDrive.path());
-    ui->labelRightPath->setText("  " + firstDrive.path());
+    ui->leftPanel->initPanel(fileSystem, true, false);
+    ui->rightPanel->initPanel(fileSystem, false, false);
+    connect(ui->leftPanel, &Panel::showInfo, ui->leftInfo, &QLabel::setText);
+    connect(ui->rightPanel, &Panel::showInfo, ui->rightInfo, &QLabel::setText);
+    connect(ui->leftPanel, &Panel::showPath, ui->labelLeftPath, &QLabel::setText);
+    connect(ui->rightPanel, &Panel::showPath, ui->labelRightPath, &QLabel::setText);
 
-    ui->leftPanel->setModel(filesystem);
-    ui->leftPanel->setRootIndex(filesystem->index(firstDrive.absoluteFilePath()));
-    ui->rightPanel->setModel(filesystem);
-    ui->rightPanel->setRootIndex(filesystem->index(firstDrive.absoluteFilePath()));
+    initDrivesComboBoxes();
 
-    ui->leftPanel->setIsleft(true);
-    ui->rightPanel->setIsleft(false);
-
-    ui->leftPanel->setFileSystem(filesystem);
-    ui->rightPanel->setFileSystem(filesystem);
-
-    ui->leftPanel->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->rightPanel->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-/*
-    ui->leftPanel->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->rightPanel->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->leftPanel->header()->setResizeMode(2, QHeaderView::ResizeToContents);
-    ui->rightPanel->header()->setResizeMode(2, QHeaderView::ResizeToContents);
-    ui->leftPanel->header()->setResizeMode(3, QHeaderView::Custom);
-    ui->rightPanel->header()->setResizeMode(3, QHeaderView::Custom);
-*/
-    ui->leftPanel->header()->resize(1, QHeaderView::ResizeToContents);
-    ui->rightPanel->header()->resize(1, QHeaderView::ResizeToContents);
-    ui->leftPanel->header()->resize(2, 100);
-    ui->rightPanel->header()->resize(2, 100);
-    ui->leftPanel->header()->resize(3, 100);
-    ui->rightPanel->header()->resize(3, 100);
-
-    workspace = new Workspace(ui->leftPanel, ui->rightPanel, filesystem);
-
-    for (int i = 0; i < inifile->GetSectionCount(); ++i)
-    {
-        ui->leftBox->addItem(QString::fromStdString(inifile->GetSections()[i]));
-        ui->rightBox->addItem(QString::fromStdString(inifile->GetSections()[i]));
-    }
-    tab = new QShortcut(this);
-    tab->setKey(Qt::Key_Tab);
-    backspace = new QShortcut(this);
-    backspace->setKey(Qt::Key_Backspace);
-    insert = new QShortcut(this);
-    insert->setKey(Qt::Key_Insert);
-    enter = new QShortcut(this);
-    enter->setKey(Qt::Key_Return);
-    up = new QShortcut(this);
-    up->setKey(Qt::Key_Up);
-    down = new QShortcut(this);
-    down->setKey(Qt::Key_Down);
-
-    connect(ui->viewButton, SIGNAL(clicked(bool)), workspace, SLOT(changeDir()));
-    connect(ui->deleteButton, SIGNAL(clicked(bool)), workspace, SLOT(remove()));
-    connect(ui->copyButton, SIGNAL(clicked(bool)), workspace, SLOT(copy()));
-    connect(ui->moveButton, SIGNAL(clicked(bool)), workspace, SLOT(move()));
-    connect(ui->createButton, SIGNAL(clicked(bool)), workspace, SLOT(createDir()));
-
-    connect(ui->leftPanel, SIGNAL(clicked(QModelIndex)), ui->leftPanel, SLOT(choose(QModelIndex)));
-    connect(ui->rightPanel, SIGNAL(clicked(QModelIndex)), ui->rightPanel, SLOT(choose(QModelIndex)));
-    connect(ui->leftPanel, SIGNAL(doubleClicked(QModelIndex)), ui->leftPanel, SLOT(changeDirectory(QModelIndex)));
-    connect(ui->rightPanel, SIGNAL(doubleClicked(QModelIndex)), ui->rightPanel, SLOT(changeDirectory(QModelIndex)));
-
-    connect(ui->leftPanel, SIGNAL(showInfo(QString)), ui->leftInfo, SLOT(setText(QString)));
-    connect(ui->rightPanel, SIGNAL(showInfo(QString)), ui->rightInfo, SLOT(setText(QString)));
-    connect(ui->leftPanel, SIGNAL(showPath(QString)), ui->labelLeftPath, SLOT(setText(QString)));
-    connect(ui->rightPanel, SIGNAL(showPath(QString)), ui->labelRightPath, SLOT(setText(QString)));
-
-    connect(insert, SIGNAL(activated()), workspace, SLOT(choose()));
-    connect(backspace, SIGNAL(activated()), workspace, SLOT(changeSelectionMode()));
-    connect(tab, SIGNAL(activated()), workspace, SLOT(changeCurrentPanel()));
-
-    connect(enter, SIGNAL(activated()), workspace, SLOT(changeDir()));
-
-    connect(down, SIGNAL(activated()), ui->leftPanel, SLOT(arrowDown()));
-    connect(down, SIGNAL(activated()), ui->rightPanel, SLOT(arrowDown()));
-    connect(up, SIGNAL(activated()), ui->leftPanel, SLOT(arrowUp()));
-    connect(up, SIGNAL(activated()), ui->rightPanel, SLOT(arrowUp()));
-
-
-    ui->copyButton->setShortcut(Qt::Key_F5);
-    ui->createButton->setShortcut(Qt::Key_F7);
-    ui->moveButton->setShortcut(Qt::Key_F6);
-    ui->deleteButton->setShortcut(Qt::Key_F8);
-    ui->sortButton->setShortcut(Qt::Key_F12);
-
-
-    workspace->updateFolder(true, firstDrive.path());
-    workspace->updateFolder(false, firstDrive.path());
-
-    ui->leftPanel->setItemsExpandable(false);
-    ui->leftPanel->setRootIsDecorated(false);
-    ui->leftPanel->setAllColumnsShowFocus(true);
-    ui->rightPanel->setItemsExpandable(false);
-    ui->rightPanel->setRootIsDecorated(false);
-    ui->rightPanel->setAllColumnsShowFocus(true);
+    workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem);
+    workspace->updateFolder(true, QDir::drives().at(0).path());
+    workspace->updateFolder(false, QDir::drives().at(0).path());
 }
 
 MainWindow::~MainWindow()
 {
+    delete workspace;
+    delete iniFile;
     delete ui;
 }
 
-
-void MainWindow::on_leftBox_activated(const QString &arg)
+void MainWindow::initDrivesComboBoxes()
 {
-    bool ifContains = false;
-    for (int i = 0; i < inifile->GetSectionCount(); i++)
+    connect(ui->leftBox, &QComboBox::currentTextChanged, this, &MainWindow::onDriveChanged);
+    connect(ui->rightBox, &QComboBox::currentTextChanged, this, &MainWindow::onDriveChanged);
+
+    foreach (const auto &drive, QDir::drives())
     {
-        if (arg.toStdString() == inifile->GetSections()[i])
+        ui->leftBox->addItem(drive.filePath());
+        ui->rightBox->addItem(drive.filePath());
+    }
+
+    for (int i = 0; i < iniFile->GetSectionCount(); i++)
+    {
+        ui->leftBox->addItem(QString::fromStdString(iniFile->GetSections()[i]));
+        ui->rightBox->addItem(QString::fromStdString(iniFile->GetSections()[i]));
+    }
+}
+
+void MainWindow::initShortcuts()
+{
+    tab = new QShortcut(this);
+    tab->setKey(Qt::Key_Tab);
+    connect(tab, &QShortcut::activated, workspace, &Workspace::changeCurrentPanel);
+
+    backspace = new QShortcut(this);
+    backspace->setKey(Qt::Key_Backspace);
+    connect(backspace, &QShortcut::activated, workspace, &Workspace::changeSelectionMode);
+
+    insert = new QShortcut(this);
+    insert->setKey(Qt::Key_Insert);
+    connect(insert, &QShortcut::activated, workspace, &Workspace::choose);
+
+    enter = new QShortcut(this);
+    enter->setKey(Qt::Key_Return);
+    connect(enter, &QShortcut::activated, workspace, &Workspace::changeDir);
+
+    up = new QShortcut(this);
+    up->setKey(Qt::Key_Up);
+    connect(up, &QShortcut::activated, ui->leftPanel, &Panel::arrowUp);
+    connect(up, &QShortcut::activated, ui->rightPanel, &Panel::arrowUp);
+
+    down = new QShortcut(this);
+    down->setKey(Qt::Key_Down);
+    connect(down, &QShortcut::activated, ui->leftPanel, &Panel::arrowDown);
+    connect(down, &QShortcut::activated, ui->rightPanel, &Panel::arrowDown);
+}
+
+void MainWindow::initButtons()
+{
+    ui->viewButton->setShortcut(Qt::Key_F3);
+    connect(ui->viewButton, &QPushButton::clicked, workspace, &Workspace::changeDir);
+
+    ui->copyButton->setShortcut(Qt::Key_F5);
+    connect(ui->copyButton, &QPushButton::clicked, workspace, &Workspace::copy);
+
+    ui->moveButton->setShortcut(Qt::Key_F6);
+    connect(ui->moveButton, &QPushButton::clicked, workspace, &Workspace::move);
+
+    ui->createButton->setShortcut(Qt::Key_F7);
+    connect(ui->createButton, &QPushButton::clicked, workspace, &Workspace::createDir);
+
+    ui->deleteButton->setShortcut(Qt::Key_F8);
+    connect(ui->deleteButton, &QPushButton::clicked, workspace, &Workspace::remove);
+
+    ui->sortButton->setShortcut(Qt::Key_F12);
+    // TODO: IMPLEMENT SORT BUTTON
+
+    connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::close);
+}
+
+void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDatabase)
+{
+    if (isDriveDatabase)
+        label->setText("/");
+    else
+        label->setText(arg);
+}
+
+void MainWindow::onDriveChanged(const QString &arg)
+{
+    bool isDriveDatabase = false;
+    for (int i = 0; i < iniFile->GetSectionCount(); i++)
+    {
+        if (arg.toStdString() == iniFile->GetSections()[i])
         {
-            ifContains = true;
+            isDriveDatabase = true;
             break;
         }
     }
 
-    if (ifContains)
+    QComboBox *comboBox = qobject_cast<QComboBox*>(sender());
+
+    if (comboBox == ui->leftBox)
     {
-        ui->leftPanel->getFunctionsDB()->Init(arg);
-        ui->leftPanel->setPath("/");
-        ui->labelLeftPath->setText("/");
-        ui->leftPanel->setIfBD(true);
-        ui->leftPanel->ChangeFolderDB(1);
-        ui->leftPanel->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        ui->leftPanel->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        ui->leftPanel->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        ui->leftPanel->setColumnWidth(3, 90);
-        ui->leftPanel->setColumnWidth(4, 220);
-        ui->leftPanel->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-        ui->leftPanel->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-        ui->leftPanel->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+        ui->leftPanel->populatePanel(arg, isDriveDatabase);
+        setPathLabels(ui->labelLeftPath, arg, isDriveDatabase);
     }
-    else
+    else if (comboBox == ui->rightBox)
     {
-        ui->leftPanel->setIfBD(false);
-        ui->leftPanel->setFileSystem(filesystem);
-        ui->leftPanel->setRootIndex(filesystem->index(arg));
-        ui->labelLeftPath->setText(arg);
-        ui->leftPanel->update();
-        ui->leftPanel->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        ui->leftPanel->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        ui->leftPanel->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        ui->leftPanel->header()->setSectionResizeMode(3, QHeaderView::Custom);
-
-
-
+        ui->rightPanel->populatePanel(arg, isDriveDatabase);
+        setPathLabels(ui->labelRightPath, arg, isDriveDatabase);
     }
-    ui->leftPanel->clearPanel();
-}
-
-
-void MainWindow::on_rightBox_activated(const QString &arg)
-{
-    bool ifContains = false;
-    for (int i = 0; i < inifile->GetSectionCount(); i++)
-    {
-        if (arg.toStdString() == inifile->GetSections()[i])
-        {
-            ifContains = true;
-            break;
-        }
-    }
-    if (ifContains)
-    {
-        ui->rightPanel->getFunctionsDB()->Init(arg);
-        ui->rightPanel->setPath("/");
-        ui->labelRightPath->setText("/");
-        ui->rightPanel->setIfBD(true);
-        ui->rightPanel->ChangeFolderDB(1);
-        ui->rightPanel->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        ui->rightPanel->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        ui->rightPanel->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        ui->rightPanel->setColumnWidth(3, 90);
-        ui->rightPanel->setColumnWidth(4, 220);
-        ui->rightPanel->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-        ui->rightPanel->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-        ui->rightPanel->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
-    }
-    else
-    {
-        ui->rightPanel->setIfBD(false);
-        ui->rightPanel->setFileSystem(filesystem);
-        ui->rightPanel->setRootIndex(filesystem->index(arg));
-        ui->labelRightPath->setText(arg);
-        ui->rightPanel->update();
-        ui->rightPanel->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        ui->rightPanel->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        ui->rightPanel->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        ui->rightPanel->header()->setSectionResizeMode(3, QHeaderView::Custom);
-    }
-    ui->rightPanel->clearPanel();
-}
-
-void MainWindow::on_exitButton_clicked()
-{
-    exit(1);
 }

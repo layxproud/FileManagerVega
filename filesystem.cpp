@@ -1,10 +1,14 @@
 #include "filesystem.h"
 
-FileSystem::FileSystem(QObject *parent)
+FileSystem::FileSystem(QObject *parent) :
+    QFileSystemModel{parent}
 {
-    this->setParent(parent);
+    setFilter(QDir::NoDot | QDir::AllEntries | QDir::System);
+    setRootPath("");
+    setReadOnly(false);
 }
-void FileSystem:: copyFolder(QString sourceFolder, QString destFolder)
+
+void FileSystem::copyFolder(QString sourceFolder, QString destFolder)
 {
     QDir sourceDir(sourceFolder);
     if(!sourceDir.exists())
