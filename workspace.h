@@ -1,25 +1,31 @@
 #ifndef WORKSPACE_H
 #define WORKSPACE_H
+
 #include <panel.h>
-#include<filesystem.h>
-#include<QMessageBox>
+#include <filesystem.h>
+#include <QMessageBox>
 #include <iostream>
+
 enum Button {
     Copy = 0,
     Move,
     MkDir,
     Remove,
 };
+
 class Workspace : public QObject
 {
     Q_OBJECT
-private:
-    Panel *left; // левая панель
-    Panel *right;// правая панель
-    bool isLeftCurrent; // с помощью этой переменной определяем текущую панель
-    FileSystem *filesystem; //файловая система    
+
 public:
-    Workspace(Panel *left, Panel *right, FileSystem *filesystem); //конструктор
+    Workspace(Panel *left, Panel *right, FileSystem *filesystem);
+
+private:
+    Panel *leftPanel; // левая панель
+    Panel *rightPanel;// правая панель
+    FileSystem *fileSystem; //файловая система
+    bool isLeftCurrent; // с помощью этой переменной определяем текущую панель
+
 public slots:
     bool getIsLeftCurrent(); // получаем информацию о текущей панели
     void choose(); // выбор элемента
@@ -35,4 +41,5 @@ public slots:
     void createDir();
     void changeDir();
 };
+
 #endif // WORKSPACE_H

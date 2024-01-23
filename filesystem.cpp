@@ -72,7 +72,10 @@ bool FileSystem::copyIndex(QModelIndex index, QString destinationFilePath)
         destinationFilePath.append(QFileInfo(sourceFile).fileName());
         this->copyFolder(sourceFilePath, destinationFilePath);
     }
+
+    return true;
 }
+
 bool FileSystem::removeIndex(QModelIndex index)
 {
     if (!this->isDir(index))
@@ -80,13 +83,15 @@ bool FileSystem::removeIndex(QModelIndex index)
         this->remove(index);
         return true;
     }
-    else {
+    else
+    {
         QDir dir;
         dir.setPath(this->fileInfo(index).absoluteFilePath());
         removeFolder(dir);
         return true;
     }
 }
+
 bool FileSystem::removeFolder(QDir dir)
 {
     bool result = false;

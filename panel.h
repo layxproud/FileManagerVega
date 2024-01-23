@@ -21,20 +21,26 @@ class Panel : public QTreeView
 public:
     Panel(QWidget *parent);
 
-    void initPanel(FileSystem *fileSystem, bool isLeft, bool ifDB);
+    void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
 
 private:
-    QString path; // путь, который отображает панель
-    bool ifDB;
-    QString info; // информация под панелью
-    QModelIndexList list; // список выделенных индексов
-    int countChosenFolders, countChosenFiles; // количество выбранных элементов. Нужно для информации под панелью
-    int countFolders, countFiles;
-    long long int size; // размер выбранных файлов. Тоже нужно для информации под панелью
-    bool isLeft;
-    long long int currentDirSize;
     FileSystem *fileSystem;
+    bool isDB;
+    bool isLeft;
+
+    /* Переменные хранящие информацию о файловой системе */
+    QString info;
+    QString path;
+    int numberOfSelectedFolders, numberOfSelectedFiles;
+    int numberOfFolders, numberOfFiles;
+    long long int selectedFilesSize;
+    long long int currentDirSize;
+
+
+    QModelIndexList list; // список выделенных индексов
+
+
     QStandardItemModel *DBmodel;
     std::vector <TIPInfo*> items;
     std::vector <folderinfo*> folders;
@@ -46,9 +52,11 @@ private:
     std::list<folderid> pathID;
 
 signals:
-    void updateInfo(bool isLeft, bool ifPlus, QModelIndex index);
+    /* Обновление GUI */
     void showInfo(const QString &);
     void showPath(const QString &);
+
+    void updateInfo(bool isLeft, bool ifPlus, QModelIndex index);
     void changeFolder(bool isLeft, QModelIndex index);
     void createDir(bool, QString);
 

@@ -96,7 +96,6 @@ void MainWindow::initButtons()
 
     ui->deleteButton->setShortcut(Qt::Key_F8);
     connect(ui->deleteButton, &QPushButton::clicked, workspace, &Workspace::remove);
-    // TODO: DELETING FILES CRASHES PROGRAM
 
     ui->sortButton->setShortcut(Qt::Key_F12);
     // TODO: IMPLEMENT SORT BUTTON
