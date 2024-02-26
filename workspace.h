@@ -26,11 +26,30 @@ private:
     FileSystem *fileSystem; //файловая система
     bool isLeftCurrent; // с помощью этой переменной определяем текущую панель
 
+private:
+    void updatePanels();
+
+    void removeFilesystemEntries(Panel* panel);
+    void removeDatabaseEntries(Panel* panel);
+
+    void copyFilesystemToDatabase(Panel* sourcePanel, Panel* destinationPanel);
+    void copyFilesystemToFilesystem(Panel* sourcePanel, Panel* destinationPanel);
+    void copyDatabaseToDatabase(Panel* sourcePanel, Panel* destinationPanel);
+    void copyDatabaseToFilesystem(Panel* sourcePanel, Panel* destinationPanel);
+
+    void moveFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel);
+    void moveFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
+    void moveDatabaseToDatabase(Panel *sourcePanel, Panel *destinationPanel);
+    void moveDatabaseToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
+
+    void createDirFileSystem(Panel *panel);
+    void createDirDatabase(Panel *panel);
+
 public slots:
-    bool getIsLeftCurrent(); // получаем информацию о текущей панели
-    void choose(); // выбор элемента
-    void remove(); // удаление элемента
-    void copy(); // копирование элемента
+    bool getIsLeftCurrent();
+    void choose();
+    void remove();
+    void copy();
     void move();
     void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
     void updateInfoDB(bool isLeft, bool isPlus);

@@ -214,6 +214,7 @@ folderinfo TIPDBShell::GetCurrentFolder()
 
 bool TIPDBShell::GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector<folderinfo *> &Folders)
 {
+    qDebug() << id;
     if (!id)
         id = 1;
     QSqlQuery dbq(*db);
@@ -274,6 +275,7 @@ bool TIPDBShell::GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector
         while (dbq.next());
     }
 
+    qDebug() << "Items: " << Items.size() << "Folders: " << Folders.size();
     return true;
 }
 

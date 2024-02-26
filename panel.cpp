@@ -81,7 +81,7 @@ QString Panel::getInfo()
     return this->info;
 }
 
-QModelIndexList Panel::getList()
+QModelIndexList& Panel::getList()
 {
     return this->list;
 }
@@ -377,7 +377,7 @@ void Panel::setFileSystem(FileSystem * filesystem)
     this->update();
 }
 
-bool Panel::getIfDB()
+bool Panel::getIsDB()
 {
     return isDB;
 }

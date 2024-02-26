@@ -16,12 +16,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->leftPanel, &Panel::showPath, ui->labelLeftPath, &QLabel::setText);
     connect(ui->rightPanel, &Panel::showPath, ui->labelRightPath, &QLabel::setText);
 
-    initDrivesComboBoxes();
-
     workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem);
     workspace->updateFolder(true, QDir::drives().at(0).path());
     workspace->updateFolder(false, QDir::drives().at(0).path());
 
+    initDrivesComboBoxes();
     initShortcuts();
     initButtons();
 }
@@ -129,10 +128,12 @@ void MainWindow::onDriveChanged(const QString &arg)
     {
         ui->leftPanel->populatePanel(arg, isDriveDatabase);
         setPathLabels(ui->labelLeftPath, arg, isDriveDatabase);
+        workspace->updateFolder(true, ui->labelLeftPath->text());
     }
     else if (comboBox == ui->rightBox)
     {
         ui->rightPanel->populatePanel(arg, isDriveDatabase);
         setPathLabels(ui->labelRightPath, arg, isDriveDatabase);
+        workspace->updateFolder(false, ui->labelRightPath->text());
     }
 }

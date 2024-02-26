@@ -63,7 +63,7 @@ signals:
 public slots:
     QString getPath(); // получаем путь
     QString getInfo(); // получаем информацию под панелью
-    QModelIndexList getList(); // получаем список выбранных индексов
+    QModelIndexList &getList(); // получаем список выбранных индексов
     FileSystem* getFilesystem();
 
     void chooseButton ();
@@ -78,7 +78,7 @@ public slots:
     void setPath(QString path);
     void setFileSystem(FileSystem *filesystem);
     void ChangeFolderDB(folderid folder);
-    bool getIfDB();
+    bool getIsDB();
     void setIfDB(bool ifDB);
     TIPDBShell* getFunctionsDB();
     std::vector<TIPInfo*>* getItems();
