@@ -1,4 +1,5 @@
 #include "panel.h"
+#include <QDesktopServices>
 
 Panel::Panel(QWidget *parent) :
     QTreeView(parent),
@@ -168,6 +169,21 @@ void Panel::changeDirectory(const QModelIndex &index)
 {
     if (!index.isValid())
         return;
+
+    // Check if the clicked item is a file
+    if (!fileSystem->isDir(index)) {
+         QString fileName = fileSystem->fileName(index);
+         QString filePath = fileSystem->filePath(index);
+
+         QString extension = QFileInfo(filePath).suffix().toLower();
+
+         if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx") {
+             QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+         }
+
+         return;
+    }
+
     selectedFilesSize = 0;
     QStandardItem *mb_ps = this->getDB()->item(index.row());
     if (isDB && mb_ps->text() == "..")
