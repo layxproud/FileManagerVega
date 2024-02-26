@@ -17,6 +17,7 @@ public:
     void copyFolder(QString sourceFolder, QString destFolder);
     bool removeIndex (QModelIndex index);
     bool removeFolder(QDir dir);
+    bool renameIndex(QModelIndex index, const QString &newPath);
     long long int getFolderSize(QString path);
 };
 

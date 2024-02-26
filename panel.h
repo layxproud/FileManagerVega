@@ -13,6 +13,7 @@
 #include <filesystem.h>
 #include <iostream>
 #include "sortableheaderview.h"
+#include <QTimer>
 
 class Panel : public QTreeView
 {
@@ -27,6 +28,8 @@ public:
 private:
     FileSystem *fileSystem;
     SortableHeaderView *headerView;
+    QTimer *clickTimer;
+    QModelIndex clickedIndex; // Stores the QModelIndex for the single click action
     bool isDB;
     bool isLeft;
 
@@ -101,6 +104,10 @@ public slots:
     void arrowUp();
     void arrowDown();
     void refreshDB();
+
+private slots:
+    void onClicked(const QModelIndex &index);
+    void onSingleClickTimeout();
 };
 
 #endif // PANEL_H

@@ -15,6 +15,10 @@ Panel::Panel(QWidget *parent) :
     headerView = new SortableHeaderView(Qt::Horizontal, this);
     setHeader(headerView);
 
+    clickTimer = new QTimer(this);
+    clickTimer->setSingleShot(true);
+    connect(clickTimer, &QTimer::timeout, this, &Panel::onSingleClickTimeout);
+
     DBmodel = new QStandardItemModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
@@ -39,7 +43,7 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     setAllColumnsShowFocus(true);
     setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(this, &QTreeView::clicked, this, &Panel::choose);
+    connect(this, &QTreeView::clicked, this, &Panel::onClicked);
     connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
 
     connect(headerView, &SortableHeaderView::sortIndicatorChanged, this, [=](int logicalIndex, Qt::SortOrder order) {
@@ -106,6 +110,27 @@ void Panel::choose(const QModelIndex &index)
 {
     if (!index.isValid())
         return;
+
+    // File renaming
+    if (this->selectionMode() == QAbstractItemView::SingleSelection && list.contains(index)) {
+        if (!isDB)
+        {
+            QString currentFileName = fileSystem->fileName(index);
+            if (currentFileName == "." || currentFileName == "..") return;
+            QString newName = QInputDialog::getText(this, "Rename", "Enter new name:", QLineEdit::Normal, currentFileName);
+            if (!newName.isEmpty()) {
+                QString newPath = fileSystem->filePath(index.parent()) + "/" + newName;
+
+                if (fileSystem->renameIndex(index, newPath)) {
+                    qDebug() << "File renamed successfully.";
+                } else {
+                    qDebug() << "Error renaming file.";
+                }
+            }
+            return;
+        }
+    }
+
     if (this->selectionMode() != QAbstractItemView::MultiSelection)
     {
         if (this->selectionMode()==QAbstractItemView::NoSelection)
@@ -167,6 +192,8 @@ void Panel::choose(const QModelIndex &index)
 
 void Panel::changeDirectory(const QModelIndex &index)
 {
+    clickTimer->stop();
+
     if (!index.isValid())
         return;
 
@@ -679,4 +706,15 @@ void Panel::refreshDB()
     this->update();
     this->setSelectionMode(QAbstractItemView::NoSelection);
     this->selectionModel()->clear();
+}
+
+void Panel::onClicked(const QModelIndex &index)
+{
+    clickedIndex = index;
+    clickTimer->start(300);
+}
+
+void Panel::onSingleClickTimeout()
+{
+    choose(clickedIndex);
 }

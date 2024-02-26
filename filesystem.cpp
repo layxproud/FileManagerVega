@@ -1,4 +1,5 @@
 #include "filesystem.h"
+#include <QInputDialog>
 
 FileSystem::FileSystem(QObject *parent) :
     QFileSystemModel{parent}
@@ -125,6 +126,27 @@ bool FileSystem::removeFolder(QDir dir)
     }
     return result;
 }
+
+bool FileSystem::renameIndex(QModelIndex index, const QString &newPath)
+{
+    if (!index.isValid())
+      return false;
+
+    // Get the current file path
+    QString currentFilePath = filePath(index);
+
+    // Check if the file exists
+    if (!QFile::exists(currentFilePath))
+      return false;
+
+    // Perform the renaming operation
+    if (QFile::rename(currentFilePath, newPath)) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
 long long int FileSystem::getFolderSize(QString path)
 {
     QFileInfo info(path);
