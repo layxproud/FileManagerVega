@@ -198,7 +198,7 @@ void Panel::changeDirectory(const QModelIndex &index)
         return;
 
     // Check if the clicked item is a file
-    if (!fileSystem->isDir(index)) {
+    if (!isDB && !fileSystem->isDir(index)) {
          QString fileName = fileSystem->fileName(index);
          QString filePath = fileSystem->filePath(index);
 
