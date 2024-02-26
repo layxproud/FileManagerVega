@@ -12,7 +12,7 @@
 #include "tipdbshell.h"
 #include <filesystem.h>
 #include <iostream>
-#include <QHeaderView>
+#include "sortableheaderview.h"
 
 class Panel : public QTreeView
 {
@@ -26,6 +26,7 @@ public:
 
 private:
     FileSystem *fileSystem;
+    SortableHeaderView *headerView;
     bool isDB;
     bool isLeft;
 

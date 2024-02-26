@@ -32,6 +32,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         panel.cpp \
+        sortableheaderview.cpp \
         tinyxml2.cpp \
         tipdbshell.cpp \
         trmlshell.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
         inifile.h \
         mainwindow.h \
         panel.h \
+        sortableheaderview.h \
         tinyxml2.h \
         tipdbshell.h \
         trmlshell.h \

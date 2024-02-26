@@ -11,6 +11,9 @@ Panel::Panel(QWidget *parent) :
     currentDirSize(0),
     current_folder_id(0)
 {
+    headerView = new SortableHeaderView(Qt::Horizontal, this);
+    setHeader(headerView);
+
     DBmodel = new QStandardItemModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
@@ -37,6 +40,10 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
 
     connect(this, &QTreeView::clicked, this, &Panel::choose);
     connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
+
+    connect(headerView, &SortableHeaderView::sortIndicatorChanged, this, [=](int logicalIndex, Qt::SortOrder order) {
+        this->sortByColumn(logicalIndex, order);
+    });
 }
 
 void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
