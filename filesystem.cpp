@@ -1,5 +1,6 @@
 #include "filesystem.h"
 #include <QInputDialog>
+#include <QDebug>
 
 FileSystem::FileSystem(QObject *parent) :
     QFileSystemModel{parent}
@@ -86,16 +87,26 @@ bool FileSystem::removeIndex(QModelIndex index)
     }
     else
     {
+        // Set the root directory to the directory containing the index
+        QString rootPath = this->filePath(index);
+        QDir rootDir(rootPath);
+
         QDir dir;
         dir.setPath(this->fileInfo(index).absoluteFilePath());
-        removeFolder(dir);
+
+        removeFolder(dir, rootDir);
         return true;
     }
 }
 
-bool FileSystem::removeFolder(QDir dir)
+bool FileSystem::removeFolder(QDir dir, const QDir &rootDir)
 {
-    bool result = false;
+    // Проверяем, находится ли папка в корневой директории
+    if (!dir.absolutePath().startsWith(rootDir.absolutePath())) {
+        qDebug() << "dir " << dir.absolutePath() << " is not in root Dir " << rootDir.absolutePath();
+        return false;
+    }
+
     //Получаем список каталогов
     QStringList lstDirs = dir.entryList(QDir::Dirs |
                     QDir::AllDirs |
@@ -103,28 +114,36 @@ bool FileSystem::removeFolder(QDir dir)
     //Получаем список файлов
     QStringList lstFiles = dir.entryList(QDir::Files);
 
-    //Удаляем файлы
+    // Удаляем файлы
     foreach (QString entry, lstFiles)
     {
-     QString entryAbsPath = dir.absolutePath() + "/" + entry;
-     QFile::setPermissions(entryAbsPath, QFile::ReadOwner | QFile::WriteOwner);
-     QFile::remove(entryAbsPath);
+        QString entryAbsPath = dir.absolutePath() + "/" + entry;
+        QFile::setPermissions(entryAbsPath, QFile::ReadOwner | QFile::WriteOwner);
+        if (!QFile::remove(entryAbsPath)) {
+            qDebug() << "Failed deleting file " << entryAbsPath << " from directory " << dir;
+            return false;
+        }
     }
 
-    //Для папок делаем рекурсивный вызов
+    // Рекурсивно обрабатываем поддиректории
     foreach (QString entry, lstDirs)
     {
-     QString entryAbsPath = dir.absolutePath() + "/" + entry;
-     QDir dr(entryAbsPath);
-     removeFolder(dr);
+        QString entryAbsPath = dir.absolutePath() + "/" + entry;
+        QDir dr(entryAbsPath);
+        if (!removeFolder(dr, rootDir)) {
+            qDebug() << "Failed to delete subdirectory " << dir;
+            return false;
+        }
     }
 
-    //Удаляем обрабатываемую папку
+    // Удаляем саму директорию
     if (!QDir().rmdir(dir.absolutePath()))
     {
-      result = true;
+        qDebug() << "Failed to delete directory " << dir;
+        return false;
     }
-    return result;
+
+    return true;
 }
 
 bool FileSystem::renameIndex(QModelIndex index, const QString &newPath)
