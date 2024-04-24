@@ -709,6 +709,11 @@ bool TIPDBShell::DeleteFolder(folderid source)
     return true;
 }
 
+bool TIPDBShell::RenameFolder(folderid id, folderid source)
+{
+    return true;
+}
+
 bool TIPDBShell::OpenItem(TIPInfo *item)
 {
     QSqlQuery dbq(*db);
@@ -722,7 +727,7 @@ bool TIPDBShell::OpenItem(TIPInfo *item)
     {
         do
         {
-            IPTerm *ti = new IPTerm(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble());
+            IPTerm *ti = new IPTerm(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble(), dbq.value(4).toInt());
             t.push_back(ti);
         }
         while (dbq.next());
@@ -733,7 +738,7 @@ bool TIPDBShell::OpenItem(TIPInfo *item)
     {
         do
         {
-            IPShingle *si = new IPShingle(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble());
+            IPShingle *si = new IPShingle(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble(), dbq.value(4).toInt());
             s.push_back(si);
         }
         while (dbq.next());

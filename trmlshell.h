@@ -129,7 +129,7 @@ struct IPTerm
     ulong			dbtimes;	   	// количество вхождений в БД
 
     IPTerm() {};
-    IPTerm(ulong i, QString t, double w) {id = i, term = t, weight = w; }
+    IPTerm(ulong i, QString t, double w, int tm) {id = i, term = t, weight = w, times = tm;}
 };
 
 struct IPShingle
@@ -146,7 +146,7 @@ struct IPShingle
 //    unsigned char   type;           // тип, 0 - термин, 1 - шингл
 
     IPShingle() {}
-    IPShingle(ulong i, QString t, double w) {id = i, term = t, weight = w; }
+    IPShingle(ulong i, QString t, double w, int tm) {id = i, term = t, weight = w, times = tm; }
 };
 
 struct IPCompareResults

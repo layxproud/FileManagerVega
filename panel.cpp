@@ -1,9 +1,9 @@
 #include "panel.h"
 #include <QDesktopServices>
+#include "CustomLineEdit.h"
 
 Panel::Panel(QWidget *parent) :
     QTreeView(parent),
-    isDoubleClick(false),
     info(""),
     numberOfSelectedFolders(0),
     numberOfSelectedFiles(0),
@@ -13,13 +13,10 @@ Panel::Panel(QWidget *parent) :
     currentDirSize(0),
     current_folder_id(0)
 {
-    headerView = new SortableHeaderView(Qt::Horizontal, this);
-    setHeader(headerView);
-
     DBmodel = new QStandardItemModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
-    Coloumns_name << "      Name" << "Size" << "Id" << "Owner" << "Date Creation" << "Relevance" << " " << " "; // ��������� ���: CompData1, CompData2, CompData3
+    Coloumns_name << "Name" << "Size" << "Id" << "Owner" << "Date Creation" << "Relevance" << " " << " ";
     int i = 0;
     foreach (QString it, Coloumns_name)
     {
@@ -43,9 +40,13 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     connect(this, &QTreeView::clicked, this, &Panel::choose);
     connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
 
-    connect(headerView, &SortableHeaderView::sortIndicatorChanged, this, [=](int logicalIndex, Qt::SortOrder order) {
-        this->sortByColumn(logicalIndex, order);
-    });
+    // Сортировка
+    sortByColumn(0, Qt::AscendingOrder);
+    setSortingEnabled(true);
+
+    // Редактирование элементов
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
+    installEventFilter(this);
 }
 
 void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
@@ -56,14 +57,7 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
         setPath("/");
         setIfDB(true);
         ChangeFolderDB(1);
-        header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        setColumnWidth(3, 90);
-        setColumnWidth(4, 220);
-        header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(QHeaderView::Interactive);
     }
     else
     {
@@ -71,13 +65,71 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
         setFileSystem(fileSystem);
         setRootIndex(fileSystem->index(arg));
         update();
-        header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(3, QHeaderView::Custom);
+        header()->setSectionResizeMode(QHeaderView::Interactive);
     }
 
     clearPanel();
+}
+
+bool Panel::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == this && event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_E) {
+            QModelIndex index = currentIndex();
+            if (index.isValid()) {
+                if (isDB) {
+                    editDBItem(index);
+                    return true;
+                }
+                else {
+                    edit(index);
+                }
+                return true;
+            }
+        }
+    }
+    return QTreeView::eventFilter(object, event); // Pass the event to the base class
+}
+
+void Panel::editDBItem(const QModelIndex &index)
+{
+    CustomLineEdit *lineEdit = new CustomLineEdit(this);
+    lineEdit->setText(index.data(Qt::DisplayRole).toString()); // Set the initial text
+
+    // Position the CustomLineEdit over the item being edited
+    QRect rect = visualRect(index);
+    lineEdit->setGeometry(rect);
+
+    // Show the CustomLineEdit
+    lineEdit->show();
+    lineEdit->setFocus();
+
+    // Connect the returnPressed signal to a lambda function that handles the editing completion
+    connect(lineEdit, &CustomLineEdit::returnPressed, [this, lineEdit, index]() {
+        // Get the new text from the QLineEdit
+        QString newText = lineEdit->text();
+        qDebug() << newText;
+
+        // Apply the changes to the database item
+        // This is where you would update the database with the new text
+        // For example:
+        // updateDatabaseItem(index, newText);
+
+        // Delete the QLineEdit
+        lineEdit->deleteLater();
+    });
+
+    // Optionally, connect the focusOut signal to handle clicking away
+    connect(lineEdit, &CustomLineEdit::focusOut, [this, lineEdit, index]() {
+        // Optionally, get the new text from the QLineEdit and apply the changes
+        // This is similar to the returnPressed signal handler
+        QString newText = lineEdit->text();
+        qDebug() << newText;
+
+        // Delete the QLineEdit
+        lineEdit->deleteLater();
+    });
 }
 
 QString Panel::getPath()
@@ -143,74 +195,49 @@ void Panel::choose(const QModelIndex &index)
         }
         else
         {
-            emit updateInfo(isLeft, true, index);
+            list.push_back(index);
             PushDB(index);
+            emit updateInfo(isLeft, true, index);
         }
     }
     else if (this->selectionMode() == QAbstractItemView::MultiSelection && list.contains(index))
     {
         if (!isDB)
-         {
+        {
             list.removeOne(index);
             emit updateInfo(isLeft, false, index);
-         }
-         else
-         {
-             emit updateInfo(isLeft, true, index);
-             RemoveDB(index);
-         }
+        }
+        else
+        {
+            list.removeOne(index);
+            RemoveDB(index);
+            emit updateInfo(isLeft, false, index);
+        }
     }
     info.append(QString :: number(selectedFilesSize) + " KB ");
     info.append("of " + QString :: number(currentDirSize) + " KB ");
     info.append("files " + QString:: number(numberOfSelectedFiles) + " of " + QString::number(numberOfFiles) + " folders " +QString::number(numberOfSelectedFolders)+" of " + QString :: number(numberOfFolders));
     emit showInfo(info);
     info.clear();
-
-    QTimer::singleShot(300, [this, index]() {
-        // Переименование
-        if (this->selectionMode() == QAbstractItemView::SingleSelection && index == lastClickedIndex && !isDoubleClick) {
-            if (!isDB)
-            {
-                QString currentFileName = fileSystem->fileName(index);
-                if (currentFileName == "." || currentFileName == "..")
-                    return;
-                QString newName = QInputDialog::getText(this, "Rename", "Enter new name:", QLineEdit::Normal, currentFileName);
-                if (!newName.isEmpty()) {
-                    QString newPath = fileSystem->filePath(index.parent()) + "/" + newName;
-
-                    if (fileSystem->renameIndex(index, newPath)) {
-                        qDebug() << "File renamed successfully.";
-                    } else {
-                        qDebug() << "Error renaming file.";
-                    }
-                }
-                return;
-            }
-        }
-        lastClickedIndex = index;
-        isDoubleClick = false;
-    });
 }
 
 void Panel::changeDirectory(const QModelIndex &index)
 {
-    isDoubleClick = true;
-
     if (!index.isValid())
         return;
 
     // Check if the clicked item is a file
     if (!isDB && !fileSystem->isDir(index)) {
-         QString fileName = fileSystem->fileName(index);
-         QString filePath = fileSystem->filePath(index);
+        QString fileName = fileSystem->fileName(index);
+        QString filePath = fileSystem->filePath(index);
 
-         QString extension = QFileInfo(filePath).suffix().toLower();
+        QString extension = QFileInfo(filePath).suffix().toLower();
 
-         if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx") {
-             QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
-         }
+        if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx") {
+            QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+        }
 
-         return;
+        return;
     }
 
     selectedFilesSize = 0;
@@ -225,21 +252,21 @@ void Panel::changeDirectory(const QModelIndex &index)
     }
     else if (isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() == " ")
     {
-            pathID.push_back(current_folder_id);
-            this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
-            path = path + this->getDB()->item(index.row())->text();
-            this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
-            this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
-     }
+        pathID.push_back(current_folder_id);
+        this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
+        path = path + this->getDB()->item(index.row())->text();
+        this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
+        this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
+    }
     else if (isDB && this->getPath() != "/" && DBmodel->item(index.row(), 1)->text() == " ")
     {
-            pathID.push_back(current_folder_id);
-            this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
-            path = path + "/" + this->getDB()->item(index.row())->text();
-            this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
-            this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
+        pathID.push_back(current_folder_id);
+        this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
+        path = path + "/" + this->getDB()->item(index.row())->text();
+        this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
+        this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
     }
-     else if (isDB && DBmodel->item(index.row(), 1)->text() != " ")
+    else if (isDB && DBmodel->item(index.row(), 1)->text() != " ")
     {
         this->getFunctionsDB()->OpenItem(findItem(this->getDB()->item(index.row(), 2)->text().toInt()));
     }
@@ -247,7 +274,7 @@ void Panel::changeDirectory(const QModelIndex &index)
     {
         if (this->fileSystem->fileInfo(index).fileName() == "..")
         {
-             this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
+            this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
             this->changeFolder(isLeft, index);
         }
         else
@@ -552,6 +579,7 @@ void Panel::PushDB(QModelIndex index)
 
 void Panel::RemoveDB(QModelIndex index)
 {
+    qDebug() << "Removing item";
     if (isDB && DBmodel->item(index.row())->text() == "..")
     {
         return;
@@ -564,7 +592,7 @@ void Panel::RemoveDB(QModelIndex index)
     else if (isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() != " ")
     {
         chosenItems.remove(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
-        selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
+        selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
         this->numberOfSelectedFiles--;
     }
 }

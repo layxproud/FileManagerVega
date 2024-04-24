@@ -1,9 +1,10 @@
 #ifndef PANEL_H
 #define PANEL_H
+
 #include <QFileSystemModel>
 #include <QTreeView>
-#include<QInputDialog>
-#include<QStringList>
+#include <QInputDialog>
+#include <QStringList>
 #include <QKeyEvent>
 #include <QShortcut>
 #include <QFile>
@@ -12,8 +13,58 @@
 #include "tipdbshell.h"
 #include <filesystem.h>
 #include <iostream>
-#include "sortableheaderview.h"
 #include <QTimer>
+#include <QHeaderView>
+#include <QStyledItemDelegate>
+
+class InlineEditDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    InlineEditDelegate(bool isDB, QObject *parent = nullptr)
+        : QStyledItemDelegate(parent), m_isDB(isDB) {}
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        if (m_isDB) {
+            QLineEdit *editor = new QLineEdit(parent);
+            // Customize the editor for database items
+            return editor;
+        } else {
+            return QStyledItemDelegate::createEditor(parent, option, index);
+        }
+    }
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override
+    {
+        if (m_isDB) {
+            QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
+            if (lineEdit) {
+                lineEdit->setText(index.data(Qt::DisplayRole).toString());
+            }
+        } else {
+            QStyledItemDelegate::setEditorData(editor, index);
+        }
+    }
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
+    {
+        qDebug() << "setModelData called";
+        if (m_isDB) {
+            QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
+            if (lineEdit) {
+                model->setData(index, lineEdit->text());
+                qDebug() << lineEdit->text();
+            }
+        } else {
+            QStyledItemDelegate::setModelData(editor, model, index);
+        }
+    }
+
+private:
+    bool m_isDB;
+};
 
 class Panel : public QTreeView
 {
@@ -24,12 +75,11 @@ public:
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
+    bool eventFilter(QObject *object, QEvent *event);
+    void editDBItem(const QModelIndex &index);
 
 private:
     FileSystem *fileSystem;
-    SortableHeaderView *headerView;
-    bool isDoubleClick = false;
-    QModelIndex lastClickedIndex;
     bool isDB;
     bool isLeft;
 

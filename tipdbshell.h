@@ -105,6 +105,7 @@ public:
     bool CopyFolder(folderid id, folderid source, folderid destination);
     bool MoveFolder(folderid id, folderid source, folderid destination);
     bool DeleteFolder(folderid source);
+    bool RenameFolder(folderid id, folderid source);
     bool OpenItem(TIPInfo *item);
 
     TIPInfo *CopyFileToDB(QString filename, folderid destination);

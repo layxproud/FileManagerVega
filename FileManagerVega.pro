@@ -27,12 +27,12 @@ CONFIG += c++11
 SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
+        customlineedit.cpp \
         filesystem.cpp \
         inifile.cpp \
         main.cpp \
         mainwindow.cpp \
         panel.cpp \
-        sortableheaderview.cpp \
         tinyxml2.cpp \
         tipdbshell.cpp \
         trmlshell.cpp \
@@ -42,11 +42,11 @@ SOURCES += \
 HEADERS += \
         Lemmatizer.h \
         agramtab.h \
+        customlineedit.h \
         filesystem.h \
         inifile.h \
         mainwindow.h \
         panel.h \
-        sortableheaderview.h \
         tinyxml2.h \
         tipdbshell.h \
         trmlshell.h \

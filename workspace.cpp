@@ -316,14 +316,13 @@ void Workspace::moveFilesystemToFilesystem(Panel* sourcePanel, Panel* destinatio
 
 void Workspace::moveDatabaseToDatabase(Panel* sourcePanel, Panel* destinationPanel)
 {
+    copyDatabaseToDatabase(sourcePanel, destinationPanel);
     for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end(); i++)
     {
-        sourcePanel->getFunctionsDB()->CopyItemWithinDatabase(*i, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
         sourcePanel->getFunctionsDB()->DeleteItem(*i, sourcePanel->getCurrentFolder());
     }
     for (auto i = sourcePanel->getChosenFolders().begin(); i != sourcePanel->getChosenFolders().end(); i++)
     {
-        sourcePanel->getFunctionsDB()->CopyFolder((*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
         sourcePanel->getFunctionsDB()->DeleteFolder((*i)->first);
     }
 }

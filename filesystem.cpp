@@ -188,3 +188,4 @@ long long int FileSystem::getFolderSize(QString path)
     }
     return size / 1024;
 }
+

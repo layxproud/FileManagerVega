@@ -3,10 +3,13 @@
 
 #include <QWidget>
 #include <QString>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsRectItem>
 
 #include <vector>
 
-#define HEADER "id\nСлово\nВес"
+#define HEADER "ID\nСлово\nВес\nВхождений"
 
 using namespace std;
 
@@ -51,6 +54,11 @@ public:
 
 private:
     Ui::Widget *ui;
+    QGraphicsScene* scene;
+    double totalWeight = 0.0;
+    std::vector<IPTerm*> top10Terms;
+    std::vector<double> percentages;
+    void fillRectangle();
 
 public slots:
 //    void genData();
