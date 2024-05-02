@@ -94,8 +94,6 @@ void ViewIP::setData(QString id, QString user, QString date, QString comment, ve
     for (const auto& term : top10Terms) {
         double percentage = (term->weight / totalWeight) * 100.0;
         percentages.push_back(percentage);
-
-        qDebug() << "Term " << curr << " weight is " << percentage;
         curr++;
     }
 

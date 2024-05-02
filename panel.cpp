@@ -226,8 +226,6 @@ void Panel::changeDirectory(const QModelIndex &index)
     }
     else
     {
-        qDebug()<<fileSystem->filePath(index);
-        qDebug()<<fileSystem->fileInfo(fileSystem->index(fileSystem->filePath(index))).fileName();
         if (this->fileSystem->fileInfo(index).fileName() == "..")
         {
             populatePanel(fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))),false);
@@ -246,13 +244,10 @@ void Panel::changeDirectory(const QModelIndex &index)
     this->setFocus();
     this->setSelectionMode(QAbstractItemView::NoSelection);
     this->setCurrentIndex(model()->index(0,0, this->rootIndex()));
-    qDebug() << "Folder changed";
     if (isDB) {
-        qDebug() << "Setting DB info";
         changeCurrentFolderInfo(path, 0,0,0);
     }
     else {
-        qDebug() << "Setting FS info";
         InfoToString();
     }
     this->update();
@@ -543,7 +538,6 @@ void Panel::PushDB(QModelIndex index)
 
 void Panel::RemoveDB(QModelIndex index)
 {
-    qDebug() << "Removing item";
     if (isDB && DBmodel->item(index.row())->text() == "..")
     {
         return;

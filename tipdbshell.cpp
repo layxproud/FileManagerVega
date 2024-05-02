@@ -215,7 +215,6 @@ folderinfo TIPDBShell::GetCurrentFolder()
 
 bool TIPDBShell::GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector<folderinfo *> &Folders)
 {
-    qDebug() << id;
     if (!id)
         id = 1;
     QSqlQuery dbq(*db);
@@ -275,8 +274,6 @@ bool TIPDBShell::GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector
         }
         while (dbq.next());
     }
-
-    qDebug() << "Items: " << Items.size() << "Folders: " << Folders.size();
     return true;
 }
 
@@ -731,7 +728,6 @@ bool TIPDBShell::RenameFolder(folderid id, const QString& newName)
         return false;
     }
 
-    qDebug() << "Folder name changed to " << newName;
     return true;
 }
 
@@ -756,7 +752,6 @@ bool TIPDBShell::RenameItem(TIPInfo *item, const QString& newName)
         return false;
     }
 
-    qDebug() << "Item name changed to " << newName;
     return true;
 }
 
@@ -1240,7 +1235,7 @@ folderid TIPDBShell::GetNextSequenceValue(QSqlQuery &query, const QString &seque
         return query.value(0).toInt();
 
     qDebug() << "Error getting next sequence value:" << query.lastError().text();
-    return -1; // Handle error appropriately
+    return -1;
 }
 
 TIPFullInfo::TIPFullInfo(IPPortrait *ip)

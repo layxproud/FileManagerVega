@@ -103,7 +103,6 @@ bool FileSystem::removeFolder(QDir dir, const QDir &rootDir)
 {
     // Проверяем, находится ли папка в корневой директории
     if (!dir.absolutePath().startsWith(rootDir.absolutePath())) {
-        qDebug() << "dir " << dir.absolutePath() << " is not in root Dir " << rootDir.absolutePath();
         return false;
     }
 
