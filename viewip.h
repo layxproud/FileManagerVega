@@ -59,10 +59,28 @@ private:
     std::vector<IPTerm*> top10Terms;
     std::vector<double> percentages;
     void fillRectangle();
+    void updateSceneSize();
 
 public slots:
 //    void genData();
     void clear();
+};
+
+class CustomGraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+
+public:
+    explicit CustomGraphicsView(QWidget *parent = nullptr) : QGraphicsView(parent) {}
+
+signals:
+    void resized();
+
+protected:
+    void resizeEvent(QResizeEvent *event) override {
+        QGraphicsView::resizeEvent(event);
+        emit resized();
+    }
 };
 
 #endif // VIEWIP_H

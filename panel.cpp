@@ -13,7 +13,7 @@ Panel::Panel(QWidget *parent) :
     currentDirSize(0),
     current_folder_id(0)
 {
-    DBmodel = new QStandardItemModel(this);
+    DBmodel = new EditableNameModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
     Coloumns_name << "Name" << "Size" << "Id" << "Owner" << "Date Creation" << "Relevance" << " " << " ";
@@ -45,8 +45,10 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     setSortingEnabled(true);
 
     // Редактирование элементов
-    setEditTriggers(QAbstractItemView::NoEditTriggers);
-    installEventFilter(this);
+    setEditTriggers(QAbstractItemView::SelectedClicked);
+    MyEditingDelegate *delegate = new MyEditingDelegate(this);
+    this->setItemDelegate(delegate);
+    connect(delegate, &MyEditingDelegate::editingFinished, this, &Panel::onEditFinished);
 }
 
 void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
@@ -71,67 +73,6 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
     clearPanel();
 }
 
-bool Panel::eventFilter(QObject *object, QEvent *event)
-{
-    if (object == this && event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_E) {
-            QModelIndex index = currentIndex();
-            if (index.isValid()) {
-                if (isDB) {
-                    editDBItem(index);
-                    return true;
-                }
-                else {
-                    edit(index);
-                }
-                return true;
-            }
-        }
-    }
-    return QTreeView::eventFilter(object, event); // Pass the event to the base class
-}
-
-void Panel::editDBItem(const QModelIndex &index)
-{
-    CustomLineEdit *lineEdit = new CustomLineEdit(this);
-    lineEdit->setText(index.data(Qt::DisplayRole).toString()); // Set the initial text
-
-    // Position the CustomLineEdit over the item being edited
-    QRect rect = visualRect(index);
-    lineEdit->setGeometry(rect);
-
-    // Show the CustomLineEdit
-    lineEdit->show();
-    lineEdit->setFocus();
-
-    // Connect the returnPressed signal to a lambda function that handles the editing completion
-    connect(lineEdit, &CustomLineEdit::returnPressed, [this, lineEdit, index]() {
-        // Get the new text from the QLineEdit
-        QString newText = lineEdit->text();
-        qDebug() << newText;
-
-        // Apply the changes to the database item
-        // This is where you would update the database with the new text
-        // For example:
-        // updateDatabaseItem(index, newText);
-
-        // Delete the QLineEdit
-        lineEdit->deleteLater();
-    });
-
-    // Optionally, connect the focusOut signal to handle clicking away
-    connect(lineEdit, &CustomLineEdit::focusOut, [this, lineEdit, index]() {
-        // Optionally, get the new text from the QLineEdit and apply the changes
-        // This is similar to the returnPressed signal handler
-        QString newText = lineEdit->text();
-        qDebug() << newText;
-
-        // Delete the QLineEdit
-        lineEdit->deleteLater();
-    });
-}
-
 QString Panel::getPath()
 {
     return this->path;
@@ -145,6 +86,11 @@ QString Panel::getInfo()
 QModelIndexList& Panel::getList()
 {
     return this->list;
+}
+
+FileSystem* Panel::getFilesystem()
+{
+    return this->fileSystem;
 }
 
 void Panel::chooseButton()
@@ -607,9 +553,9 @@ std::list <folderinfo*> &Panel::getChosenFolders()
     return chosenFolders;
 }
 
-FileSystem* Panel::getFilesystem()
+void Panel::onEditFinished()
 {
-    return this->fileSystem;
+    qDebug() << "Edit finished";
 }
 
 void Panel::InfoToString()

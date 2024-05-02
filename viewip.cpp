@@ -38,49 +38,18 @@ Widget::Widget(QWidget *parent) :
     ui->tb_terms->setSortingEnabled(true);
     ui->tb_shingles->setSortingEnabled(true);
 
+    // Виджет для отображения весов терминов
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
-    scene->setSceneRect(ui->graphicsView->viewport()->rect());
+    connect(ui->graphicsView, &CustomGraphicsView::resized, this, &Widget::updateSceneSize);
+    updateSceneSize();
 }
 
 Widget::~Widget()
 {
     delete ui;
 }
-/*
-std::string random_string( size_t length )
-{
-    auto randchar = []() -> char
-    {
-        const char charset[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[ rand() % max_index ];
-    };
-    std::string str(length,0);
-    std::generate_n( str.begin(), length, randchar );
-    return str;
-}
 
-void Widget::genData()
-{
-    vector<IPTerm*> terms;
-    for(int i = 0; i < rand() % 100; i++)
-    {
-        IPTerm *p = new IPTerm(static_cast<ulong>(i+1), QString(random_string(20).c_str()), (double)rand() / RAND_MAX);
-        terms.push_back(p);
-    }
-    vector<IPShingle*> shingles;
-    for(int i = 0; i < rand() % 100; i++)
-    {
-        IPShingle *p = new IPShingle(static_cast<ulong>(i+1), QString(random_string(15).c_str()), (double)rand() / RAND_MAX);
-        shingles.push_back(p);
-    }
-    setData("256", "ПОЛЬЗОВАТЕЛЬ", "11.02", "Комментарий", terms, shingles);
-}
-*/
 void Widget::setData(QString id, QString user, QString date, QString comment, vector<IPTerm*> terms, vector<IPShingle*> shingles)
 {
     totalWeight = 0.0;
@@ -136,6 +105,8 @@ void Widget::setData(QString id, QString user, QString date, QString comment, ve
 
 void Widget::fillRectangle()
 {
+    scene->clear();
+
     // Get the scene's width and height
     auto sceneWidth = scene->width();
     auto sceneHeight = scene->height();
@@ -164,6 +135,12 @@ void Widget::fillRectangle()
         QGraphicsRectItem* filledRect = scene->addRect(currentX, 0, segmentWidth, sceneHeight, QPen(), QBrush(color));
         currentX += segmentWidth;
     }
+}
+
+void Widget::updateSceneSize()
+{
+    scene->setSceneRect(ui->graphicsView->viewport()->rect());
+    fillRectangle();
 }
 
 void Widget::clear()

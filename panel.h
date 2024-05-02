@@ -13,57 +13,40 @@
 #include "tipdbshell.h"
 #include <filesystem.h>
 #include <iostream>
-#include <QTimer>
 #include <QHeaderView>
 #include <QStyledItemDelegate>
 
-class InlineEditDelegate : public QStyledItemDelegate
-{
+class EditableNameModel : public QStandardItemModel {
     Q_OBJECT
 
 public:
-    InlineEditDelegate(bool isDB, QObject *parent = nullptr)
-        : QStyledItemDelegate(parent), m_isDB(isDB) {}
+    EditableNameModel(QObject *parent = nullptr) : QStandardItemModel(parent) {}
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
-    {
-        if (m_isDB) {
-            QLineEdit *editor = new QLineEdit(parent);
-            // Customize the editor for database items
-            return editor;
+    Qt::ItemFlags flags(const QModelIndex &index) const override {
+        Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
+
+        // Make only the first column editable
+        if (index.column() == 0) {
+            return defaultFlags | Qt::ItemIsEditable;
         } else {
-            return QStyledItemDelegate::createEditor(parent, option, index);
+            return defaultFlags & ~Qt::ItemIsEditable;
         }
     }
+};
 
-    void setEditorData(QWidget *editor, const QModelIndex &index) const override
-    {
-        if (m_isDB) {
-            QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
-            if (lineEdit) {
-                lineEdit->setText(index.data(Qt::DisplayRole).toString());
-            }
-        } else {
-            QStyledItemDelegate::setEditorData(editor, index);
-        }
+class MyEditingDelegate : public QStyledItemDelegate {
+    Q_OBJECT
+
+public:
+    MyEditingDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+        QStyledItemDelegate::setModelData(editor, model, index);
+        emit editingFinished(index);
     }
 
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
-    {
-        qDebug() << "setModelData called";
-        if (m_isDB) {
-            QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
-            if (lineEdit) {
-                model->setData(index, lineEdit->text());
-                qDebug() << lineEdit->text();
-            }
-        } else {
-            QStyledItemDelegate::setModelData(editor, model, index);
-        }
-    }
-
-private:
-    bool m_isDB;
+signals:
+    void editingFinished(const QModelIndex &) const;
 };
 
 class Panel : public QTreeView
@@ -75,8 +58,6 @@ public:
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
-    bool eventFilter(QObject *object, QEvent *event);
-    void editDBItem(const QModelIndex &index);
 
 private:
     FileSystem *fileSystem;
@@ -148,6 +129,9 @@ public slots:
     void RemoveDB(QModelIndex index);
     std::list <TIPInfo*> &getChosenItems();
     std::list <folderinfo*> &getChosenFolders();
+
+    // NEW SLOTS BY DMITRY NOVOZHILOV
+    void onEditFinished();
 
     void InfoToString();
     void clearInfo();

@@ -104,7 +104,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGraphicsView" name="graphicsView">
+    <widget class="CustomGraphicsView" name="graphicsView">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -189,6 +189,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>CustomGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>viewip.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
