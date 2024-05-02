@@ -4,6 +4,7 @@
 #include "viewip.h"
 #include "trmlshell.h"
 #include <QMessageBox>
+#include <QDebug>
 
 bool start = true;
 folderid count_folders = 1;
@@ -55,7 +56,7 @@ bool TIPDBShell::Init(QString instance)
     }
     // LogPrintf("initDb(): Connect to PZ database: %s@%s/%s", user, host, dbname);
 
-    w = new Widget;
+    w = new ViewIP;
     w->setWindowModality(Qt::ApplicationModal);
 
     free(host); free(dbname); free(user); free(pass);
@@ -709,8 +710,53 @@ bool TIPDBShell::DeleteFolder(folderid source)
     return true;
 }
 
-bool TIPDBShell::RenameFolder(folderid id, folderid source)
+bool TIPDBShell::RenameFolder(folderid id, const QString& newName)
 {
+    if (id <= 1)
+        return false;
+
+    QSqlQuery dbq(*db);
+    QString query = QString("UPDATE in_collection SET title = :newName WHERE id = :id");
+    dbq.prepare(query);
+    dbq.bindValue(":newName", newName);
+    dbq.bindValue(":id", id);
+
+    bool ret = dbq.exec();
+
+    if (!ret)
+    {
+        QSqlError res = db->lastError();
+        // Error updating folder title
+        // Log error if needed
+        return false;
+    }
+
+    qDebug() << "Folder name changed to " << newName;
+    return true;
+}
+
+bool TIPDBShell::RenameItem(TIPInfo *item, const QString& newName)
+{
+    if (!item || !item->id)
+        return false; // Wrong input data
+
+    QSqlQuery dbq(*db);
+    QString query = QString("UPDATE document SET title = :newName WHERE id = :id");
+    dbq.prepare(query);
+    dbq.bindValue(":newName", newName);
+    dbq.bindValue(":id", item->id);
+
+    bool ret = dbq.exec();
+
+    if (!ret)
+    {
+        QSqlError res = db->lastError();
+        // Error updating item title
+        // Log error if needed
+        return false;
+    }
+
+    qDebug() << "Item name changed to " << newName;
     return true;
 }
 

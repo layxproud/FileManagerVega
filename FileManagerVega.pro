@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql axcontainer
+QT       += core gui sql axcontainer xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,7 +27,6 @@ CONFIG += c++11
 SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
-        customlineedit.cpp \
         filesystem.cpp \
         inifile.cpp \
         main.cpp \
@@ -37,12 +36,12 @@ SOURCES += \
         tipdbshell.cpp \
         trmlshell.cpp \
         viewip.cpp \
-        workspace.cpp
+        workspace.cpp \
+        xmlparser.cpp
 
 HEADERS += \
         Lemmatizer.h \
         agramtab.h \
-        customlineedit.h \
         filesystem.h \
         inifile.h \
         mainwindow.h \
@@ -51,7 +50,8 @@ HEADERS += \
         tipdbshell.h \
         trmlshell.h \
         viewip.h \
-        workspace.h
+        workspace.h \
+        xmlparser.h
 
 FORMS += \
         mainwindow.ui \

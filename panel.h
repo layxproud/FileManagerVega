@@ -15,6 +15,8 @@
 #include <iostream>
 #include <QHeaderView>
 #include <QStyledItemDelegate>
+#include "xmlparser.h"
+#include "viewip.h"
 
 class EditableNameModel : public QStandardItemModel {
     Q_OBJECT
@@ -25,7 +27,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override {
         Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
 
-        // Make only the first column editable
+        // Можно редактировать только столбец с именем
         if (index.column() == 0) {
             return defaultFlags | Qt::ItemIsEditable;
         } else {
@@ -33,6 +35,7 @@ public:
         }
     }
 };
+
 
 class MyEditingDelegate : public QStyledItemDelegate {
     Q_OBJECT
@@ -49,12 +52,13 @@ signals:
     void editingFinished(const QModelIndex &) const;
 };
 
+
 class Panel : public QTreeView
 {
     Q_OBJECT
 
 public:
-    Panel(QWidget *parent);
+    explicit Panel(QWidget *parent);
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
@@ -85,6 +89,9 @@ private:
     TIPDBShell *functions_of_current_BD;
     folderid current_folder_id;
     std::list<folderid> pathID;
+
+    // Окно для отображения XML файлов
+    ViewIP* viewip;
 
 signals:
     /* Обновление GUI */
@@ -131,7 +138,7 @@ public slots:
     std::list <folderinfo*> &getChosenFolders();
 
     // NEW SLOTS BY DMITRY NOVOZHILOV
-    void onEditFinished();
+    void onEditFinished(const QModelIndex &index);
 
     void InfoToString();
     void clearInfo();

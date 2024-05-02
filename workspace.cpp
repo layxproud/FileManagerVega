@@ -478,6 +478,7 @@ void Workspace::updateFolder(bool isLeft, QString path)
             continue;
         if (i_file.isDir())
         {
+            qDebug() << i_file;
             countFolders++;
         }
         else

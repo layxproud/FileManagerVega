@@ -1,6 +1,5 @@
 #include "panel.h"
 #include <QDesktopServices>
-#include "CustomLineEdit.h"
 
 Panel::Panel(QWidget *parent) :
     QTreeView(parent),
@@ -11,7 +10,8 @@ Panel::Panel(QWidget *parent) :
     numberOfFiles(0),
     selectedFilesSize(0),
     currentDirSize(0),
-    current_folder_id(0)
+    current_folder_id(0),
+    viewip{nullptr}
 {
     DBmodel = new EditableNameModel(this);
     DBmodel->insertColumns(0, 8);
@@ -182,6 +182,14 @@ void Panel::changeDirectory(const QModelIndex &index)
         if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx") {
             QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
         }
+        else if (extension == "xml") {
+            XmlParser parser;
+            XmlParser::ParsedData parsedData = parser.readFileAndParse(filePath);
+            viewip = new ViewIP;
+            viewip->setData(parsedData.id, parsedData.user, parsedData.date, parsedData.comment,
+                            parsedData.terms, parsedData.shingles);
+            viewip->show();
+        }
 
         return;
     }
@@ -218,26 +226,36 @@ void Panel::changeDirectory(const QModelIndex &index)
     }
     else
     {
+        qDebug()<<fileSystem->filePath(index);
+        qDebug()<<fileSystem->fileInfo(fileSystem->index(fileSystem->filePath(index))).fileName();
         if (this->fileSystem->fileInfo(index).fileName() == "..")
         {
-            this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
-            this->changeFolder(isLeft, index);
+            populatePanel(fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))),false);
+            //this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
+            //emit this->changeFolder(isLeft, index);
         }
         else
         {
-            this->setRootIndex(index);
-            this->setPath(fileSystem->filePath(index));
-            this->changeFolder(isLeft, index);
+            populatePanel(fileSystem->filePath(index),false);
+            //this->setPath(fileSystem->filePath(index));
+            //this->setRootIndex(index);
+            //emit this->changeFolder(isLeft, index);
         }
     }
     this->clearInfo();
     this->setFocus();
     this->setSelectionMode(QAbstractItemView::NoSelection);
     this->setCurrentIndex(model()->index(0,0, this->rootIndex()));
-    if (isDB)
+    qDebug() << "Folder changed";
+    if (isDB) {
+        qDebug() << "Setting DB info";
         changeCurrentFolderInfo(path, 0,0,0);
-    else
+    }
+    else {
+        qDebug() << "Setting FS info";
         InfoToString();
+    }
+    this->update();
 }
 
 void Panel::changeSelectionMode()
@@ -553,9 +571,18 @@ std::list <folderinfo*> &Panel::getChosenFolders()
     return chosenFolders;
 }
 
-void Panel::onEditFinished()
+void Panel::onEditFinished(const QModelIndex& index)
 {
-    qDebug() << "Edit finished";
+    if (isDB && DBmodel->item(index.row())->text() == "..") {
+        return;
+    }
+    // Папка (нет размера)
+    else if(isDB && DBmodel->item(index.row(), 1)->text() == " ") {
+        this->getFunctionsDB()->RenameFolder(findFolder(DBmodel->item(index.row(), 2)->text().toInt())->first, DBmodel->item(index.row(), 0)->text());
+    }
+    else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
+        this->getFunctionsDB()->RenameItem(findItem(DBmodel->item(index.row(), 2)->text().toInt()), DBmodel->item(index.row(), 0)->text());
+    }
 }
 
 void Panel::InfoToString()

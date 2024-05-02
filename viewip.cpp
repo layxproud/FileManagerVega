@@ -3,7 +3,7 @@
 #include "trmlshell.h"
 #include <QDebug>
 
-Widget::Widget(QWidget *parent) :
+ViewIP::ViewIP(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Widget)
 {
@@ -41,16 +41,16 @@ Widget::Widget(QWidget *parent) :
     // Виджет для отображения весов терминов
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
-    connect(ui->graphicsView, &CustomGraphicsView::resized, this, &Widget::updateSceneSize);
+    connect(ui->graphicsView, &CustomGraphicsView::resized, this, &ViewIP::updateSceneSize);
     updateSceneSize();
 }
 
-Widget::~Widget()
+ViewIP::~ViewIP()
 {
     delete ui;
 }
 
-void Widget::setData(QString id, QString user, QString date, QString comment, vector<IPTerm*> terms, vector<IPShingle*> shingles)
+void ViewIP::setData(QString id, QString user, QString date, QString comment, vector<IPTerm*> terms, vector<IPShingle*> shingles)
 {
     totalWeight = 0.0;
     top10Terms.clear();
@@ -59,7 +59,6 @@ void Widget::setData(QString id, QString user, QString date, QString comment, ve
     ui->edit_user->setText(user);
     ui->edit_date->setText(date);
     ui->edit_com->setText(comment);
-
 
     for(uint i = 0; i < terms.size(); i++)
     {
@@ -103,7 +102,7 @@ void Widget::setData(QString id, QString user, QString date, QString comment, ve
     fillRectangle();
 }
 
-void Widget::fillRectangle()
+void ViewIP::fillRectangle()
 {
     scene->clear();
 
@@ -137,13 +136,13 @@ void Widget::fillRectangle()
     }
 }
 
-void Widget::updateSceneSize()
+void ViewIP::updateSceneSize()
 {
     scene->setSceneRect(ui->graphicsView->viewport()->rect());
     fillRectangle();
 }
 
-void Widget::clear()
+void ViewIP::clear()
 {
     ui->edit_id->clear();
     ui->edit_user->clear();

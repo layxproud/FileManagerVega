@@ -41,13 +41,30 @@ struct IPShingle
 };
 */
 
-class Widget : public QWidget
+class CustomGraphicsView : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit Widget(QWidget *parent = 0);
-    ~Widget();
+    explicit CustomGraphicsView(QWidget *parent = nullptr) : QGraphicsView(parent) {}
+
+signals:
+    void resized();
+
+protected:
+    void resizeEvent(QResizeEvent *event) override {
+        QGraphicsView::resizeEvent(event);
+        emit resized();
+    }
+};
+
+class ViewIP : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit ViewIP(QWidget *parent = 0);
+    ~ViewIP();
 
     void setData(QString id, QString user, QString date, QString comment, vector<IPTerm*> terms, vector<IPShingle*> shingles);
 
@@ -64,23 +81,6 @@ private:
 public slots:
 //    void genData();
     void clear();
-};
-
-class CustomGraphicsView : public QGraphicsView
-{
-    Q_OBJECT
-
-public:
-    explicit CustomGraphicsView(QWidget *parent = nullptr) : QGraphicsView(parent) {}
-
-signals:
-    void resized();
-
-protected:
-    void resizeEvent(QResizeEvent *event) override {
-        QGraphicsView::resizeEvent(event);
-        emit resized();
-    }
 };
 
 #endif // VIEWIP_H
