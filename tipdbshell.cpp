@@ -740,7 +740,7 @@ bool TIPDBShell::RenameItem(TIPInfo *item, const QString& newName)
     QString query = QString("UPDATE document SET title = :newName WHERE id = :id");
     dbq.prepare(query);
     dbq.bindValue(":newName", newName);
-    dbq.bindValue(":id", item->id);
+    dbq.bindValue(":id", QVariant::fromValue(item->id));
 
     bool ret = dbq.exec();
 
