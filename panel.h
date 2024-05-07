@@ -1,9 +1,10 @@
 #ifndef PANEL_H
 #define PANEL_H
+
 #include <QFileSystemModel>
 #include <QTreeView>
-#include<QInputDialog>
-#include<QStringList>
+#include <QInputDialog>
+#include <QStringList>
 #include <QKeyEvent>
 #include <QShortcut>
 #include <QFile>
@@ -12,24 +13,58 @@
 #include "tipdbshell.h"
 #include <filesystem.h>
 #include <iostream>
-#include "sortableheaderview.h"
-#include <QTimer>
+#include <QHeaderView>
+#include <QStyledItemDelegate>
+#include "xmlparser.h"
+#include "viewip.h"
+
+class EditableNameModel : public QStandardItemModel {
+    Q_OBJECT
+
+public:
+    EditableNameModel(QObject *parent = nullptr) : QStandardItemModel(parent) {}
+
+    Qt::ItemFlags flags(const QModelIndex &index) const override {
+        Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
+
+        // Можно редактировать только столбец с именем
+        if (index.column() == 0) {
+            return defaultFlags | Qt::ItemIsEditable;
+        } else {
+            return defaultFlags & ~Qt::ItemIsEditable;
+        }
+    }
+};
+
+
+class MyEditingDelegate : public QStyledItemDelegate {
+    Q_OBJECT
+
+public:
+    MyEditingDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+        QStyledItemDelegate::setModelData(editor, model, index);
+        emit editingFinished(index);
+    }
+
+signals:
+    void editingFinished(const QModelIndex &) const;
+};
+
 
 class Panel : public QTreeView
 {
     Q_OBJECT
 
 public:
-    Panel(QWidget *parent);
+    explicit Panel(QWidget *parent);
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
 
 private:
     FileSystem *fileSystem;
-    SortableHeaderView *headerView;
-    bool isDoubleClick = false;
-    QModelIndex lastClickedIndex;
     bool isDB;
     bool isLeft;
 
@@ -54,6 +89,9 @@ private:
     TIPDBShell *functions_of_current_BD;
     folderid current_folder_id;
     std::list<folderid> pathID;
+
+    // Окно для отображения XML файлов
+    ViewIP* viewip;
 
 signals:
     /* Обновление GUI */
@@ -98,6 +136,9 @@ public slots:
     void RemoveDB(QModelIndex index);
     std::list <TIPInfo*> &getChosenItems();
     std::list <folderinfo*> &getChosenFolders();
+
+    // NEW SLOTS BY DMITRY NOVOZHILOV
+    void onEditFinished(const QModelIndex &index);
 
     void InfoToString();
     void clearInfo();

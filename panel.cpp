@@ -3,7 +3,6 @@
 
 Panel::Panel(QWidget *parent) :
     QTreeView(parent),
-    isDoubleClick(false),
     info(""),
     numberOfSelectedFolders(0),
     numberOfSelectedFiles(0),
@@ -11,15 +10,13 @@ Panel::Panel(QWidget *parent) :
     numberOfFiles(0),
     selectedFilesSize(0),
     currentDirSize(0),
-    current_folder_id(0)
+    current_folder_id(0),
+    viewip{nullptr}
 {
-    headerView = new SortableHeaderView(Qt::Horizontal, this);
-    setHeader(headerView);
-
-    DBmodel = new QStandardItemModel(this);
+    DBmodel = new EditableNameModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
-    Coloumns_name << "      Name" << "Size" << "Id" << "Owner" << "Date Creation" << "Relevance" << " " << " "; // ��������� ���: CompData1, CompData2, CompData3
+    Coloumns_name << "Name" << "Size" << "Id" << "Owner" << "Date Creation" << "Relevance" << " " << " ";
     int i = 0;
     foreach (QString it, Coloumns_name)
     {
@@ -43,9 +40,15 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     connect(this, &QTreeView::clicked, this, &Panel::choose);
     connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
 
-    connect(headerView, &SortableHeaderView::sortIndicatorChanged, this, [=](int logicalIndex, Qt::SortOrder order) {
-        this->sortByColumn(logicalIndex, order);
-    });
+    // Сортировка
+    sortByColumn(0, Qt::AscendingOrder);
+    setSortingEnabled(true);
+
+    // Редактирование элементов
+    setEditTriggers(QAbstractItemView::SelectedClicked);
+    MyEditingDelegate *delegate = new MyEditingDelegate(this);
+    this->setItemDelegate(delegate);
+    connect(delegate, &MyEditingDelegate::editingFinished, this, &Panel::onEditFinished);
 }
 
 void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
@@ -56,14 +59,7 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
         setPath("/");
         setIfDB(true);
         ChangeFolderDB(1);
-        header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        setColumnWidth(3, 90);
-        setColumnWidth(4, 220);
-        header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
+        header()->setSectionResizeMode(QHeaderView::Interactive);
     }
     else
     {
@@ -71,10 +67,7 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
         setFileSystem(fileSystem);
         setRootIndex(fileSystem->index(arg));
         update();
-        header()->setSectionResizeMode(0, QHeaderView::Stretch);
-        header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        header()->setSectionResizeMode(3, QHeaderView::Custom);
+        header()->setSectionResizeMode(QHeaderView::Interactive);
     }
 
     clearPanel();
@@ -93,6 +86,11 @@ QString Panel::getInfo()
 QModelIndexList& Panel::getList()
 {
     return this->list;
+}
+
+FileSystem* Panel::getFilesystem()
+{
+    return this->fileSystem;
 }
 
 void Panel::chooseButton()
@@ -143,74 +141,57 @@ void Panel::choose(const QModelIndex &index)
         }
         else
         {
-            emit updateInfo(isLeft, true, index);
+            list.push_back(index);
             PushDB(index);
+            emit updateInfo(isLeft, true, index);
         }
     }
     else if (this->selectionMode() == QAbstractItemView::MultiSelection && list.contains(index))
     {
         if (!isDB)
-         {
+        {
             list.removeOne(index);
             emit updateInfo(isLeft, false, index);
-         }
-         else
-         {
-             emit updateInfo(isLeft, true, index);
-             RemoveDB(index);
-         }
+        }
+        else
+        {
+            list.removeOne(index);
+            RemoveDB(index);
+            emit updateInfo(isLeft, false, index);
+        }
     }
     info.append(QString :: number(selectedFilesSize) + " KB ");
     info.append("of " + QString :: number(currentDirSize) + " KB ");
     info.append("files " + QString:: number(numberOfSelectedFiles) + " of " + QString::number(numberOfFiles) + " folders " +QString::number(numberOfSelectedFolders)+" of " + QString :: number(numberOfFolders));
     emit showInfo(info);
     info.clear();
-
-    QTimer::singleShot(300, [this, index]() {
-        // Переименование
-        if (this->selectionMode() == QAbstractItemView::SingleSelection && index == lastClickedIndex && !isDoubleClick) {
-            if (!isDB)
-            {
-                QString currentFileName = fileSystem->fileName(index);
-                if (currentFileName == "." || currentFileName == "..")
-                    return;
-                QString newName = QInputDialog::getText(this, "Rename", "Enter new name:", QLineEdit::Normal, currentFileName);
-                if (!newName.isEmpty()) {
-                    QString newPath = fileSystem->filePath(index.parent()) + "/" + newName;
-
-                    if (fileSystem->renameIndex(index, newPath)) {
-                        qDebug() << "File renamed successfully.";
-                    } else {
-                        qDebug() << "Error renaming file.";
-                    }
-                }
-                return;
-            }
-        }
-        lastClickedIndex = index;
-        isDoubleClick = false;
-    });
 }
 
 void Panel::changeDirectory(const QModelIndex &index)
 {
-    isDoubleClick = true;
-
     if (!index.isValid())
         return;
 
     // Check if the clicked item is a file
     if (!isDB && !fileSystem->isDir(index)) {
-         QString fileName = fileSystem->fileName(index);
-         QString filePath = fileSystem->filePath(index);
+        QString fileName = fileSystem->fileName(index);
+        QString filePath = fileSystem->filePath(index);
 
-         QString extension = QFileInfo(filePath).suffix().toLower();
+        QString extension = QFileInfo(filePath).suffix().toLower();
 
-         if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx") {
-             QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
-         }
+        if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx") {
+            QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+        }
+        else if (extension == "xml") {
+            XmlParser parser;
+            XmlParser::ParsedData parsedData = parser.readFileAndParse(filePath);
+            viewip = new ViewIP;
+            viewip->setData(parsedData.id, parsedData.user, parsedData.date, parsedData.comment,
+                            parsedData.terms, parsedData.shingles);
+            viewip->show();
+        }
 
-         return;
+        return;
     }
 
     selectedFilesSize = 0;
@@ -225,21 +206,21 @@ void Panel::changeDirectory(const QModelIndex &index)
     }
     else if (isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() == " ")
     {
-            pathID.push_back(current_folder_id);
-            this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
-            path = path + this->getDB()->item(index.row())->text();
-            this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
-            this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
-     }
+        pathID.push_back(current_folder_id);
+        this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
+        path = path + this->getDB()->item(index.row())->text();
+        this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
+        this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
+    }
     else if (isDB && this->getPath() != "/" && DBmodel->item(index.row(), 1)->text() == " ")
     {
-            pathID.push_back(current_folder_id);
-            this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
-            path = path + "/" + this->getDB()->item(index.row())->text();
-            this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
-            this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
+        pathID.push_back(current_folder_id);
+        this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
+        path = path + "/" + this->getDB()->item(index.row())->text();
+        this->changeCurrentFolderInfo(this->getPath(), 0, 0, 0);
+        this->ChangeFolderDB(this->getCurrentFolder()); // тут мы должны сменить директорию
     }
-     else if (isDB && DBmodel->item(index.row(), 1)->text() != " ")
+    else if (isDB && DBmodel->item(index.row(), 1)->text() != " ")
     {
         this->getFunctionsDB()->OpenItem(findItem(this->getDB()->item(index.row(), 2)->text().toInt()));
     }
@@ -247,24 +228,29 @@ void Panel::changeDirectory(const QModelIndex &index)
     {
         if (this->fileSystem->fileInfo(index).fileName() == "..")
         {
-             this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
-            this->changeFolder(isLeft, index);
+            populatePanel(fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))),false);
+            //this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
+            //emit this->changeFolder(isLeft, index);
         }
         else
         {
-            this->setRootIndex(index);
-            this->setPath(fileSystem->filePath(index));
-            this->changeFolder(isLeft, index);
+            populatePanel(fileSystem->filePath(index),false);
+            //this->setPath(fileSystem->filePath(index));
+            //this->setRootIndex(index);
+            //emit this->changeFolder(isLeft, index);
         }
     }
     this->clearInfo();
     this->setFocus();
     this->setSelectionMode(QAbstractItemView::NoSelection);
     this->setCurrentIndex(model()->index(0,0, this->rootIndex()));
-    if (isDB)
+    if (isDB) {
         changeCurrentFolderInfo(path, 0,0,0);
-    else
+    }
+    else {
         InfoToString();
+    }
+    this->update();
 }
 
 void Panel::changeSelectionMode()
@@ -564,7 +550,7 @@ void Panel::RemoveDB(QModelIndex index)
     else if (isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() != " ")
     {
         chosenItems.remove(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
-        selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
+        selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
         this->numberOfSelectedFiles--;
     }
 }
@@ -579,9 +565,18 @@ std::list <folderinfo*> &Panel::getChosenFolders()
     return chosenFolders;
 }
 
-FileSystem* Panel::getFilesystem()
+void Panel::onEditFinished(const QModelIndex& index)
 {
-    return this->fileSystem;
+    if (isDB && DBmodel->item(index.row())->text() == "..") {
+        return;
+    }
+    // Папка (нет размера)
+    else if(isDB && DBmodel->item(index.row(), 1)->text() == " ") {
+        this->getFunctionsDB()->RenameFolder(findFolder(DBmodel->item(index.row(), 2)->text().toInt())->first, DBmodel->item(index.row(), 0)->text());
+    }
+    else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
+        this->getFunctionsDB()->RenameItem(findItem(DBmodel->item(index.row(), 2)->text().toInt()), DBmodel->item(index.row(), 0)->text());
+    }
 }
 
 void Panel::InfoToString()

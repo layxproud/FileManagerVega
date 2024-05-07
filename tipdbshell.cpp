@@ -4,6 +4,7 @@
 #include "viewip.h"
 #include "trmlshell.h"
 #include <QMessageBox>
+#include <QDebug>
 
 bool start = true;
 folderid count_folders = 1;
@@ -55,7 +56,7 @@ bool TIPDBShell::Init(QString instance)
     }
     // LogPrintf("initDb(): Connect to PZ database: %s@%s/%s", user, host, dbname);
 
-    w = new Widget;
+    w = new ViewIP;
     w->setWindowModality(Qt::ApplicationModal);
 
     free(host); free(dbname); free(user); free(pass);
@@ -214,7 +215,6 @@ folderinfo TIPDBShell::GetCurrentFolder()
 
 bool TIPDBShell::GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector<folderinfo *> &Folders)
 {
-    qDebug() << id;
     if (!id)
         id = 1;
     QSqlQuery dbq(*db);
@@ -274,8 +274,6 @@ bool TIPDBShell::GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector
         }
         while (dbq.next());
     }
-
-    qDebug() << "Items: " << Items.size() << "Folders: " << Folders.size();
     return true;
 }
 
@@ -709,6 +707,54 @@ bool TIPDBShell::DeleteFolder(folderid source)
     return true;
 }
 
+bool TIPDBShell::RenameFolder(folderid id, const QString& newName)
+{
+    if (id <= 1)
+        return false;
+
+    QSqlQuery dbq(*db);
+    QString query = QString("UPDATE in_collection SET title = :newName WHERE id = :id");
+    dbq.prepare(query);
+    dbq.bindValue(":newName", newName);
+    dbq.bindValue(":id", id);
+
+    bool ret = dbq.exec();
+
+    if (!ret)
+    {
+        QSqlError res = db->lastError();
+        // Error updating folder title
+        // Log error if needed
+        return false;
+    }
+
+    return true;
+}
+
+bool TIPDBShell::RenameItem(TIPInfo *item, const QString& newName)
+{
+    if (!item || !item->id)
+        return false; // Wrong input data
+
+    QSqlQuery dbq(*db);
+    QString query = QString("UPDATE document SET title = :newName WHERE id = :id");
+    dbq.prepare(query);
+    dbq.bindValue(":newName", newName);
+    dbq.bindValue(":id", item->id);
+
+    bool ret = dbq.exec();
+
+    if (!ret)
+    {
+        QSqlError res = db->lastError();
+        // Error updating item title
+        // Log error if needed
+        return false;
+    }
+
+    return true;
+}
+
 bool TIPDBShell::OpenItem(TIPInfo *item)
 {
     QSqlQuery dbq(*db);
@@ -722,7 +768,7 @@ bool TIPDBShell::OpenItem(TIPInfo *item)
     {
         do
         {
-            IPTerm *ti = new IPTerm(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble());
+            IPTerm *ti = new IPTerm(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble(), dbq.value(4).toInt());
             t.push_back(ti);
         }
         while (dbq.next());
@@ -733,7 +779,7 @@ bool TIPDBShell::OpenItem(TIPInfo *item)
     {
         do
         {
-            IPShingle *si = new IPShingle(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble());
+            IPShingle *si = new IPShingle(dbq.value(0).toInt(), dbq.value(1).toString(), dbq.value(2).toDouble(), dbq.value(4).toInt());
             s.push_back(si);
         }
         while (dbq.next());
@@ -1189,7 +1235,7 @@ folderid TIPDBShell::GetNextSequenceValue(QSqlQuery &query, const QString &seque
         return query.value(0).toInt();
 
     qDebug() << "Error getting next sequence value:" << query.lastError().text();
-    return -1; // Handle error appropriately
+    return -1;
 }
 
 TIPFullInfo::TIPFullInfo(IPPortrait *ip)

@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class Widget;
+class ViewIP;
 class IPPortrait;
 
 struct TIPInfo
@@ -79,7 +79,7 @@ class TIPDBShell
 {
     QSqlDatabase *db;
     folderid curFolder;
-    Widget *w;
+    ViewIP *w;
 
     folderid getFolderIdByName(QString newFolder);
     QString getFolderNameById(folderid id);
@@ -87,6 +87,7 @@ class TIPDBShell
     bool saveToDB(TIPFullInfo *full);
     TIPFullInfo *loadFromDB(int id);
     bool saveToFile(TIPFullInfo *full, QString filename);
+
 public:
     bool Init(QString instance = "");
     bool Init(QString shost, QString sdbname, int iport, QString suser, QString spass);
@@ -105,6 +106,8 @@ public:
     bool CopyFolder(folderid id, folderid source, folderid destination);
     bool MoveFolder(folderid id, folderid source, folderid destination);
     bool DeleteFolder(folderid source);
+    bool RenameFolder(folderid id, const QString &newName);
+    bool RenameItem(TIPInfo *item, const QString &newName);
     bool OpenItem(TIPInfo *item);
 
     TIPInfo *CopyFileToDB(QString filename, folderid destination);

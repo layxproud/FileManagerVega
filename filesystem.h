@@ -9,8 +9,6 @@
 
 class FileSystem : public QFileSystemModel
 {
-private:
-
 public:
     FileSystem(QObject *parent = 0);
     bool copyIndex(QModelIndex index, QString destination);

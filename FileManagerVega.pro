@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql axcontainer
+QT       += core gui sql axcontainer xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,12 +32,12 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         panel.cpp \
-        sortableheaderview.cpp \
         tinyxml2.cpp \
         tipdbshell.cpp \
         trmlshell.cpp \
         viewip.cpp \
-        workspace.cpp
+        workspace.cpp \
+        xmlparser.cpp
 
 HEADERS += \
         Lemmatizer.h \
@@ -46,12 +46,12 @@ HEADERS += \
         inifile.h \
         mainwindow.h \
         panel.h \
-        sortableheaderview.h \
         tinyxml2.h \
         tipdbshell.h \
         trmlshell.h \
         viewip.h \
-        workspace.h
+        workspace.h \
+        xmlparser.h
 
 FORMS += \
         mainwindow.ui \
