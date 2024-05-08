@@ -17,7 +17,7 @@ bool TIPDBShell::Init(QString instance)
     if (!ini->IsExist())
     {
         // Unable to open ini-file
-        // LogPrintf("? ***ERROR: initDb(): Can`t open ini-file for PZ database connection parameters!");
+        qDebug() << "? ***ERROR: initDb(): Can`t open ini-file for PZ database connection parameters!";
         return false;
     }
 
@@ -33,7 +33,7 @@ bool TIPDBShell::Init(QString instance)
     if (!db->isValid())
     {
         // Unable to connect DB
-        // LogPrintf("? ***ERROR: initDb(): Can`t use or create connection: ", dbsectionname.toStdString().c_str());
+        qDebug() << "? ***ERROR: initDb(): Can`t use or create connection";
         free(host) ; free(dbname); free(user); free(pass);
         return false;
     }
@@ -49,7 +49,7 @@ bool TIPDBShell::Init(QString instance)
     {
         QSqlError res = db->lastError();
         db = NULL;
-        // LogPrintf("? ***ERROR: initDb(): Can`t connect to PZ database: %s@%s/%s", user, host, dbname);
+        qDebug() << QString("? ***ERROR: initDb(): Can`t connect to PZ database: %1@%2:%3/%4").arg(user).arg(host).arg(port).arg(dbname);
         // LogPrintf("? ***ERROR: initDb(): %s", res.text().toStdString().c_str());
         free(host) ; free(dbname); free(user); free(pass);
         return false;

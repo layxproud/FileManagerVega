@@ -6,7 +6,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
-
+#include <QCloseEvent>
 #include <vector>
 
 #define HEADER "ID\nСлово\nВес\nВхождений"
@@ -20,26 +20,6 @@ class Widget;
 
 struct IPTerm;
 struct IPShingle;
-
-/*
-struct IPTerm
-{
-    ulong			id;				//
-    QString 		term;			//
-    double			weight;			//
-
-    IPTerm(ulong i, QString t, double w) {id = i, term = t, weight = w; }
-};
-
-struct IPShingle
-{
-    ulong			id;				//
-    QString 		term;			//
-    double			weight;			//
-
-    IPShingle(ulong i, QString t, double w) {id = i, term = t, weight = w; }
-};
-*/
 
 class CustomGraphicsView : public QGraphicsView
 {
@@ -68,18 +48,22 @@ public:
 
     void setData(QString id, QString user, QString date, QString comment, vector<IPTerm*> terms, vector<IPShingle*> shingles);
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::Widget *ui;
-    QGraphicsScene* scene;
-    double totalWeight = 0.0;
+    QGraphicsScene *scene;
+    double totalTermsWeight;
+    double totalShinglesWeight;
     std::vector<IPTerm*> top10Terms;
+    std::vector<IPShingle*> top10Shingles;
     std::vector<double> percentages;
+
+private slots:
     void fillRectangle();
     void updateSceneSize();
-
-public slots:
-//    void genData();
+    void onTabChanged(int index);
     void clear();
 };
 
