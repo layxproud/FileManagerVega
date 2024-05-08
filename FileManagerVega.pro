@@ -63,15 +63,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    LIB/libpq.dll \
-    LIB/libpq.lib \
     resources/dbf.png \
     resources/folder.png \
     resources/icon \
     resources/icon.ico \
     resources/redo.png \
     resources/undo.png
-
-LIBS += -L$$PWD/LIB
-
-LIBS += -llibpq
