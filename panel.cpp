@@ -229,15 +229,12 @@ void Panel::changeDirectory(const QModelIndex &index)
         if (this->fileSystem->fileInfo(index).fileName() == "..")
         {
             populatePanel(fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))),false);
-            //this->setRootIndex(fileSystem->index(fileSystem->filePath(index)));
-            //emit this->changeFolder(isLeft, index);
+            emit changeFolder(isLeft, index);
         }
         else
         {
             populatePanel(fileSystem->filePath(index),false);
-            //this->setPath(fileSystem->filePath(index));
-            //this->setRootIndex(index);
-            //emit this->changeFolder(isLeft, index);
+            emit changeFolder(isLeft, index);
         }
     }
     this->clearInfo();

@@ -8,11 +8,11 @@
 #include <QGraphicsRectItem>
 #include <QCloseEvent>
 #include <vector>
+#include "trmlshell.h"
 
 #define HEADER "ID\nСлово\nВес\nВхождений"
 
 using namespace std;
-
 
 namespace Ui {
 class Widget;

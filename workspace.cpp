@@ -397,6 +397,21 @@ void Workspace::createDirDatabase(Panel* panel)
     panel->getFolders()->push_back(fold);
 }
 
+void Workspace::changeDir()
+{
+    if(isLeftCurrent)
+    {
+        leftPanel->changeDirectory(leftPanel->currentIndex());
+        leftPanel->setFocus();
+        leftPanel->setCurrentIndex(leftPanel->model()->index(0, 0, leftPanel->rootIndex()));
+    }
+    else
+    {
+        rightPanel->changeDirectory(rightPanel->currentIndex());
+        rightPanel->setFocus();
+    }
+}
+
 void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
 {
     if (fileSystem->fileName(index) == "..")
@@ -525,21 +540,6 @@ void Workspace::changeCurrentPanel()
         leftPanel->setFocus();
         if (!leftPanel->currentIndex().isValid())
             leftPanel->setCurrentIndex(leftPanel->model()->index(0, 0, leftPanel->rootIndex()));
-    }
-}
-
-void Workspace::changeDir()
-{
-    if(isLeftCurrent)
-    {
-        leftPanel->changeDirectory(leftPanel->currentIndex());
-        leftPanel->setFocus();
-        leftPanel->setCurrentIndex(leftPanel->model()->index(0, 0, leftPanel->rootIndex()));
-    }
-    else
-    {
-        rightPanel->changeDirectory(rightPanel->currentIndex());
-        rightPanel->setFocus();
     }
 }
 

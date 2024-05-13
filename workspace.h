@@ -21,10 +21,10 @@ public:
     Workspace(Panel *left, Panel *right, FileSystem *filesystem);
 
 private:
-    Panel *leftPanel; // левая панель
-    Panel *rightPanel;// правая панель
-    FileSystem *fileSystem; //файловая система
-    bool isLeftCurrent; // с помощью этой переменной определяем текущую панель
+    Panel *leftPanel;
+    Panel *rightPanel;
+    FileSystem *fileSystem;
+    bool isLeftCurrent;
 
 private:
     void updatePanels();
@@ -51,14 +51,14 @@ public slots:
     void remove();
     void copy();
     void move();
+    void createDir();
+    void changeDir();
     void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
     void updateInfoDB(bool isLeft, bool isPlus);
     void updateFolder(bool isLeft, QString path);
     void indexToString(bool isLeft, QModelIndex index);
     void changeSelectionMode();
     void changeCurrentPanel();
-    void createDir();
-    void changeDir();
 };
 
 #endif // WORKSPACE_H

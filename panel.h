@@ -18,12 +18,24 @@
 #include "xmlparser.h"
 #include "viewip.h"
 
+/**
+ * @brief Класс для модели, в которой редактируется только первый столбец
+ */
 class EditableNameModel : public QStandardItemModel {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Базовый конструтор
+     * @param parent - родитель
+     */
     EditableNameModel(QObject *parent = nullptr) : QStandardItemModel(parent) {}
 
+    /**
+     * @brief Задание флагов для столбцов
+     * @param index - индекс столбца
+     * @return
+     */
     Qt::ItemFlags flags(const QModelIndex &index) const override {
         Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
 
@@ -36,23 +48,37 @@ public:
     }
 };
 
-
+/**
+ * @brief Класс для корректного редактирования объектов БД
+ */
 class MyEditingDelegate : public QStyledItemDelegate {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Стандартный конструтор
+     * @param parent - родитель
+     */
     MyEditingDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
 
+    /**
+     * @brief Возвращает обновленные данные в модель
+     */
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
         QStyledItemDelegate::setModelData(editor, model, index);
         emit editingFinished(index);
     }
 
 signals:
+    /**
+     * @brief По завершении редактирования отправляет сигнал
+     */
     void editingFinished(const QModelIndex &) const;
 };
 
-
+/**
+ * @brief The Panel class
+ */
 class Panel : public QTreeView
 {
     Q_OBJECT
@@ -64,22 +90,20 @@ public:
     void populatePanel(const QString &arg, bool isDriveDatabase);
 
 private:
-    FileSystem *fileSystem;
     bool isDB;
     bool isLeft;
 
-    /* Переменные хранящие информацию о файловой системе */
+    /* Файловая система */
+    FileSystem *fileSystem;
     QString info;
     QString path;
     int numberOfSelectedFolders, numberOfSelectedFiles;
     int numberOfFolders, numberOfFiles;
     long long int selectedFilesSize;
     long long int currentDirSize;
-
-
     QModelIndexList list; // список выделенных индексов
 
-
+    /* База данных */
     QStandardItemModel *DBmodel;
     std::vector <TIPInfo*> items;
     std::vector <folderinfo*> folders;
@@ -98,20 +122,34 @@ signals:
     void showInfo(const QString &);
     void showPath(const QString &);
 
-    void updateInfo(bool isLeft, bool ifPlus, QModelIndex index);
+    void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
     void changeFolder(bool isLeft, QModelIndex index);
-    void createDir(bool, QString);
 
 public slots:
+    /**
+     * @brief Функция возвращающая текущий путь
+     * @return
+     */
     QString getPath(); // получаем путь
     QString getInfo(); // получаем информацию под панелью
     QModelIndexList &getList(); // получаем список выбранных индексов
     FileSystem* getFilesystem();
 
-    void chooseButton ();
-    void choose(const QModelIndex &index); // в этом методе определяем выбран
-    void changeDirectory(const QModelIndex &index); // меняем директорию на панели
-    void changeSelectionMode(); //меняем режим выбора на панели(один элемент или несколько)
+    void chooseButton();
+    /**
+     * @brief Определяет действие при одиночном клике
+     * @param index - индекс нажатого элемента
+     */
+    void choose(const QModelIndex &index);
+    /**
+     * @brief Определяет действие при двойном клике
+     * @param index - индекс нажатого элемента
+     */
+    void changeDirectory(const QModelIndex &index);
+    /**
+     * @brief Меняет режим выбора элементов
+     */
+    void changeSelectionMode();
     void changeCountChosenFiles(bool isPlus);
     void changeCountChosenFolders(bool isPlus);
     void changeSize(bool isPlus, long long int delta);
@@ -136,8 +174,6 @@ public slots:
     void RemoveDB(QModelIndex index);
     std::list <TIPInfo*> &getChosenItems();
     std::list <folderinfo*> &getChosenFolders();
-
-    // NEW SLOTS BY DMITRY NOVOZHILOV
     void onEditFinished(const QModelIndex &index);
 
     void InfoToString();

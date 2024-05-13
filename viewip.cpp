@@ -1,6 +1,5 @@
 #include "viewip.h"
 #include "ui_viewip.h"
-#include "trmlshell.h"
 #include <QDebug>
 
 ViewIP::ViewIP(QWidget *parent)

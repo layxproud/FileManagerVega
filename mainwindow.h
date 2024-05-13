@@ -31,14 +31,11 @@ private:
     QShortcut *up;
     QShortcut *down;
 
-private:
+private slots:
     void initDrivesComboBoxes();
     void initShortcuts();
     void initButtons();
-
     void setPathLabels(QLabel *label, const QString& arg, bool isDriveDatabase);
-
-private slots:
     void onDriveChanged(const QString &arg);
 };
 
