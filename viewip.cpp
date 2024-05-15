@@ -12,6 +12,8 @@ ViewIP::ViewIP(QWidget *parent)
     , percentages{}
 {
     ui->setupUi(this);
+    setWindowModality(Qt::ApplicationModal);
+    setAttribute(Qt::WA_DeleteOnClose);
 
     ui->tb_terms->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tb_terms->horizontalHeader()->setStretchLastSection(true);

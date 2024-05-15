@@ -18,7 +18,6 @@ IPCompare::IPCompare(IPCompareResults &res, QWidget *parent) :
 
 IPCompare::~IPCompare()
 {
-    qDebug() << "Deleting";
     delete ui;
 }
 

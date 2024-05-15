@@ -577,6 +577,7 @@ void Workspace::comparePortraits()
     qDebug() << "Circle 2 radius " << comparisonResults.r2;
     qDebug() << "Distance between circles " << comparisonResults.d;
     ipCompare = new IPCompare(comparisonResults);
+    connect(ipCompare, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
     ipCompare->show();
     widgetsList.append(ipCompare);
     clearComparisonResults();
@@ -605,21 +606,21 @@ void Workspace::calculateComparisonParameters(const std::vector<TIPFullTermInfo*
                                             const std::vector<TIPFullTermInfo*>& rightTerms)
 {
     double c1, c2, d1, d2;
-    std::unordered_map<long, double> leftTermWeights;
-    std::unordered_map<long, double> rightTermWeights;
+    std::unordered_map<QString, double> leftTermWeights;
+    std::unordered_map<QString, double> rightTermWeights;
 
     for (const auto& term : leftTerms) {
-        leftTermWeights[term->id] = term->weight;
+        leftTermWeights[term->term] = term->weight;
     }
 
     for (const auto& term : rightTerms) {
-        rightTermWeights[term->id] = term->weight;
+        rightTermWeights[term->term] = term->weight;
     }
 
     c1 = 0;
     d1 = 0;
     for (const auto& term : leftTerms) {
-        if (rightTermWeights.find(term->id) != rightTermWeights.end()) {
+        if (rightTermWeights.find(term->term) != rightTermWeights.end()) {
             c1 += term->weight;
         } else {
             d1 += term->weight;
@@ -629,7 +630,7 @@ void Workspace::calculateComparisonParameters(const std::vector<TIPFullTermInfo*
     c2 = 0;
     d2 = 0;
     for (const auto& term : rightTerms) {
-        if (leftTermWeights.find(term->id) != leftTermWeights.end()) {
+        if (leftTermWeights.find(term->term) != leftTermWeights.end()) {
             c2 += term->weight;
         } else {
             d2 += term->weight;
@@ -671,6 +672,14 @@ void Workspace::calculateComparisonCircles()
     comparisonResults.r1 = r1;
     comparisonResults.r2 = r2;
     comparisonResults.d = d;
+}
+
+void Workspace::handleWidgetDestroyed(QObject *object)
+{
+    QWidget *widget = qobject_cast<QWidget*>(object);
+    if (widget && widgetsList.contains(widget)) {
+        widgetsList.removeOne(widget);
+    }
 }
 
 void Workspace::updateInfoDB(bool isLeft, bool isPlus)

@@ -56,9 +56,6 @@ bool TIPDBShell::Init(QString instance)
     }
     // LogPrintf("initDb(): Connect to PZ database: %s@%s/%s", user, host, dbname);
 
-    w = new ViewIP;
-    w->setWindowModality(Qt::ApplicationModal);
-
     free(host); free(dbname); free(user); free(pass);
 
     curFolder = 1;
@@ -787,6 +784,7 @@ bool TIPDBShell::OpenItem(TIPInfo *item)
 
     QString owner;
     owner.setNum(item->id);
+    w = new ViewIP();
     w->setData(owner, item->ownerName, item->creationTime.toString(), item->name, t, s);
     w->show();
 

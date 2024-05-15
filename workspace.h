@@ -57,6 +57,7 @@ private:
     void calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
                              const std::vector<TIPFullTermInfo *> &rightTerms);
     void calculateComparisonCircles();
+    void handleWidgetDestroyed(QObject *object);
 
 public slots:
     bool getIsLeftCurrent();
