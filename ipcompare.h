@@ -25,6 +25,7 @@ private:
     IPCompareResults params;
     QGraphicsScene *scene;
     void drawCirclesAndLine();
+    void updateLabels();
 };
 
 #endif // IPCOMPARE_H

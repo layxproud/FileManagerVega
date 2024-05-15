@@ -13,6 +13,7 @@ IPCompare::IPCompare(IPCompareResults &res, QWidget *parent) :
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     drawCirclesAndLine();
+    updateLabels();
 }
 
 IPCompare::~IPCompare()
@@ -37,4 +38,12 @@ void IPCompare::drawCirclesAndLine()
     scene->addItem(circle1);
     scene->addItem(circle2);
     scene->addItem(line);
+}
+
+void IPCompare::updateLabels()
+{
+    ui->c1Value->setText(QString::number(params.comm1));
+    ui->c2Value->setText(QString::number(params.comm2));
+    ui->d1Value->setText(QString::number(params.diff1));
+    ui->d2Value->setText(QString::number(params.diff2));
 }

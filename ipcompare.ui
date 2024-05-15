@@ -22,56 +22,100 @@
      <item row="1" column="0">
       <widget class="QLabel" name="c1Value">
        <property name="text">
-        <string>TextLabel</string>
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="c1Label">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string>c1</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QLabel" name="c2Value">
        <property name="text">
-        <string>TextLabel</string>
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="0" column="2">
       <widget class="QLabel" name="d1Label">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string>d1</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QLabel" name="c2Label">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string>c2</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="0" column="3">
       <widget class="QLabel" name="d2Label">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string>d2</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="1" column="2">
       <widget class="QLabel" name="d1Value">
        <property name="text">
-        <string>TextLabel</string>
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="1" column="3">
       <widget class="QLabel" name="d2Value">
        <property name="text">
-        <string>TextLabel</string>
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
