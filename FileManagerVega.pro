@@ -27,6 +27,7 @@ CONFIG += c++11
 SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
+        curlhandler.cpp \
         filesystem.cpp \
         inifile.cpp \
         main.cpp \
@@ -42,6 +43,7 @@ SOURCES += \
 HEADERS += \
         Lemmatizer.h \
         agramtab.h \
+        curlhandler.h \
         filesystem.h \
         inifile.h \
         mainwindow.h \
@@ -56,6 +58,18 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
         viewip.ui
+
+LIBCURL_DEBUG_PATH = D:/lib/install/libcurl-debug
+LIBCURL_RELEASE_PATH = D:/lib/install/libcurl-release
+
+CONFIG(debug, debug|release) {
+    LIBS += -L$$LIBCURL_DEBUG_PATH/lib -llibcurl_debug
+    INCLUDEPATH += $$LIBCURL_DEBUG_PATH/include
+} else {
+    LIBS += -L$$LIBCURL_RELEASE_PATH/lib -llibcurl
+    INCLUDEPATH += $$LIBCURL_RELEASE_PATH/include
+}
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
