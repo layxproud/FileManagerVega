@@ -59,8 +59,8 @@ FORMS += \
         mainwindow.ui \
         viewip.ui
 
-LIBCURL_DEBUG_PATH = D:/lib/install/libcurl-debug
-LIBCURL_RELEASE_PATH = D:/lib/install/libcurl-release
+LIBCURL_DEBUG_PATH = C:/lib/install/libcurl-debug
+LIBCURL_RELEASE_PATH = C:/lib/install/libcurl-release
 
 CONFIG(debug, debug|release) {
     LIBS += -L$$LIBCURL_DEBUG_PATH/lib -llibcurl_debug

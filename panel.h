@@ -76,6 +76,7 @@ signals:
     void editingFinished(const QModelIndex &) const;
 };
 
+
 /**
  * @brief The Panel class
  */

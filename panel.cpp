@@ -35,6 +35,7 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     setItemsExpandable(false);
     setRootIsDecorated(false);
     setAllColumnsShowFocus(true);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::NoSelection);
 
     connect(this, &QTreeView::clicked, this, &Panel::choose);
@@ -101,68 +102,59 @@ void Panel::chooseButton()
     this->choose(this->currentIndex());
 }
 
-void Panel::choose(const QModelIndex &index)
+void Panel::choose(const QModelIndex &originalIndex)
 {
-    if (!index.isValid())
+    if (!originalIndex.isValid())
         return;
 
-    if (this->selectionMode() != QAbstractItemView::MultiSelection)
+    // Normalize the index to the first column of its row
+    QModelIndex normalizedIndex = originalIndex.sibling(originalIndex.row(), 0);
+
+    if (this->selectionMode()!= QAbstractItemView::MultiSelection)
     {
-        if (this->selectionMode()==QAbstractItemView::NoSelection)
+        if (this->selectionMode() == QAbstractItemView::NoSelection)
         {
             this->setSelectionMode(QAbstractItemView::SingleSelection);
-            this->setCurrentIndex(index);
+            this->setCurrentIndex(normalizedIndex);
         }
-        if (!isDB)
+        list.clear();
+        chosenItems.clear();
+        chosenFolders.clear();
+        list.push_back(normalizedIndex);
+        selectedFilesSize = 0;
+        numberOfSelectedFiles = 0;
+        numberOfSelectedFolders = 0;
+        if (isDB)
         {
-            list.clear();
-            list.push_back(index);
-            selectedFilesSize = 0;
-            numberOfSelectedFiles = 0;
-            numberOfSelectedFolders = 0;
-            emit updateInfo(isLeft, true, index);
+            PushDB(normalizedIndex);
         }
-        else
-        {
-            numberOfSelectedFiles = 0;
-            numberOfSelectedFolders = 0;
-            chosenItems.clear();
-            chosenFolders.clear();
-            PushDB(index);
-            emit updateInfo(isLeft, true, index);
-        }
+        emit updateInfo(isLeft, true, normalizedIndex);
     }
-    else if (this->selectionMode() == QAbstractItemView::MultiSelection && !list.contains(index))
+    else if (this->selectionMode() == QAbstractItemView::MultiSelection)
     {
-        if (!isDB)
+        if (!list.contains(normalizedIndex))
         {
-            list.push_back(index);
-            emit updateInfo(isLeft, true, index);
+            list.push_back(normalizedIndex);
+            if (isDB)
+            {
+                PushDB(normalizedIndex);
+            }
+            emit updateInfo(isLeft, true, normalizedIndex);
         }
         else
         {
-            list.push_back(index);
-            PushDB(index);
-            emit updateInfo(isLeft, true, index);
+            list.removeOne(normalizedIndex);
+            if (isDB)
+            {
+                RemoveDB(normalizedIndex);
+            }
+            emit updateInfo(isLeft, false, normalizedIndex);
         }
     }
-    else if (this->selectionMode() == QAbstractItemView::MultiSelection && list.contains(index))
-    {
-        if (!isDB)
-        {
-            list.removeOne(index);
-            emit updateInfo(isLeft, false, index);
-        }
-        else
-        {
-            list.removeOne(index);
-            RemoveDB(index);
-            emit updateInfo(isLeft, false, index);
-        }
-    }
-    info.append(QString :: number(selectedFilesSize) + " KB ");
-    info.append("of " + QString :: number(currentDirSize) + " KB ");
-    info.append("files " + QString:: number(numberOfSelectedFiles) + " of " + QString::number(numberOfFiles) + " folders " +QString::number(numberOfSelectedFolders)+" of " + QString :: number(numberOfFolders));
+    info.append(QString::number(selectedFilesSize) + " KB ");
+    info.append("of " + QString::number(currentDirSize) + " KB ");
+    info.append("files " + QString::number(numberOfSelectedFiles) + " of " + QString::number(numberOfFiles) +
+                " folders " + QString::number(numberOfSelectedFolders) + " of " + QString::number(numberOfFolders));
     emit showInfo(info);
     info.clear();
 }
@@ -516,7 +508,7 @@ void Panel::PushDB(QModelIndex index)
     {
         return;
     }
-    else if(isDB && /*this->getPath() == "/" &&*/ DBmodel->item(index.row(), 1)->text() == " ")
+    else if(isDB && DBmodel->item(index.row(), 1)->text() == " ")
     {
         folderinfo *fi = findFolder(DBmodel->item(index.row(), 2)->text().toInt());
         if (fi)
@@ -525,7 +517,7 @@ void Panel::PushDB(QModelIndex index)
             this->numberOfSelectedFolders++;
         }
     }
-    else if (isDB && /*this->getPath() == "/" &&*/ DBmodel->item(index.row(), 1)->text() != " ")
+    else if (isDB && DBmodel->item(index.row(), 1)->text() != " ")
     {
         chosenItems.push_back(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
         selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
@@ -539,12 +531,12 @@ void Panel::RemoveDB(QModelIndex index)
     {
         return;
     }
-    else if(isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() == " ")
+    else if(isDB && DBmodel->item(index.row(), 1)->text() == " ")
     {
         chosenFolders.remove(findFolder(DBmodel->item(index.row(), 2)->text().toInt()));
         this->numberOfSelectedFolders--;
     }
-    else if (isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() != " ")
+    else if (isDB && DBmodel->item(index.row(), 1)->text() != " ")
     {
         chosenItems.remove(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
         selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
