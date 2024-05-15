@@ -18,6 +18,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     Ui::MainWindow *ui;
     Workspace *workspace;
@@ -35,6 +38,7 @@ private slots:
     void initDrivesComboBoxes();
     void initShortcuts();
     void initButtons();
+    void initToolbar();
     void setPathLabels(QLabel *label, const QString& arg, bool isDriveDatabase);
     void onDriveChanged(const QString &arg);
 };

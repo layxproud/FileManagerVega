@@ -17,6 +17,7 @@
 #include <QStyledItemDelegate>
 #include "xmlparser.h"
 #include "viewip.h"
+#include <QSortFilterProxyModel>
 
 /**
  * @brief Класс для модели, в которой редактируется только первый столбец
@@ -76,6 +77,25 @@ signals:
     void editingFinished(const QModelIndex &) const;
 };
 
+class CustomSortFilterProxyModel : public QSortFilterProxyModel
+{
+public:
+    CustomSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent) {}
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+        // Check if either index refers to the ".." item
+        if (sourceModel()->data(left).toString() == "..") {
+            return true; // Always consider ".." smaller
+        } else if (sourceModel()->data(right).toString() == "..") {
+            return false; // Always consider ".." larger
+        } else {
+            // Default comparison for other items
+            return QSortFilterProxyModel::lessThan(left, right);
+        }
+    }
+};
+
 
 /**
  * @brief The Panel class
@@ -93,6 +113,7 @@ public:
 private:
     bool isDB;
     bool isLeft;
+    CustomSortFilterProxyModel *proxyModel;
 
     /* Файловая система */
     FileSystem *fileSystem;

@@ -1,6 +1,7 @@
 #include "workspace.h"
 
-Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem) :
+Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent) :
+    QObject(parent),
     leftPanel{left},
     rightPanel{right},
     fileSystem{filesystem},
@@ -14,6 +15,11 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem) :
     connect(leftPanel, &Panel::changeFolder, this, &Workspace::indexToString);
     connect(rightPanel, &Panel::changeFolder, this, &Workspace::indexToString);
 }
+
+Workspace::~Workspace()
+{
+}
+
 
 void Workspace::updatePanels()
 {
@@ -388,7 +394,7 @@ void Workspace::createDirDatabase(Panel* panel)
     int new_id = panel->getFunctionsDB()->NewFolder(newCatalog);
     QStandardItem* id = new QStandardItem(QString::number(new_id));
     QStandardItem* name = new QStandardItem(newCatalog);
-    name->setIcon(QIcon("resources/folder.png"));
+    name->setIcon(QIcon(":/icons/resources/folder.png"));
     panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 2, id);
     panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 0, name);
     folderinfo* fold = new folderinfo;
@@ -396,6 +402,7 @@ void Workspace::createDirDatabase(Panel* panel)
     fold->second = newCatalog;
     panel->getFolders()->push_back(fold);
 }
+
 
 void Workspace::changeDir()
 {
@@ -460,6 +467,8 @@ void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
             return;
         }
     }
+    qDebug() << leftPanel->getList();
+    qDebug() << rightPanel->getList();
 }
 
 void Workspace::indexToString(bool isLeft, QModelIndex index)
@@ -541,6 +550,127 @@ void Workspace::changeCurrentPanel()
         if (!leftPanel->currentIndex().isValid())
             leftPanel->setCurrentIndex(leftPanel->model()->index(0, 0, leftPanel->rootIndex()));
     }
+}
+
+void Workspace::comparePortraits()
+{
+    if (!leftPanel->getIsDB() || !rightPanel->getIsDB())
+    {
+        qDebug() << "В обоих панелях должна быть открыта база данных";
+        return;
+    }
+    if (leftPanel->getChosenItems().empty() || rightPanel->getChosenItems().empty())
+    {
+        qDebug() << "В одной из панелей не выбрано ни одного элемента";
+        return;
+    }
+
+    auto leftPortrait = *(leftPanel->getChosenItems().rbegin());
+    auto rightPortrait = *(rightPanel->getChosenItems().rbegin());
+
+    auto fullLeftPortrait = leftPanel->getFunctionsDB()->loadFromDB(leftPortrait->id);
+    auto fullRightPortrait = rightPanel->getFunctionsDB()->loadFromDB(rightPortrait->id);
+
+    calculateComparisonParameters(fullLeftPortrait->terms, fullRightPortrait->terms);
+    calculateComparisonCircles();
+    qDebug() << "Circle 1 radius " << comparisonResults.r1;
+    qDebug() << "Circle 2 radius " << comparisonResults.r2;
+    qDebug() << "Distance between circles " << comparisonResults.d;
+    ipCompare = new IPCompare(comparisonResults);
+    ipCompare->show();
+    widgetsList.append(ipCompare);
+    clearComparisonResults();
+}
+
+void Workspace::killChildren() {
+    foreach (QWidget* widget, widgetsList) {
+        delete widget;
+    }
+    widgetsList.clear();
+}
+
+void Workspace::clearComparisonResults()
+{
+    comparisonResults.comm1 = 0.0;
+    comparisonResults.comm2 = 0.0;
+    comparisonResults.diff1 = 0.0;
+    comparisonResults.diff2 = 0.0;
+    comparisonResults.r1 = 0.0;
+    comparisonResults.r2 = 0.0;
+    comparisonResults.d = 0.0;
+}
+
+
+void Workspace::calculateComparisonParameters(const std::vector<TIPFullTermInfo*>& leftTerms,
+                                            const std::vector<TIPFullTermInfo*>& rightTerms)
+{
+    double c1, c2, d1, d2;
+    std::unordered_map<long, double> leftTermWeights;
+    std::unordered_map<long, double> rightTermWeights;
+
+    for (const auto& term : leftTerms) {
+        leftTermWeights[term->id] = term->weight;
+    }
+
+    for (const auto& term : rightTerms) {
+        rightTermWeights[term->id] = term->weight;
+    }
+
+    c1 = 0;
+    d1 = 0;
+    for (const auto& term : leftTerms) {
+        if (rightTermWeights.find(term->id) != rightTermWeights.end()) {
+            c1 += term->weight;
+        } else {
+            d1 += term->weight;
+        }
+    }
+
+    c2 = 0;
+    d2 = 0;
+    for (const auto& term : rightTerms) {
+        if (leftTermWeights.find(term->id) != leftTermWeights.end()) {
+            c2 += term->weight;
+        } else {
+            d2 += term->weight;
+        }
+    }
+    comparisonResults.comm1 = c1;
+    comparisonResults.comm2 = c2;
+    comparisonResults.diff1 = d1;
+    comparisonResults.diff2 = d2;
+}
+
+void Workspace::calculateComparisonCircles()
+{
+    double c1 = comparisonResults.comm1;
+    double c2 = comparisonResults.comm2;
+    double d1 = comparisonResults.diff1;
+    double d2 = comparisonResults.diff2;
+    double r1 = 0, r2 = 0, rmax = 100, rmin = 0, d = 0, nc2 = 0, nd2 = 0;
+    nc2 = c1;
+    nd2 = (c2 > 0.0000000001) ? d2*c1/c2 : d2;
+    if (c1 + d1 > nc2 + nd2)
+    {
+        r1 = rmax;
+        rmin = r2 = sqrt(100. * 100 * (nc2 + nd2) / (c1 + d1));
+        if (c1 > 0)
+            d = rmax + 2*rmin * (0.5 - nc2 / (nc2 + nd2) );
+        else
+            d = rmin + rmax;
+    }
+    else
+    {
+        r2 = rmax;
+        rmin = r1 = sqrt(100. * 100 * (c1 + d1) / (nc2 + nd2));
+        if (c2 > 0)
+            d = rmax  + 2*rmin * (0.5 - c1 / (c1 + d1));
+        else
+            d = rmin + rmax;
+    }
+    comparisonResults.r1 = r1;
+    comparisonResults.r2 = r2;
+    comparisonResults.d = d;
 }
 
 void Workspace::updateInfoDB(bool isLeft, bool isPlus)

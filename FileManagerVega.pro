@@ -30,6 +30,7 @@ SOURCES += \
         curlhandler.cpp \
         filesystem.cpp \
         inifile.cpp \
+        ipcompare.cpp \
         main.cpp \
         mainwindow.cpp \
         panel.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
         curlhandler.h \
         filesystem.h \
         inifile.h \
+        ipcompare.h \
         mainwindow.h \
         panel.h \
         tinyxml2.h \
@@ -56,6 +58,7 @@ HEADERS += \
         xmlparser.h
 
 FORMS += \
+        ipcompare.ui \
         mainwindow.ui \
         viewip.ui
 
@@ -70,16 +73,10 @@ CONFIG(debug, debug|release) {
     INCLUDEPATH += $$LIBCURL_RELEASE_PATH/include
 }
 
-
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    resources/dbf.png \
-    resources/folder.png \
-    resources/icon \
-    resources/icon.ico \
-    resources/redo.png \
-    resources/undo.png
+RESOURCES += \
+    res.qrc

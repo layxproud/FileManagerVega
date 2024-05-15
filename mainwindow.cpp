@@ -23,13 +23,22 @@ MainWindow::MainWindow(QWidget *parent) :
     initDrivesComboBoxes();
     initShortcuts();
     initButtons();
+    initToolbar();
 }
 
 MainWindow::~MainWindow()
 {
-    delete workspace;
     delete iniFile;
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (workspace)
+    {
+        workspace->killChildren();
+    }
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::initDrivesComboBoxes()
@@ -100,6 +109,11 @@ void MainWindow::initButtons()
     // TODO: IMPLEMENT SORT BUTTON
 
     connect(ui->exitButton, &QPushButton::clicked, this, &MainWindow::close);
+}
+
+void MainWindow::initToolbar()
+{
+    connect(ui->actionIPCompare, &QAction::triggered, workspace, &Workspace::comparePortraits);
 }
 
 void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDatabase)

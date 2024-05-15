@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>IPManager</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -265,6 +265,30 @@
     </item>
    </layout>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionIPCompare"/>
+  </widget>
+  <action name="actionIPCompare">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/compare.png</normaloff>:/icons/resources/compare.png</iconset>
+   </property>
+   <property name="text">
+    <string>IPCompare</string>
+   </property>
+   <property name="toolTip">
+    <string>Сравнение портретов</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -274,6 +298,8 @@
    <header>panel.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>

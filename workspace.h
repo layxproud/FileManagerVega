@@ -5,6 +5,10 @@
 #include <filesystem.h>
 #include <QMessageBox>
 #include <iostream>
+#include "trmlshell.h"
+#include <unordered_map>
+#include <algorithm>
+#include "ipcompare.h"
 
 enum Button {
     Copy = 0,
@@ -18,13 +22,17 @@ class Workspace : public QObject
     Q_OBJECT
 
 public:
-    Workspace(Panel *left, Panel *right, FileSystem *filesystem);
+    Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent = nullptr);
+    ~Workspace();
 
 private:
     Panel *leftPanel;
     Panel *rightPanel;
     FileSystem *fileSystem;
     bool isLeftCurrent;
+    IPCompareResults comparisonResults;
+    IPCompare *ipCompare;
+    QList<QWidget*> widgetsList;
 
 private:
     void updatePanels();
@@ -45,6 +53,11 @@ private:
     void createDirFileSystem(Panel *panel);
     void createDirDatabase(Panel *panel);
 
+    void clearComparisonResults();
+    void calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
+                             const std::vector<TIPFullTermInfo *> &rightTerms);
+    void calculateComparisonCircles();
+
 public slots:
     bool getIsLeftCurrent();
     void choose();
@@ -59,6 +72,8 @@ public slots:
     void indexToString(bool isLeft, QModelIndex index);
     void changeSelectionMode();
     void changeCurrentPanel();
+    void comparePortraits();
+    void killChildren();
 };
 
 #endif // WORKSPACE_H

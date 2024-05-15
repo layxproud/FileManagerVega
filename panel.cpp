@@ -60,17 +60,14 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
         setPath("/");
         setIfDB(true);
         ChangeFolderDB(1);
-        header()->setSectionResizeMode(QHeaderView::Interactive);
     }
     else
     {
         setIfDB(false);
         setFileSystem(fileSystem);
         setRootIndex(fileSystem->index(arg));
-        update();
-        header()->setSectionResizeMode(QHeaderView::Interactive);
     }
-
+    header()->setSectionResizeMode(QHeaderView::Interactive);
     clearPanel();
 }
 
@@ -107,10 +104,9 @@ void Panel::choose(const QModelIndex &originalIndex)
     if (!originalIndex.isValid())
         return;
 
-    // Normalize the index to the first column of its row
     QModelIndex normalizedIndex = originalIndex.sibling(originalIndex.row(), 0);
 
-    if (this->selectionMode()!= QAbstractItemView::MultiSelection)
+    if (this->selectionMode() != QAbstractItemView::MultiSelection)
     {
         if (this->selectionMode() == QAbstractItemView::NoSelection)
         {
@@ -369,11 +365,11 @@ void Panel::ChangeFolderDB(folderid folder)
             {
                 if (DBmodel->item(i, 3)->text() == " ")
                 {
-                    DBmodel->item(i, 0)->setIcon(QIcon("resources/folder.png"));
+                    DBmodel->item(i, 0)->setIcon(QIcon(":/icons/resources/folder.png"));
                 }
                 else
                 {
-                    DBmodel->item(i, 0)->setIcon(QIcon("resources/dbf.png"));
+                    DBmodel->item(i, 0)->setIcon(QIcon(":/icons/resources/dbf.png"));
                 }
             }
             j++;

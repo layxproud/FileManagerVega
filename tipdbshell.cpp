@@ -737,7 +737,7 @@ bool TIPDBShell::RenameItem(TIPInfo *item, const QString& newName)
         return false; // Wrong input data
 
     QSqlQuery dbq(*db);
-    QString query = QString("UPDATE document SET title = :newName WHERE id = :id");
+    QString query = QString("UPDATE ip_portrait SET comment = :newName WHERE id = :id");
     dbq.prepare(query);
     dbq.bindValue(":newName", newName);
     dbq.bindValue(":id", QVariant::fromValue(item->id));
@@ -1215,10 +1215,10 @@ float TIPDBShell::GetOperationProgress()
     return ret;
 }
 
-bool TIPDBShell::CompareItems(TIPInfo *item)
+bool TIPDBShell::CompareItems(TIPFullInfo *item1, TIPFullInfo *item2)
 {
-    start = true;
-    return start;
+    qDebug() << "Comparing " << item1->id << " and " << item2->id << " same DB";
+    return true;
 }
 
 bool TIPDBShell::CompareItemsToFile(QString filename)

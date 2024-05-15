@@ -85,7 +85,6 @@ class TIPDBShell
     QString getFolderNameById(folderid id);
     bool loadFromFile(QString filename, TIPInfo *info, TIPFullInfo *full);
     bool saveToDB(TIPFullInfo *full);
-    TIPFullInfo *loadFromDB(int id);
     bool saveToFile(TIPFullInfo *full, QString filename);
 
 public:
@@ -93,6 +92,8 @@ public:
     bool Init(QString shost, QString sdbname, int iport, QString suser, QString spass);
 
     QSqlDatabase *getDataBase();
+    // Переместил из private
+    TIPFullInfo *loadFromDB(int id);
 
     folderid ChangeFolder(folderid id = 0, QString newFolder = "");
     folderinfo GetCurrentFolder();
@@ -115,7 +116,7 @@ public:
 
     float GetOperationProgress();
 
-    bool CompareItems(TIPInfo *item);
+    bool CompareItems(TIPFullInfo *item1, TIPFullInfo *item2);
     bool CompareItemsToFile(QString filename);
 
 private:
