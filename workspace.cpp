@@ -573,9 +573,6 @@ void Workspace::comparePortraits()
 
     calculateComparisonParameters(fullLeftPortrait->terms, fullRightPortrait->terms);
     calculateComparisonCircles();
-    qDebug() << "Circle 1 radius " << comparisonResults.r1;
-    qDebug() << "Circle 2 radius " << comparisonResults.r2;
-    qDebug() << "Distance between circles " << comparisonResults.d;
     ipCompare = new IPCompare(comparisonResults);
     connect(ipCompare, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
     ipCompare->show();

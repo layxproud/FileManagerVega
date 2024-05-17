@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->leftPanel, &Panel::showPath, ui->labelLeftPath, &QLabel::setText);
     connect(ui->rightPanel, &Panel::showPath, ui->labelRightPath, &QLabel::setText);
 
-    workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem);
+    workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem, this);
     workspace->updateFolder(true, QDir::drives().at(0).path());
     workspace->updateFolder(false, QDir::drives().at(0).path());
 
