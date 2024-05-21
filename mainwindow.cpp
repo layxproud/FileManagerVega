@@ -5,7 +5,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow{parent},
     ui{new Ui::MainWindow},
     fileSystem{new FileSystem(this)},
-    iniFile{new TIniFile("db.ini")}
+    iniFile{new TIniFile("db.ini")},
+    serviceHandler{new ServiceHandler(this)}
 {
     ui->setupUi(this);
 
@@ -19,11 +20,18 @@ MainWindow::MainWindow(QWidget *parent) :
     workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem, this);
     workspace->updateFolder(true, QDir::drives().at(0).path());
     workspace->updateFolder(false, QDir::drives().at(0).path());
+    workspace->setServiceHandler(serviceHandler);
 
     initDrivesComboBoxes();
     initShortcuts();
     initButtons();
     initToolbar();
+
+    loginWindow = new LoginWindow(this);
+    loginWindow->setModal(true);
+    connect(loginWindow, &LoginWindow::loginAttempt, serviceHandler, &ServiceHandler::receiveAccessToken);
+    connect(serviceHandler, &ServiceHandler::tokenReceived, loginWindow, &LoginWindow::onTokenReceived);
+    loginWindow->show();
 }
 
 MainWindow::~MainWindow()
@@ -114,6 +122,7 @@ void MainWindow::initButtons()
 void MainWindow::initToolbar()
 {
     connect(ui->actionIPCompare, &QAction::triggered, workspace, &Workspace::comparePortraits);
+    connect(ui->actiongetXMLFile, &QAction::triggered, workspace, &Workspace::getXMLFile);
 }
 
 void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDatabase)

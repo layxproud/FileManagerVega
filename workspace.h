@@ -5,10 +5,8 @@
 #include <filesystem.h>
 #include <QMessageBox>
 #include <iostream>
-#include "trmlshell.h"
-#include <unordered_map>
-#include <algorithm>
 #include "ipcompare.h"
+#include "servicehandler.h"
 
 enum Button {
     Copy = 0,
@@ -25,12 +23,14 @@ public:
     Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent = nullptr);
     ~Workspace();
 
+    void setServiceHandler(ServiceHandler *sh);
+
 private:
     Panel *leftPanel;
     Panel *rightPanel;
     FileSystem *fileSystem;
+    ServiceHandler *serviceHandler;
     bool isLeftCurrent;
-    IPCompareResults comparisonResults;
     IPCompare *ipCompare;
     QList<QWidget*> widgetsList;
 
@@ -73,7 +73,12 @@ public slots:
     void indexToString(bool isLeft, QModelIndex index);
     void changeSelectionMode();
     void changeCurrentPanel();
+
+    // Семантические функции
     void comparePortraits();
+    void getXMLFile();
+
+    // GUI
     void killChildren();
 };
 

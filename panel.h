@@ -145,6 +145,7 @@ signals:
     void showPath(const QString &);
 
     void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
+    void updateInfoDB(bool isLeft, bool isPlus);
     void changeFolder(bool isLeft, QModelIndex index);
 
 public slots:

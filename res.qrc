@@ -7,5 +7,10 @@
         <file>resources/redo.png</file>
         <file>resources/undo.png</file>
         <file>resources/compare.png</file>
+        <file>resources/xml-file.png</file>
+        <file>resources/vega-logo.png</file>
+    </qresource>
+    <qresource prefix="/gifs">
+        <file>resources/loading.gif</file>
     </qresource>
 </RCC>

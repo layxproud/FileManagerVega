@@ -17,7 +17,7 @@ class IPCompare : public QWidget
     Q_OBJECT
 
 public:
-    explicit IPCompare(IPCompareResults &res, QWidget *parent = nullptr);
+    explicit IPCompare(const IPCompareResults &res, QWidget *parent = nullptr);
     ~IPCompare();
 
 private:

@@ -27,13 +27,14 @@ CONFIG += c++11
 SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
-        curlhandler.cpp \
         filesystem.cpp \
         inifile.cpp \
         ipcompare.cpp \
+        loginwindow.cpp \
         main.cpp \
         mainwindow.cpp \
         panel.cpp \
+        servicehandler.cpp \
         tinyxml2.cpp \
         tipdbshell.cpp \
         trmlshell.cpp \
@@ -44,12 +45,13 @@ SOURCES += \
 HEADERS += \
         Lemmatizer.h \
         agramtab.h \
-        curlhandler.h \
         filesystem.h \
         inifile.h \
         ipcompare.h \
+        loginwindow.h \
         mainwindow.h \
         panel.h \
+        servicehandler.h \
         tinyxml2.h \
         tipdbshell.h \
         trmlshell.h \
@@ -59,6 +61,7 @@ HEADERS += \
 
 FORMS += \
         ipcompare.ui \
+        loginwindow.ui \
         mainwindow.ui \
         viewip.ui
 

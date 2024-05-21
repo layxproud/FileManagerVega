@@ -5,13 +5,16 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject 
     leftPanel{left},
     rightPanel{right},
     fileSystem{filesystem},
-    isLeftCurrent{true}
+    isLeftCurrent{true},
+    serviceHandler{}
 {
     leftPanel->setFocus();
     leftPanel->setCurrentIndex(this->leftPanel->currentIndex());
 
     connect(leftPanel, &Panel::updateInfo, this, &Workspace::updateInfo);
     connect(rightPanel, &Panel::updateInfo, this, &Workspace::updateInfo);
+    connect(leftPanel, &Panel::updateInfoDB, this, &Workspace::updateInfoDB);
+    connect(rightPanel, &Panel::updateInfoDB, this, &Workspace::updateInfoDB);
     connect(leftPanel, &Panel::changeFolder, this, &Workspace::indexToString);
     connect(rightPanel, &Panel::changeFolder, this, &Workspace::indexToString);
 }
@@ -20,6 +23,10 @@ Workspace::~Workspace()
 {
 }
 
+void Workspace::setServiceHandler(ServiceHandler* sh)
+{
+    this->serviceHandler = sh;
+}
 
 void Workspace::updatePanels()
 {
@@ -471,6 +478,38 @@ void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
     qDebug() << rightPanel->getList();
 }
 
+void Workspace::updateInfoDB(bool isLeft, bool isPlus)
+{
+    if (isLeft)
+    {
+        isLeftCurrent = true;
+        for (auto i = leftPanel->getChosenItems().begin(); i != leftPanel->getChosenItems().end(); i++)
+        {
+            leftPanel->changeSize(isPlus, (*i)->sizeInBytes / 1024);
+            leftPanel->changeCountChosenFiles(isPlus);
+        }
+        for (auto i = leftPanel->getChosenFolders().begin(); i != leftPanel->getChosenFolders().end(); i++)
+        {
+            leftPanel->changeSize(isPlus, 0);
+            leftPanel->changeCountChosenFolders(isPlus);
+        }
+    }
+    else
+    {
+        isLeftCurrent = false;
+        for (auto i = rightPanel->getChosenItems().begin(); i != rightPanel->getChosenItems().end(); i++)
+        {
+            rightPanel->changeSize(isPlus, (*i)->sizeInBytes / 1024);
+            rightPanel->changeCountChosenFiles(isPlus);
+        }
+        for (auto i = rightPanel->getChosenFolders().begin(); i != rightPanel->getChosenFolders().end(); i++)
+        {
+            rightPanel->changeSize(isPlus, 0);
+            rightPanel->changeCountChosenFolders(isPlus);
+        }
+    }
+}
+
 void Workspace::indexToString(bool isLeft, QModelIndex index)
 {
     if (isLeft && leftPanel->getIsDB())
@@ -554,6 +593,11 @@ void Workspace::changeCurrentPanel()
 
 void Workspace::comparePortraits()
 {
+    if (!serviceHandler) {
+        qDebug() << "Проблема с модулем веб-сервисов";
+        return;
+    }
+
     if (!leftPanel->getIsDB() || !rightPanel->getIsDB())
     {
         qDebug() << "В обоих панелях должна быть открыта база данных";
@@ -571,13 +615,29 @@ void Workspace::comparePortraits()
     auto fullLeftPortrait = leftPanel->getFunctionsDB()->loadFromDB(leftPortrait->id);
     auto fullRightPortrait = rightPanel->getFunctionsDB()->loadFromDB(rightPortrait->id);
 
-    calculateComparisonParameters(fullLeftPortrait->terms, fullRightPortrait->terms);
-    calculateComparisonCircles();
-    ipCompare = new IPCompare(comparisonResults);
+    ipCompare = new IPCompare(
+        serviceHandler->comparePortraits(fullLeftPortrait->terms, fullRightPortrait->terms));
     connect(ipCompare, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
     ipCompare->show();
     widgetsList.append(ipCompare);
-    clearComparisonResults();
+}
+
+void Workspace::getXMLFile()
+{
+    if (!serviceHandler) {
+        qDebug() << "Проблема с модулем веб-сервисов";
+        return;
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/index/xml?access_key=good&input_doc_id=701";
+    std::string filePath = "output.xml";
+
+    if(serviceHandler->getXMLFile(url, filePath)) {
+        std::cout << "File downloaded successfully to " << filePath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to download file" << std::endl;
+    }
 }
 
 void Workspace::killChildren() {
@@ -587,126 +647,10 @@ void Workspace::killChildren() {
     widgetsList.clear();
 }
 
-void Workspace::clearComparisonResults()
-{
-    comparisonResults.comm1 = 0.0;
-    comparisonResults.comm2 = 0.0;
-    comparisonResults.diff1 = 0.0;
-    comparisonResults.diff2 = 0.0;
-    comparisonResults.r1 = 0.0;
-    comparisonResults.r2 = 0.0;
-    comparisonResults.d = 0.0;
-}
-
-
-void Workspace::calculateComparisonParameters(const std::vector<TIPFullTermInfo*>& leftTerms,
-                                            const std::vector<TIPFullTermInfo*>& rightTerms)
-{
-    double c1, c2, d1, d2;
-    std::unordered_map<QString, double> leftTermWeights;
-    std::unordered_map<QString, double> rightTermWeights;
-
-    for (const auto& term : leftTerms) {
-        leftTermWeights[term->term] = term->weight;
-    }
-
-    for (const auto& term : rightTerms) {
-        rightTermWeights[term->term] = term->weight;
-    }
-
-    c1 = 0;
-    d1 = 0;
-    for (const auto& term : leftTerms) {
-        if (rightTermWeights.find(term->term) != rightTermWeights.end()) {
-            c1 += term->weight;
-        } else {
-            d1 += term->weight;
-        }
-    }
-
-    c2 = 0;
-    d2 = 0;
-    for (const auto& term : rightTerms) {
-        if (leftTermWeights.find(term->term) != leftTermWeights.end()) {
-            c2 += term->weight;
-        } else {
-            d2 += term->weight;
-        }
-    }
-    comparisonResults.comm1 = c1;
-    comparisonResults.comm2 = c2;
-    comparisonResults.diff1 = d1;
-    comparisonResults.diff2 = d2;
-}
-
-void Workspace::calculateComparisonCircles()
-{
-    double c1 = comparisonResults.comm1;
-    double c2 = comparisonResults.comm2;
-    double d1 = comparisonResults.diff1;
-    double d2 = comparisonResults.diff2;
-    double r1 = 0, r2 = 0, rmax = 100, rmin = 0, d = 0, nc2 = 0, nd2 = 0;
-    nc2 = c1;
-    nd2 = (c2 > 0.0000000001) ? d2*c1/c2 : d2;
-    if (c1 + d1 > nc2 + nd2)
-    {
-        r1 = rmax;
-        rmin = r2 = sqrt(100. * 100 * (nc2 + nd2) / (c1 + d1));
-        if (c1 > 0)
-            d = rmax + 2*rmin * (0.5 - nc2 / (nc2 + nd2) );
-        else
-            d = rmin + rmax;
-    }
-    else
-    {
-        r2 = rmax;
-        rmin = r1 = sqrt(100. * 100 * (c1 + d1) / (nc2 + nd2));
-        if (c2 > 0)
-            d = rmax  + 2*rmin * (0.5 - c1 / (c1 + d1));
-        else
-            d = rmin + rmax;
-    }
-    comparisonResults.r1 = r1;
-    comparisonResults.r2 = r2;
-    comparisonResults.d = d;
-}
-
 void Workspace::handleWidgetDestroyed(QObject *object)
 {
     QWidget *widget = qobject_cast<QWidget*>(object);
     if (widget && widgetsList.contains(widget)) {
         widgetsList.removeOne(widget);
-    }
-}
-
-void Workspace::updateInfoDB(bool isLeft, bool isPlus)
-{
-    if (isLeft)
-    {
-        isLeftCurrent = true;
-        for (auto i = leftPanel->getChosenItems().begin(); i != leftPanel->getChosenItems().end(); i++)
-        {
-            leftPanel->changeSize(isPlus, (*i)->sizeInBytes / 1024);
-            leftPanel->changeCountChosenFiles(isPlus);
-        }
-        for (auto i = leftPanel->getChosenFolders().begin(); i != leftPanel->getChosenFolders().end(); i++)
-        {
-            leftPanel->changeSize(isPlus, 0);
-            leftPanel->changeCountChosenFolders(isPlus);
-        }
-    }
-    else
-    {
-        isLeftCurrent = false;
-        for (auto i = rightPanel->getChosenItems().begin(); i != rightPanel->getChosenItems().end(); i++)
-        {
-            rightPanel->changeSize(isPlus, (*i)->sizeInBytes / 1024);
-            rightPanel->changeCountChosenFiles(isPlus);
-        }
-        for (auto i = rightPanel->getChosenFolders().begin(); i != rightPanel->getChosenFolders().end(); i++)
-        {
-            rightPanel->changeSize(isPlus, 0);
-            rightPanel->changeCountChosenFolders(isPlus);
-        }
     }
 }

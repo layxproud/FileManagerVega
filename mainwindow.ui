@@ -276,6 +276,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionIPCompare"/>
+   <addaction name="actiongetXMLFile"/>
   </widget>
   <action name="actionIPCompare">
    <property name="icon">
@@ -287,6 +288,18 @@
    </property>
    <property name="toolTip">
     <string>Сравнение портретов</string>
+   </property>
+  </action>
+  <action name="actiongetXMLFile">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/xml-file.png</normaloff>:/icons/resources/xml-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>getXMLFile</string>
+   </property>
+   <property name="toolTip">
+    <string>Получить XML файл</string>
    </property>
   </action>
  </widget>

@@ -2,7 +2,7 @@
 #include "ui_ipcompare.h"
 #include <QDebug>
 
-IPCompare::IPCompare(IPCompareResults &res, QWidget *parent) :
+IPCompare::IPCompare(const IPCompareResults &res, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::IPCompare),
     params(res)

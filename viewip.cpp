@@ -2,14 +2,14 @@
 #include "ui_viewip.h"
 #include <QDebug>
 
-ViewIP::ViewIP(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
-    , totalTermsWeight(0)
-    , totalShinglesWeight(0)
-    , top10Terms{}
-    , top10Shingles{}
-    , percentages{}
+ViewIP::ViewIP(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::Widget),
+    totalTermsWeight(0),
+    totalShinglesWeight(0),
+    top10Terms{},
+    top10Shingles{},
+    percentages{}
 {
     ui->setupUi(this);
     setWindowModality(Qt::ApplicationModal);

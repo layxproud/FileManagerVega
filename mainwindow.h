@@ -5,6 +5,8 @@
 #include "workspace.h"
 #include "filesystem.h"
 #include "inifile.h"
+#include "loginwindow.h"
+#include "servicehandler.h"
 
 namespace Ui {
 class MainWindow;
@@ -26,6 +28,8 @@ private:
     Workspace *workspace;
     FileSystem *fileSystem;
     TIniFile *iniFile;
+    LoginWindow *loginWindow;
+    ServiceHandler *serviceHandler;
 
     QShortcut *tab;
     QShortcut *backspace;
