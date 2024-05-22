@@ -4,62 +4,22 @@
 #include <QDebug>
 
 ServiceHandler::ServiceHandler(QObject *parent)
-    : QObject{parent}
+    : QObject{parent},
+    worker(new NetworkWorker()),
+    workerThread(new QThread(this))
 {
+    worker->moveToThread(workerThread);
+    connect(workerThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::onWorkerReceivedToken);
+    connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
+    workerThread->start();
 }
 
 ServiceHandler::~ServiceHandler()
 {
-}
-
-void ServiceHandler::receiveAccessToken(const QString &login, const QString &pass)
-{
-    CURL *curl;
-    CURLcode res;
-    std::string readBuffer;
-
-    std::string url = "https://vega.mirea.ru/authservice.php?op=getusertoken&login=" + login.toStdString() + "&password=" + pass.toStdString();
-
-    curl = curl_easy_init();
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-        }
-        else {
-            QByteArray jsonData = QByteArray::fromStdString(readBuffer);
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
-            if (!jsonDoc.isNull()) {
-                if (jsonDoc.isObject()) {
-                    QJsonObject jsonObj = jsonDoc.object();
-                    if (jsonObj.contains("token")) {
-                        accessToken = jsonObj["token"].toString().toStdString();
-                        emit tokenReceived();
-                        qDebug() << "Token: " << QString::fromStdString(accessToken);
-                    }
-                    else {
-                        std::cerr << "JSON parse error: 'token' not found" << std::endl;
-                    }
-                }
-                else {
-                    std::cerr << "JSON parse error: Document is not an object" << std::endl;
-                }
-            }
-            else {
-                std::cerr << "JSON parse error" << std::endl;
-            }
-        }
-        curl_easy_cleanup(curl);
-    }
-}
-
-void ServiceHandler::setAccessToken(const std::string &token)
-{
-    accessToken = token;
+    workerThread->quit();
+    workerThread->wait();
+    delete workerThread;
 }
 
 IPCompareResults ServiceHandler::comparePortraits(const std::vector<TIPFullTermInfo *> &leftTerms,
@@ -69,37 +29,6 @@ IPCompareResults ServiceHandler::comparePortraits(const std::vector<TIPFullTermI
     calculateComparisonParameters(leftTerms, rightTerms);
     calculateComparisonCircles();
     return comparisonResults;
-}
-
-bool ServiceHandler::getXMLFile(const string &url, const string &filePath)
-{
-    CURL *curl;
-    FILE *fp;
-    CURLcode res;
-
-    curl = curl_easy_init();
-    if (curl) {
-        fp = fopen(filePath.c_str(), "wb");
-        if (!fp) {
-            std::cerr << "Failed to open file " << filePath << std::endl;
-            return false;
-        }
-
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-        }
-
-        fclose(fp);
-        curl_easy_cleanup(curl);
-
-        return res == CURLE_OK;
-    }
-    return false;
 }
 
 void ServiceHandler::calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
@@ -183,4 +112,119 @@ void ServiceHandler::calculateComparisonCircles()
     comparisonResults.r1 = r1;
     comparisonResults.r2 = r2;
     comparisonResults.d = d;
+}
+
+void ServiceHandler::getAccessToken(const QString &login, const QString &pass)
+{
+    QMetaObject::invokeMethod(worker, "receiveAccessToken", Q_ARG(QString, login), Q_ARG(QString, pass));
+    // worker->receiveAccessToken(login, pass);
+}
+
+void ServiceHandler::getXmlFile(const string &url, const string &filePath)
+{
+    worker->getXmlFile(url, filePath);
+}
+
+void ServiceHandler::onWorkerReceivedToken(bool success)
+{
+    emit tokenReceived(success);
+}
+
+void ServiceHandler::onWorkerGotXmlFile(bool success)
+{
+    if (success) {
+        std::cout << "File downloaded successfully" << std::endl;
+    } else {
+        std::cerr << "Failed to download file" << std::endl;
+    }
+}
+
+NetworkWorker::NetworkWorker(QObject *parent) :
+    QObject{parent}
+{
+
+}
+
+NetworkWorker::~NetworkWorker()
+{
+
+}
+
+void NetworkWorker::receiveAccessToken(const QString& login, const QString& pass)
+{
+    CURL *curl;
+    CURLcode res;
+    std::string readBuffer;
+
+    std::string url = "https://vega.mirea.ru/authservice.php?op=getusertoken&login=" + login.toStdString() + "&password=" + pass.toStdString();
+
+    curl = curl_easy_init();
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+        }
+        else {
+            QByteArray jsonData = QByteArray::fromStdString(readBuffer);
+            QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+            if (!jsonDoc.isNull()) {
+                if (jsonDoc.isObject()) {
+                    QJsonObject jsonObj = jsonDoc.object();
+                    if (jsonObj.contains("token")) {
+                        accessToken = jsonObj["token"].toString().toStdString();
+                        emit tokenReceived(true);
+                    }
+                    else {
+                        std::cerr << "JSON parse error: 'token' not found" << std::endl;
+                        emit tokenReceived(false);
+                    }
+                }
+                else {
+                    std::cerr << "JSON parse error: Document is not an object" << std::endl;
+                    emit tokenReceived(false);
+                }
+            }
+            else {
+                std::cerr << "JSON parse error" << std::endl;
+                emit tokenReceived(false);
+            }
+        }
+        curl_easy_cleanup(curl);
+    }
+}
+
+void NetworkWorker::getXmlFile(const string &url, const string &filePath)
+{
+    CURL *curl;
+    FILE *fp;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (curl) {
+        fp = fopen(filePath.c_str(), "wb");
+        if (!fp) {
+            std::cerr << "Failed to open file " << filePath << std::endl;
+            emit xmlFileDownloaded(false);
+        }
+
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+            emit xmlFileDownloaded(false);
+        }
+
+        fclose(fp);
+        curl_easy_cleanup(curl);
+
+        emit xmlFileDownloaded(true);
+    }
+    emit xmlFileDownloaded(false);
 }

@@ -33,6 +33,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 int main(int argc, char *argv[])
 {
+    // Очистка файла
+    QFile outputFile("debug.log");
+    if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        outputFile.close();
+    } else {
+        qDebug() << "Failed to open log file for clearing";
+    }
     // qputenv("QT_DEBUG_PLUGINS", QByteArray("1"));
     qInstallMessageHandler(customMessageHandler);
 

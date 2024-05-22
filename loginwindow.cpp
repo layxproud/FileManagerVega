@@ -17,26 +17,27 @@ LoginWindow::~LoginWindow()
     delete ui;
 }
 
-void LoginWindow::onTokenReceived()
+void LoginWindow::onTokenReceived(bool success)
 {
     ui->loadingLabel->movie()->stop();
     ui->loadingLabel->clear();
 
-    QMessageBox msgBox;
-    msgBox.setText("Вход выполнен успешно");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
+    if (success) {
+        this->close();
+    }
 
-    connect(&msgBox, &QMessageBox::buttonClicked, this, &LoginWindow::onMsgBoxAccepted);
-    connect(&msgBox, &QMessageBox::finished, this, &LoginWindow::onMsgBoxAccepted);
-
-    msgBox.exec();
+    ui->loginInput->setEnabled(true);
+    ui->passwordInput->setEnabled(true);
+    ui->loadingLabel->setText("Вход не удался");
+    ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
 }
 
 void LoginWindow::onLoginButtonClicked()
 {
     ui->loadingLabel->setMovie(movie);
     ui->loadingLabel->movie()->start();
+    ui->loginInput->setEnabled(false);
+    ui->passwordInput->setEnabled(false);
     emit loginAttempt(ui->loginInput->text(), ui->passwordInput->text());
 }
 
@@ -44,3 +45,9 @@ void LoginWindow::onMsgBoxAccepted()
 {
     this->accept();
 }
+
+void LoginWindow::on_pushButton_clicked()
+{
+    this->accept();
+}
+

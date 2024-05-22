@@ -22,11 +22,13 @@ private:
     QMovie *movie;
 
 public slots:
-    void onTokenReceived();
+    void onTokenReceived(bool success);
 
 private slots:
     void onLoginButtonClicked();
     void onMsgBoxAccepted();
+
+    void on_pushButton_clicked();
 
 signals:
     void loginAttempt(const QString& login, const QString& pass);

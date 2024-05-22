@@ -94,8 +94,8 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>30</width>
-           <height>30</height>
+           <width>1000</width>
+           <height>1000</height>
           </size>
          </property>
          <property name="text">
@@ -155,11 +155,25 @@
           </font>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(21, 213, 85);
-color: white;</string>
+          <string notr="true">#loginButton {
+    background-color: rgb(21, 213, 85);
+    color: white;
+}
+
+#loginButton:hover {
+    background-color: rgb(17, 179, 71); 
+    color: yellow;
+}</string>
          </property>
          <property name="text">
           <string>Вход</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>PushButton</string>
          </property>
         </widget>
        </item>

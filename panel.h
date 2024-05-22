@@ -19,24 +19,13 @@
 #include "viewip.h"
 #include <QSortFilterProxyModel>
 
-/**
- * @brief Класс для модели, в которой редактируется только первый столбец
- */
+
 class EditableNameModel : public QStandardItemModel {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Базовый конструтор
-     * @param parent - родитель
-     */
     EditableNameModel(QObject *parent = nullptr) : QStandardItemModel(parent) {}
 
-    /**
-     * @brief Задание флагов для столбцов
-     * @param index - индекс столбца
-     * @return
-     */
     Qt::ItemFlags flags(const QModelIndex &index) const override {
         Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
 
@@ -49,31 +38,19 @@ public:
     }
 };
 
-/**
- * @brief Класс для корректного редактирования объектов БД
- */
+
 class MyEditingDelegate : public QStyledItemDelegate {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Стандартный конструтор
-     * @param parent - родитель
-     */
     MyEditingDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
 
-    /**
-     * @brief Возвращает обновленные данные в модель
-     */
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
         QStyledItemDelegate::setModelData(editor, model, index);
         emit editingFinished(index);
     }
 
 signals:
-    /**
-     * @brief По завершении редактирования отправляет сигнал
-     */
     void editingFinished(const QModelIndex &) const;
 };
 
@@ -84,31 +61,31 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
-        // Check if either index refers to the ".." item
         if (sourceModel()->data(left).toString() == "..") {
-            return true; // Always consider ".." smaller
+            return true;
         } else if (sourceModel()->data(right).toString() == "..") {
-            return false; // Always consider ".." larger
+            return false;
         } else {
-            // Default comparison for other items
             return QSortFilterProxyModel::lessThan(left, right);
         }
     }
 };
 
-
-/**
- * @brief The Panel class
- */
 class Panel : public QTreeView
 {
     Q_OBJECT
 
 public:
     explicit Panel(QWidget *parent);
+    ~Panel();
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
+    void setIsleft(bool isLeft);
+    void setIsDB(bool isDB);
+    void setPath(QString path);
+    bool getIsDB();
+
 
 private:
     bool isDB;
@@ -123,7 +100,7 @@ private:
     int numberOfFolders, numberOfFiles;
     long long int selectedFilesSize;
     long long int currentDirSize;
-    QModelIndexList list; // список выделенных индексов
+    QModelIndexList list;
 
     /* База данных */
     QStandardItemModel *DBmodel;
@@ -145,44 +122,26 @@ signals:
     void showPath(const QString &);
 
     void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
-    void updateInfoDB(bool isLeft, bool isPlus);
-    void changeFolder(bool isLeft, QModelIndex index);
+    void changeFolder(bool isLeft, QString path, bool isDB);
 
 public slots:
-    /**
-     * @brief Функция возвращающая текущий путь
-     * @return
-     */
-    QString getPath(); // получаем путь
-    QString getInfo(); // получаем информацию под панелью
-    QModelIndexList &getList(); // получаем список выбранных индексов
+    QString getPath();
+    QString getInfo();
+    QModelIndexList &getList();
     FileSystem* getFilesystem();
 
     void chooseButton();
-    /**
-     * @brief Определяет действие при одиночном клике
-     * @param index - индекс нажатого элемента
-     */
     void choose(const QModelIndex &index);
-    /**
-     * @brief Определяет действие при двойном клике
-     * @param index - индекс нажатого элемента
-     */
     void changeDirectory(const QModelIndex &index);
-    /**
-     * @brief Меняет режим выбора элементов
-     */
     void changeSelectionMode();
     void changeCountChosenFiles(bool isPlus);
     void changeCountChosenFolders(bool isPlus);
     void changeSize(bool isPlus, long long int delta);
     void changeCurrentFolderInfo(QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount);
-    void setIsleft(bool isLeft);
-    void setPath(QString path);
+
     void setFileSystem(FileSystem *filesystem);
     void ChangeFolderDB(folderid folder);
-    bool getIsDB();
-    void setIfDB(bool ifDB);
+
     TIPDBShell* getFunctionsDB();
     std::vector<TIPInfo*>* getItems();
     std::vector<folderinfo*>* getFolders();
@@ -199,11 +158,14 @@ public slots:
     std::list <folderinfo*> &getChosenFolders();
     void onEditFinished(const QModelIndex &index);
 
-    void InfoToString();
+    void infoToString();
     void clearInfo();
     void arrowUp();
     void arrowDown();
     void refreshDB();
+
+private slots:
+    void openFile(const QModelIndex &index);
 };
 
 #endif // PANEL_H

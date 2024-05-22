@@ -13,10 +13,8 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject 
 
     connect(leftPanel, &Panel::updateInfo, this, &Workspace::updateInfo);
     connect(rightPanel, &Panel::updateInfo, this, &Workspace::updateInfo);
-    connect(leftPanel, &Panel::updateInfoDB, this, &Workspace::updateInfoDB);
-    connect(rightPanel, &Panel::updateInfoDB, this, &Workspace::updateInfoDB);
-    connect(leftPanel, &Panel::changeFolder, this, &Workspace::indexToString);
-    connect(rightPanel, &Panel::changeFolder, this, &Workspace::indexToString);
+    connect(leftPanel, &Panel::changeFolder, this, &Workspace::updateFolder);
+    connect(rightPanel, &Panel::changeFolder, this, &Workspace::updateFolder);
 }
 
 Workspace::~Workspace()
@@ -39,8 +37,8 @@ void Workspace::updatePanels()
     if (rightPanel->getIsDB())
         rightPanel->refreshDB();
 
-    updateFolder(true, leftPanel->getPath());
-    updateFolder(false, rightPanel->getPath());
+    updateFolder(true, leftPanel->getPath(), leftPanel->getIsDB());
+    updateFolder(false, rightPanel->getPath(), rightPanel->getIsDB());
 }
 
 void Workspace::choose()
@@ -388,7 +386,7 @@ void Workspace::createDirFileSystem(Panel* panel)
                                                QLineEdit::Normal,
                                                "");
     fileSystem->mkdir(panel->rootIndex(), newCatalog);
-    updateFolder(isLeftCurrent, panel->getPath());
+    updateFolder(isLeftCurrent, panel->getPath(), false);
 }
 
 void Workspace::createDirDatabase(Panel* panel)
@@ -474,88 +472,54 @@ void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
             return;
         }
     }
-    qDebug() << leftPanel->getList();
-    qDebug() << rightPanel->getList();
 }
 
-void Workspace::updateInfoDB(bool isLeft, bool isPlus)
+void Workspace::updateFolder(bool isLeft, QString path, bool isDB)
 {
-    if (isLeft)
-    {
-        isLeftCurrent = true;
-        for (auto i = leftPanel->getChosenItems().begin(); i != leftPanel->getChosenItems().end(); i++)
-        {
-            leftPanel->changeSize(isPlus, (*i)->sizeInBytes / 1024);
-            leftPanel->changeCountChosenFiles(isPlus);
-        }
-        for (auto i = leftPanel->getChosenFolders().begin(); i != leftPanel->getChosenFolders().end(); i++)
-        {
-            leftPanel->changeSize(isPlus, 0);
-            leftPanel->changeCountChosenFolders(isPlus);
-        }
-    }
-    else
-    {
-        isLeftCurrent = false;
-        for (auto i = rightPanel->getChosenItems().begin(); i != rightPanel->getChosenItems().end(); i++)
-        {
-            rightPanel->changeSize(isPlus, (*i)->sizeInBytes / 1024);
-            rightPanel->changeCountChosenFiles(isPlus);
-        }
-        for (auto i = rightPanel->getChosenFolders().begin(); i != rightPanel->getChosenFolders().end(); i++)
-        {
-            rightPanel->changeSize(isPlus, 0);
-            rightPanel->changeCountChosenFolders(isPlus);
-        }
-    }
-}
-
-void Workspace::indexToString(bool isLeft, QModelIndex index)
-{
-    if (isLeft && leftPanel->getIsDB())
-    {
-        return;
-    }
-    else if (!isLeft && rightPanel->getIsDB())
-    {
-        return;
-    }
-    else
-    {
-        updateFolder(isLeft, fileSystem->fileInfo(index).absoluteFilePath());
-    }
-}
-
-void Workspace::updateFolder(bool isLeft, QString path)
-{
-    QDir file;
-    file.setPath(path);
-    QStringList files = file.entryList(QDir::Files);
-    int countFolders = 0;
-    int countFiles = 0;
     long long int size = 0;
-    foreach (QFileInfo i_file, file.entryInfoList())
-    {
-        QString i_filename(i_file.fileName());
-        if (i_filename == "." || i_filename == ".." || i_filename.isEmpty())
-            continue;
-        if (i_file.isDir())
-        {
-            countFolders++;
+
+    if (!isDB) {
+        QDir currDir;
+        currDir.setPath(path);
+        QStringList files = currDir.entryList(QDir::Files);
+        int countFolders = 0;
+        int countFiles = 0;
+
+        foreach (QFileInfo currEntry, currDir.entryInfoList()) {
+            QString currEntryName(currEntry.fileName());
+            if (currEntryName == "." || currEntryName == ".." || currEntryName.isEmpty())
+                continue;
+            if (currEntry.isDir()) {
+                countFolders++;
+            } else {
+                countFiles++;
+                size += currEntry.size() / 1024;
+            }
         }
-        else
-        {
-            countFiles++;
-            size += i_file.size() / 1024;
+
+        if (isLeft) {
+            leftPanel->changeCurrentFolderInfo(path, size, countFiles, countFolders);
+        } else {
+            rightPanel->changeCurrentFolderInfo(path, size, countFiles, countFolders);
         }
-    }
-    if (isLeft)
-    {
-        leftPanel->changeCurrentFolderInfo(path, size, countFiles, countFolders);
-    }
-    else
-    {
-        rightPanel->changeCurrentFolderInfo(path, size, countFiles, countFolders);
+    } else {
+        std::vector <TIPInfo*> items;
+        std::vector <folderinfo*> folders;
+
+        if (isLeft) {
+            leftPanel->getFunctionsDB()->GetFolderContents(leftPanel->getCurrentFolder(), items, folders);
+            for (const auto& item : items) {
+                size += item->sizeInTerms;
+            }
+            qDebug() << size;
+            leftPanel->changeCurrentFolderInfo(path, size, items.size(), folders.size());
+        } else {
+            rightPanel->getFunctionsDB()->GetFolderContents(rightPanel->getCurrentFolder(), items, folders);
+            for (const auto& item : items) {
+                size += item->sizeInTerms;
+            }
+            rightPanel->changeCurrentFolderInfo(path, size, items.size(), folders.size());
+        }
     }
 }
 
@@ -622,7 +586,7 @@ void Workspace::comparePortraits()
     widgetsList.append(ipCompare);
 }
 
-void Workspace::getXMLFile()
+void Workspace::getXmlFile()
 {
     if (!serviceHandler) {
         qDebug() << "Проблема с модулем веб-сервисов";
@@ -632,12 +596,7 @@ void Workspace::getXMLFile()
     std::string url = "https://vega.mirea.ru/intservice/index/xml?access_key=good&input_doc_id=701";
     std::string filePath = "output.xml";
 
-    if(serviceHandler->getXMLFile(url, filePath)) {
-        std::cout << "File downloaded successfully to " << filePath << std::endl;
-    }
-    else {
-        std::cerr << "Failed to download file" << std::endl;
-    }
+    serviceHandler->getXmlFile(url, filePath);
 }
 
 void Workspace::killChildren() {

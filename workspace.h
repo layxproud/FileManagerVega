@@ -68,15 +68,13 @@ public slots:
     void createDir();
     void changeDir();
     void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
-    void updateInfoDB(bool isLeft, bool isPlus);
-    void updateFolder(bool isLeft, QString path);
-    void indexToString(bool isLeft, QModelIndex index);
+    void updateFolder(bool isLeft, QString path, bool isDB);
     void changeSelectionMode();
     void changeCurrentPanel();
 
     // Семантические функции
     void comparePortraits();
-    void getXMLFile();
+    void getXmlFile();
 
     // GUI
     void killChildren();

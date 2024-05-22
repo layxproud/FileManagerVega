@@ -296,7 +296,7 @@
      <normaloff>:/icons/resources/xml-file.png</normaloff>:/icons/resources/xml-file.png</iconset>
    </property>
    <property name="text">
-    <string>getXMLFile</string>
+    <string>getXmlFile</string>
    </property>
    <property name="toolTip">
     <string>Получить XML файл</string>
