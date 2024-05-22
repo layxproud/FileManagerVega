@@ -201,6 +201,7 @@ void NetworkWorker::getXmlFile(const string &url, const string &filePath)
         if (!fp) {
             std::cerr << "Failed to open file " << filePath << std::endl;
             emit xmlFileDownloaded(false);
+            return;
         }
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -211,12 +212,15 @@ void NetworkWorker::getXmlFile(const string &url, const string &filePath)
         if (res != CURLE_OK) {
             std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
             emit xmlFileDownloaded(false);
+            return;
         }
 
         fclose(fp);
         curl_easy_cleanup(curl);
 
         emit xmlFileDownloaded(true);
+        return;
     }
     emit xmlFileDownloaded(false);
+    return;
 }
