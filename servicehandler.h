@@ -6,6 +6,7 @@
 #include <curl/curl.h>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMap>
 #include <QObject>
 #include <QThread>
 
@@ -17,8 +18,9 @@ public:
     ~NetworkWorker();
 
 public slots:
-    void receiveAccessToken(const QString &login, const QString &pass);
-    void getXmlFile(const std::string &url, const std::string &filePath);
+    void getAccessToken(const QString &login, const QString &pass);
+    void getXmlFile(const QString &url, const QString &filePath);
+    void indexFiles(const QMap<QString, DocumentData> &documents);
 
 signals:
     void tokenReceived(bool success);
@@ -69,7 +71,9 @@ signals:
 
 public slots:
     void getAccessToken(const QString &login, const QString &pass);
-    void getXmlFile(const std::string &url, const std::string &filePath);
+    void getXmlFile(const QString &url, const QString &filePath);
+    void indexFiles(const QMap<QString, DocumentData> &documents);
+
     void onWorkerReceivedToken(bool success);
     void onWorkerGotXmlFile(bool success);
 };

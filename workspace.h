@@ -1,6 +1,7 @@
 #ifndef WORKSPACE_H
 #define WORKSPACE_H
 
+#include "indexwindow.h"
 #include "ipcompare.h"
 #include "servicehandler.h"
 #include <filesystem.h>
@@ -32,6 +33,7 @@ private:
     ServiceHandler *serviceHandler;
     bool isLeftCurrent;
     IPCompare *ipCompare;
+    IndexWindow *indexWindow;
     QList<QWidget *> widgetsList;
 
 private:

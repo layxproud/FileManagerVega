@@ -139,10 +139,35 @@ void Workspace::copy()
 
 void Workspace::copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel)
 {
-    QModelIndexList &il = sourcePanel->getList();
-    for (auto i = il.begin(); i != il.end(); i++) {
+    QModelIndexList &allIndexes = sourcePanel->getList();
+    QModelIndexList xmlFiles;
+    QStringList filesToIndex;
+    for (const auto &index : allIndexes) {
+        QString filePath = sourcePanel->getFilesystem()->filePath(index);
+        QString extension = QFileInfo(filePath).suffix().toLower();
+        if (extension == "txt" || extension == "pdf" || extension == "html" || extension == "docx"
+            || extension == "doc") {
+            filesToIndex.append(filePath);
+        } else if (extension == "xml") {
+            xmlFiles.append(index);
+        } else {
+            continue;
+        }
+    }
+
+    indexWindow = new IndexWindow();
+    indexWindow->setModal(true);
+    indexWindow->setFiles(filesToIndex);
+    connect(indexWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+    connect(indexWindow, &IndexWindow::indexFiles, serviceHandler, &ServiceHandler::indexFiles);
+    indexWindow->show();
+    widgetsList.append(indexWindow);
+
+    // serviceHandler->indexFiles(filesToIndex);
+
+    for (const auto &file : xmlFiles) {
         destinationPanel->getFunctionsDB()->CopyFileToDB(
-            sourcePanel->getFilesystem()->fileInfo(*i).absoluteFilePath(),
+            sourcePanel->getFilesystem()->fileInfo(file).absoluteFilePath(),
             destinationPanel->getCurrentFolder());
     }
 }
@@ -509,8 +534,10 @@ void Workspace::getXmlFile()
         return;
     }
 
-    std::string url = "https://vega.mirea.ru/intservice/index/xml?access_key=good&input_doc_id=701";
-    std::string filePath = "output.xml";
+    QString url = "https://vega.mirea.ru/intservice/index/xml?access_key=good&input_doc_id=701";
+    QString filePath = "output.xml";
+
+    // TODO: Добавить окно с выбором локации для сохранения файла.
 
     serviceHandler->getXmlFile(url, filePath);
 }

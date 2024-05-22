@@ -115,14 +115,17 @@ void ServiceHandler::calculateComparisonCircles()
 
 void ServiceHandler::getAccessToken(const QString &login, const QString &pass)
 {
-    QMetaObject::invokeMethod(
-        worker, "receiveAccessToken", Q_ARG(QString, login), Q_ARG(QString, pass));
-    // worker->receiveAccessToken(login, pass);
+    QMetaObject::invokeMethod(worker, "getAccessToken", Q_ARG(QString, login), Q_ARG(QString, pass));
 }
 
-void ServiceHandler::getXmlFile(const string &url, const string &filePath)
+void ServiceHandler::getXmlFile(const QString &url, const QString &filePath)
 {
-    worker->getXmlFile(url, filePath);
+    QMetaObject::invokeMethod(worker, "getXmlFile", Q_ARG(QString, url), Q_ARG(QString, filePath));
+}
+
+void ServiceHandler::indexFiles(const QMap<QString, DocumentData> &documents)
+{
+    worker->indexFiles(documents);
 }
 
 void ServiceHandler::onWorkerReceivedToken(bool success)
@@ -145,7 +148,7 @@ NetworkWorker::NetworkWorker(QObject *parent)
 
 NetworkWorker::~NetworkWorker() {}
 
-void NetworkWorker::receiveAccessToken(const QString &login, const QString &pass)
+void NetworkWorker::getAccessToken(const QString &login, const QString &pass)
 {
     CURL *curl;
     CURLcode res;
@@ -189,7 +192,7 @@ void NetworkWorker::receiveAccessToken(const QString &login, const QString &pass
     }
 }
 
-void NetworkWorker::getXmlFile(const string &url, const string &filePath)
+void NetworkWorker::getXmlFile(const QString &url, const QString &filePath)
 {
     CURL *curl;
     FILE *fp;
@@ -197,14 +200,14 @@ void NetworkWorker::getXmlFile(const string &url, const string &filePath)
 
     curl = curl_easy_init();
     if (curl) {
-        fp = fopen(filePath.c_str(), "wb");
+        fp = fopen(filePath.toStdString().c_str(), "wb");
         if (!fp) {
-            std::cerr << "Failed to open file " << filePath << std::endl;
+            std::cerr << "Failed to open file " << filePath.toStdString() << std::endl;
             emit xmlFileDownloaded(false);
             return;
         }
 
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, url.toStdString().c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
@@ -223,4 +226,9 @@ void NetworkWorker::getXmlFile(const string &url, const string &filePath)
     }
     emit xmlFileDownloaded(false);
     return;
+}
+
+void NetworkWorker::indexFiles(const QMap<QString, DocumentData> &documents)
+{
+    qDebug() << "Indexing";
 }

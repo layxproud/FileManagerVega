@@ -769,6 +769,16 @@ bool TIPDBShell::OpenItem(TIPInfo *item)
     return true;
 }
 
+double TIPDBShell::convertCommaSeparatedStringToDouble(const std::string &str)
+{
+    std::string modifiedStr = str;
+    size_t pos = modifiedStr.find('.');
+    if (pos != std::string::npos) {
+        modifiedStr[pos] = ',';
+    }
+    return std::stod(modifiedStr);
+}
+
 bool TIPDBShell::loadFromFile(QString filename, TIPInfo *info, TIPFullInfo *full)
 {
     tinyxml2::XMLDocument *doc = new tinyxml2::XMLDocument();
@@ -810,8 +820,10 @@ bool TIPDBShell::loadFromFile(QString filename, TIPInfo *info, TIPFullInfo *full
         TIPFullTermInfo *t = new TIPFullTermInfo;
         t->id = termtag->IntAttribute("id", 0);
         t->term = termtag->Attribute("term");
-        t->weight = termtag->DoubleAttribute("weight", 0);
-        t->occurences = termtag->DoubleAttribute("occurences", 0);
+        std::string weightStr = termtag->Attribute("weight");
+        t->weight = convertCommaSeparatedStringToDouble(weightStr);
+        std::string occurencesStr = termtag->Attribute("occurences");
+        t->occurences = convertCommaSeparatedStringToDouble(occurencesStr);
         t->times = termtag->IntAttribute("times", 0);
 
         full->terms.push_back(t);

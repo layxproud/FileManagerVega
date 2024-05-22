@@ -136,6 +136,7 @@ public:
 
 private:
     folderid GetNextSequenceValue(QSqlQuery &query, const QString &sequenceName);
+    double convertCommaSeparatedStringToDouble(const std::string &str);
 };
 
 #endif // TIPDBSHELL_H

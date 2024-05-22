@@ -186,6 +186,26 @@ struct IPCompareResults
     double simC;  // общая схожесть портетов
 };
 
+struct DocumentData
+{
+    int id;
+    QString title;
+    QString disciplines;
+    QString themes;
+    QString comment;
+    QString mark;
+    QString descHeader;
+    QString descBody;
+    QString authors;
+    int typeDocId;
+    QString udk;
+    QString bbk;
+    QString code;
+    QString url;
+    QString publishYear;
+    QString publisher;
+};
+
 struct IPExtendedCompareResults : IPCompareResults
 {
     ulong ulWithId;     // id С КЕМ сравнивают

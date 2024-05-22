@@ -28,6 +28,7 @@ SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
         filesystem.cpp \
+        indexwindow.cpp \
         inifile.cpp \
         ipcompare.cpp \
         loginwindow.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
         Lemmatizer.h \
         agramtab.h \
         filesystem.h \
+        indexwindow.h \
         inifile.h \
         ipcompare.h \
         loginwindow.h \
@@ -60,6 +62,7 @@ HEADERS += \
         xmlparser.h
 
 FORMS += \
+        indexwindow.ui \
         ipcompare.ui \
         loginwindow.ui \
         mainwindow.ui \

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>IndexWindow</class>
+ <widget class="QDialog" name="IndexWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>720</width>
+    <height>446</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QListWidget" name="listWidget"/>
+   </item>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>422</width>
+          <height>810</height>
+         </rect>
+        </property>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="idInput"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="titleLabel">
+           <property name="text">
+            <string>title</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="titleInput"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="disciplinesLabel">
+           <property name="text">
+            <string>disciplines</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="disciplinesInput"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="themesLabel">
+           <property name="text">
+            <string>themes</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="themesInput"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="commentLabel">
+           <property name="text">
+            <string>comment</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="commentInput"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="markLabel">
+           <property name="text">
+            <string>mark</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="markInput"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="descHeaderLabel">
+           <property name="text">
+            <string>desc_header</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="descHeaderInput"/>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="descBodyLabel">
+           <property name="text">
+            <string>desc_body</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLineEdit" name="descBodyInput"/>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="authorsLabel">
+           <property name="text">
+            <string>authors</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLineEdit" name="authorsInput"/>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="typeDocIdLabel">
+           <property name="text">
+            <string>type_doc_id</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QLineEdit" name="typeDocIdInput"/>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="udkLabel">
+           <property name="text">
+            <string>udk</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QLineEdit" name="udkInput"/>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="bbkLabel">
+           <property name="text">
+            <string>bbk</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QLineEdit" name="bbkInput"/>
+         </item>
+         <item row="12" column="0">
+          <widget class="QLabel" name="codeLabel">
+           <property name="text">
+            <string>code</string>
+           </property>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <widget class="QLineEdit" name="codeInput"/>
+         </item>
+         <item row="13" column="0">
+          <widget class="QLabel" name="urlLabel">
+           <property name="text">
+            <string>url</string>
+           </property>
+          </widget>
+         </item>
+         <item row="13" column="1">
+          <widget class="QLineEdit" name="urlInput"/>
+         </item>
+         <item row="14" column="0">
+          <widget class="QLabel" name="publishYearLAbel">
+           <property name="text">
+            <string>publish_year</string>
+           </property>
+          </widget>
+         </item>
+         <item row="14" column="1">
+          <widget class="QLineEdit" name="publishYearInput"/>
+         </item>
+         <item row="15" column="0">
+          <widget class="QLabel" name="publisherLabel">
+           <property name="text">
+            <string>publisher</string>
+           </property>
+          </widget>
+         </item>
+         <item row="15" column="1">
+          <widget class="QLineEdit" name="publisherInput"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="idLabel">
+           <property name="text">
+            <string>id</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="cancelButton">
+         <property name="text">
+          <string>Отмена</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="applyButton">
+         <property name="text">
+          <string>Готово</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
