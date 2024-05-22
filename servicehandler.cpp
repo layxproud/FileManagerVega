@@ -1,12 +1,12 @@
 #include "servicehandler.h"
-#include <unordered_map>
 #include <iostream>
+#include <unordered_map>
 #include <QDebug>
 
 ServiceHandler::ServiceHandler(QObject *parent)
-    : QObject{parent},
-    worker(new NetworkWorker()),
-    workerThread(new QThread(this))
+    : QObject{parent}
+    , worker(new NetworkWorker())
+    , workerThread(new QThread(this))
 {
     worker->moveToThread(workerThread);
     connect(workerThread, &QThread::finished, worker, &QObject::deleteLater);
@@ -22,8 +22,9 @@ ServiceHandler::~ServiceHandler()
     delete workerThread;
 }
 
-IPCompareResults ServiceHandler::comparePortraits(const std::vector<TIPFullTermInfo *> &leftTerms,
-                                        const std::vector<TIPFullTermInfo *> &rightTerms)
+IPCompareResults ServiceHandler::comparePortraits(
+    const std::vector<TIPFullTermInfo *> &leftTerms,
+    const std::vector<TIPFullTermInfo *> &rightTerms)
 {
     clearComparisonResults();
     calculateComparisonParameters(leftTerms, rightTerms);
@@ -31,24 +32,25 @@ IPCompareResults ServiceHandler::comparePortraits(const std::vector<TIPFullTermI
     return comparisonResults;
 }
 
-void ServiceHandler::calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
-                                                     const std::vector<TIPFullTermInfo *> &rightTerms)
+void ServiceHandler::calculateComparisonParameters(
+    const std::vector<TIPFullTermInfo *> &leftTerms,
+    const std::vector<TIPFullTermInfo *> &rightTerms)
 {
     double c1, c2, d1, d2;
     std::unordered_map<QString, double> leftTermWeights;
     std::unordered_map<QString, double> rightTermWeights;
 
-    for (const auto& term : leftTerms) {
+    for (const auto &term : leftTerms) {
         leftTermWeights[term->term] = term->weight;
     }
 
-    for (const auto& term : rightTerms) {
+    for (const auto &term : rightTerms) {
         rightTermWeights[term->term] = term->weight;
     }
 
     c1 = 0;
     d1 = 0;
-    for (const auto& term : leftTerms) {
+    for (const auto &term : leftTerms) {
         if (rightTermWeights.find(term->term) != rightTermWeights.end()) {
             c1 += term->weight;
         } else {
@@ -58,7 +60,7 @@ void ServiceHandler::calculateComparisonParameters(const std::vector<TIPFullTerm
 
     c2 = 0;
     d2 = 0;
-    for (const auto& term : rightTerms) {
+    for (const auto &term : rightTerms) {
         if (leftTermWeights.find(term->term) != leftTermWeights.end()) {
             c2 += term->weight;
         } else {
@@ -90,22 +92,19 @@ void ServiceHandler::calculateComparisonCircles()
     double d2 = comparisonResults.diff2;
     double r1 = 0, r2 = 0, rmax = 100, rmin = 0, d = 0, nc2 = 0, nd2 = 0;
     nc2 = c1;
-    nd2 = (c2 > 0.0000000001) ? d2*c1/c2 : d2;
-    if (c1 + d1 > nc2 + nd2)
-    {
+    nd2 = (c2 > 0.0000000001) ? d2 * c1 / c2 : d2;
+    if (c1 + d1 > nc2 + nd2) {
         r1 = rmax;
         rmin = r2 = sqrt(100. * 100 * (nc2 + nd2) / (c1 + d1));
         if (c1 > 0)
-            d = rmax + 2*rmin * (0.5 - nc2 / (nc2 + nd2) );
+            d = rmax + 2 * rmin * (0.5 - nc2 / (nc2 + nd2));
         else
             d = rmin + rmax;
-    }
-    else
-    {
+    } else {
         r2 = rmax;
         rmin = r1 = sqrt(100. * 100 * (c1 + d1) / (nc2 + nd2));
         if (c2 > 0)
-            d = rmax  + 2*rmin * (0.5 - c1 / (c1 + d1));
+            d = rmax + 2 * rmin * (0.5 - c1 / (c1 + d1));
         else
             d = rmin + rmax;
     }
@@ -116,7 +115,8 @@ void ServiceHandler::calculateComparisonCircles()
 
 void ServiceHandler::getAccessToken(const QString &login, const QString &pass)
 {
-    QMetaObject::invokeMethod(worker, "receiveAccessToken", Q_ARG(QString, login), Q_ARG(QString, pass));
+    QMetaObject::invokeMethod(
+        worker, "receiveAccessToken", Q_ARG(QString, login), Q_ARG(QString, pass));
     // worker->receiveAccessToken(login, pass);
 }
 
@@ -139,24 +139,20 @@ void ServiceHandler::onWorkerGotXmlFile(bool success)
     }
 }
 
-NetworkWorker::NetworkWorker(QObject *parent) :
-    QObject{parent}
-{
+NetworkWorker::NetworkWorker(QObject *parent)
+    : QObject{parent}
+{}
 
-}
+NetworkWorker::~NetworkWorker() {}
 
-NetworkWorker::~NetworkWorker()
-{
-
-}
-
-void NetworkWorker::receiveAccessToken(const QString& login, const QString& pass)
+void NetworkWorker::receiveAccessToken(const QString &login, const QString &pass)
 {
     CURL *curl;
     CURLcode res;
     std::string readBuffer;
 
-    std::string url = "https://vega.mirea.ru/authservice.php?op=getusertoken&login=" + login.toStdString() + "&password=" + pass.toStdString();
+    std::string url = "https://vega.mirea.ru/authservice.php?op=getusertoken&login="
+                      + login.toStdString() + "&password=" + pass.toStdString();
 
     curl = curl_easy_init();
     if (curl) {
@@ -167,8 +163,7 @@ void NetworkWorker::receiveAccessToken(const QString& login, const QString& pass
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
             std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-        }
-        else {
+        } else {
             QByteArray jsonData = QByteArray::fromStdString(readBuffer);
             QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
             if (!jsonDoc.isNull()) {
@@ -177,18 +172,15 @@ void NetworkWorker::receiveAccessToken(const QString& login, const QString& pass
                     if (jsonObj.contains("token")) {
                         accessToken = jsonObj["token"].toString().toStdString();
                         emit tokenReceived(true);
-                    }
-                    else {
+                    } else {
                         std::cerr << "JSON parse error: 'token' not found" << std::endl;
                         emit tokenReceived(false);
                     }
-                }
-                else {
+                } else {
                     std::cerr << "JSON parse error: Document is not an object" << std::endl;
                     emit tokenReceived(false);
                 }
-            }
-            else {
+            } else {
                 std::cerr << "JSON parse error" << std::endl;
                 emit tokenReceived(false);
             }

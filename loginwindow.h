@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QMovie>
 
-
 namespace Ui {
 class LoginWindow;
 }
@@ -31,7 +30,7 @@ private slots:
     void on_pushButton_clicked();
 
 signals:
-    void loginAttempt(const QString& login, const QString& pass);
+    void loginAttempt(const QString &login, const QString &pass);
 };
 
 #endif // LOGINWINDOW_H

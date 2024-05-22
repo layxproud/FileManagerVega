@@ -1,14 +1,13 @@
 #ifndef SERVICEHANDLER_H
 #define SERVICEHANDLER_H
 
-#include <QObject>
-#include <curl/curl.h>
-#include "trmlshell.h"
 #include "tipdbshell.h"
+#include "trmlshell.h"
+#include <curl/curl.h>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QObject>
 #include <QThread>
-
 
 class NetworkWorker : public QObject
 {
@@ -27,17 +26,18 @@ signals:
 
 private:
     std::string accessToken;
-    static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-        ((std::string*)userp)->append((char*)contents, size * nmemb);
+    static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+    {
+        ((std::string *) userp)->append((char *) contents, size * nmemb);
         return size * nmemb;
     }
 
-    static size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+    static size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream)
+    {
         size_t written = fwrite(ptr, size, nmemb, stream);
         return written;
     }
 };
-
 
 class ServiceHandler : public QObject
 {
@@ -50,15 +50,17 @@ public:
     explicit ServiceHandler(QObject *parent = nullptr);
     ~ServiceHandler();
 
-    IPCompareResults comparePortraits(const std::vector<TIPFullTermInfo *> &leftTerms,
-                                      const std::vector<TIPFullTermInfo *> &rightTerms);
+    IPCompareResults comparePortraits(
+        const std::vector<TIPFullTermInfo *> &leftTerms,
+        const std::vector<TIPFullTermInfo *> &rightTerms);
 
 private:
     NetworkWorker *worker;
     QThread *workerThread;
 
-    void calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
-                                       const std::vector<TIPFullTermInfo *> &rightTerms);
+    void calculateComparisonParameters(
+        const std::vector<TIPFullTermInfo *> &leftTerms,
+        const std::vector<TIPFullTermInfo *> &rightTerms);
     void clearComparisonResults();
     void calculateComparisonCircles();
 

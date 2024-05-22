@@ -1,22 +1,29 @@
 #include "panel.h"
 #include <QDesktopServices>
 
-Panel::Panel(QWidget *parent) :
-    QTreeView(parent),
-    info(""),
-    numberOfSelectedFolders(0),
-    numberOfSelectedFiles(0),
-    numberOfFolders(0),
-    numberOfFiles(0),
-    selectedFilesSize(0),
-    currentDirSize(0),
-    current_folder_id(0),
-    viewip{nullptr}
+Panel::Panel(QWidget *parent)
+    : QTreeView(parent)
+    , info("")
+    , numberOfSelectedFolders(0)
+    , numberOfSelectedFiles(0)
+    , numberOfFolders(0)
+    , numberOfFiles(0)
+    , selectedFilesSize(0)
+    , currentDirSize(0)
+    , current_folder_id(0)
+    , viewip{nullptr}
 {
     DBmodel = new EditableNameModel(this);
     DBmodel->insertColumns(0, 8);
     QStringList Coloumns_name;
-    Coloumns_name << "Name" << "Size" << "Id" << "Owner" << "Date Creation" << "Relevance" << " " << " ";
+    Coloumns_name << "Name"
+                  << "Size"
+                  << "Id"
+                  << "Owner"
+                  << "Date Creation"
+                  << "Relevance"
+                  << " "
+                  << " ";
     int i = 0;
     foreach (QString it, Coloumns_name) {
         DBmodel->setHeaderData(i, Qt::Horizontal, QVariant(it));
@@ -74,16 +81,11 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
 
 /*** ГЕТТЕРЫ И СЕТТЕРЫ ***/
 
-void Panel::setFileSystem(FileSystem * filesystem)
+void Panel::setFileSystem(FileSystem *filesystem)
 {
     this->setModel(filesystem);
     this->fileSystem = filesystem;
     this->update();
-}
-
-void Panel::setIsleft(bool isLeft)
-{
-    this->isLeft = isLeft;
 }
 
 void Panel::setPath(QString path)
@@ -96,7 +98,7 @@ void Panel::setIsDB(bool isDB)
     this->isDB = isDB;
 }
 
-FileSystem* Panel::getFilesystem()
+FileSystem *Panel::getFilesystem()
 {
     return this->fileSystem;
 }
@@ -116,27 +118,27 @@ QString Panel::getInfo()
     return this->info;
 }
 
-QModelIndexList& Panel::getList()
+QModelIndexList &Panel::getList()
 {
     return this->list;
 }
 
-TIPDBShell* Panel::getFunctionsDB()
+TIPDBShell *Panel::getFunctionsDB()
 {
     return functions_of_current_BD;
 }
 
-std::vector<TIPInfo*>* Panel::getItems()
+std::vector<TIPInfo *> *Panel::getItems()
 {
     return &this->items;
 }
 
-std::vector<folderinfo*>* Panel::getFolders()
+std::vector<folderinfo *> *Panel::getFolders()
 {
     return &this->folders;
 }
 
-QStandardItemModel* Panel::getDB()
+QStandardItemModel *Panel::getDB()
 {
     return this->DBmodel;
 }
@@ -151,12 +153,12 @@ folderid Panel::getCurrentFolder()
     return this->current_folder_id;
 }
 
-std::list <TIPInfo*> &Panel::getChosenItems()
+std::list<TIPInfo *> &Panel::getChosenItems()
 {
     return chosenItems;
 }
 
-std::list <folderinfo*> &Panel::getChosenFolders()
+std::list<folderinfo *> &Panel::getChosenFolders()
 {
     return chosenFolders;
 }
@@ -250,11 +252,13 @@ void Panel::changeDirectory(const QModelIndex &index)
         emit changeFolder(isLeft, this->getPath(), isDB);
     } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
         // Портрет
-        this->getFunctionsDB()->OpenItem(findItem(this->getDB()->item(index.row(), 2)->text().toInt()));
+        this->getFunctionsDB()->OpenItem(
+            findItem(this->getDB()->item(index.row(), 2)->text().toInt()));
     } else {
         if (this->fileSystem->fileInfo(index).fileName() == "..") {
             populatePanel(fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))), false);
-            emit changeFolder(isLeft, fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))), isDB);
+            emit changeFolder(
+                isLeft, fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))), isDB);
         } else {
             populatePanel(fileSystem->filePath(index), false);
             emit changeFolder(isLeft, fileSystem->filePath(index), isDB);
@@ -264,12 +268,12 @@ void Panel::changeDirectory(const QModelIndex &index)
     this->clearInfo();
     this->setFocus();
     this->setSelectionMode(QAbstractItemView::NoSelection);
-    this->setCurrentIndex(model()->index(0,0, this->rootIndex()));
-//    if (isDB) {
-//        changeCurrentFolderInfo(path, 0,0,0);
-//    } else {
-//        infoToString();
-//    }
+    this->setCurrentIndex(model()->index(0, 0, this->rootIndex()));
+    //    if (isDB) {
+    //        changeCurrentFolderInfo(path, 0,0,0);
+    //    } else {
+    //        infoToString();
+    //    }
     this->update();
 }
 
@@ -313,7 +317,8 @@ void Panel::changeSize(bool isPlus, long long int delta)
     }
 }
 
-void Panel::changeCurrentFolderInfo(QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount)
+void Panel::changeCurrentFolderInfo(
+    QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount)
 {
     this->path = path;
     this->currentDirSize = sizeCurrentFolder;
@@ -340,16 +345,18 @@ void Panel::ChangeFolderDB(folderid folder)
 
     for (unsigned int i = 0; i < allCount; i++) {
         if (i < folders.size()) {
-            Coloumns_value << folders[i]->second << " "
-                           << QString::number(folders[i]->first)
-                           << " " << " " << " " << " " << " ";
+            Coloumns_value << folders[i]->second << " " << QString::number(folders[i]->first) << " "
+                           << " "
+                           << " "
+                           << " "
+                           << " ";
         } else {
             numberOfFiles++;
-            Coloumns_value << items[i % items.size()]->name <<
-                QString::number(items[i % items.size()]->sizeInTerms) <<
-                QString::number(items[i % items.size()]->id)  <<
-                items[i % items.size()]->ownerName <<
-                items[i % items.size()]->creationTime.toString();
+            Coloumns_value << items[i % items.size()]->name
+                           << QString::number(items[i % items.size()]->sizeInTerms)
+                           << QString::number(items[i % items.size()]->id)
+                           << items[i % items.size()]->ownerName
+                           << items[i % items.size()]->creationTime.toString();
 
             if (items[i % items.size()]->compData1 == 0) {
                 Coloumns_value << " ";
@@ -363,7 +370,7 @@ void Panel::ChangeFolderDB(folderid folder)
                 Coloumns_value << QString::number(items[i % items.size()]->compData2);
             }
 
-            if (items[i% items.size()]->compData3 == 0) {
+            if (items[i % items.size()]->compData3 == 0) {
                 Coloumns_value << " ";
             } else {
                 Coloumns_value << QString::number(items[i % items.size()]->compData3);
@@ -425,14 +432,14 @@ QString Panel::cdUp(QString path)
     }
 
     if (last_slash == 0) {
-        buffer.remove(1, buffer.size()-1);
+        buffer.remove(1, buffer.size() - 1);
     } else {
-        buffer.remove(last_slash, buffer.size()-last_slash);
+        buffer.remove(last_slash, buffer.size() - last_slash);
     }
     return buffer;
 }
 
-TIPInfo* Panel::findItem(folderid item)
+TIPInfo *Panel::findItem(folderid item)
 {
     for (size_t i = 0; i < items.size(); i++) {
         if (items[i]->id == item) {
@@ -443,7 +450,7 @@ TIPInfo* Panel::findItem(folderid item)
     return nullptr;
 }
 
-folderinfo* Panel::findFolder(folderid folder)
+folderinfo *Panel::findFolder(folderid folder)
 {
     for (size_t i = 0; i < folders.size(); i++) {
         if (folders[i]->first == folder) {
@@ -462,7 +469,7 @@ void Panel::PushDB(QModelIndex index)
 
     if (isDB && DBmodel->item(index.row())->text() == "..") {
         return;
-    } else if(isDB && DBmodel->item(index.row(), 1)->text() == " ") {
+    } else if (isDB && DBmodel->item(index.row(), 1)->text() == " ") {
         folderinfo *fi = findFolder(DBmodel->item(index.row(), 2)->text().toInt());
         if (fi) {
             chosenFolders.push_back(fi);
@@ -480,7 +487,7 @@ void Panel::RemoveDB(QModelIndex index)
 {
     if (isDB && DBmodel->item(index.row())->text() == "..") {
         return;
-    } else if(isDB && DBmodel->item(index.row(), 1)->text() == " ") {
+    } else if (isDB && DBmodel->item(index.row(), 1)->text() == " ") {
         chosenFolders.remove(findFolder(DBmodel->item(index.row(), 2)->text().toInt()));
         this->numberOfSelectedFolders--;
     } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
@@ -493,22 +500,29 @@ void Panel::RemoveDB(QModelIndex index)
     }
 }
 
-void Panel::onEditFinished(const QModelIndex& index)
+void Panel::onEditFinished(const QModelIndex &index)
 {
     if (isDB && DBmodel->item(index.row())->text() == "..") {
         return;
-    } else if(isDB && DBmodel->item(index.row(), 1)->text() == " ") {
-        this->getFunctionsDB()->RenameFolder(findFolder(DBmodel->item(index.row(), 2)->text().toInt())->first, DBmodel->item(index.row(), 0)->text());
+    } else if (isDB && DBmodel->item(index.row(), 1)->text() == " ") {
+        this->getFunctionsDB()->RenameFolder(
+            findFolder(DBmodel->item(index.row(), 2)->text().toInt())->first,
+            DBmodel->item(index.row(), 0)->text());
     } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
-        this->getFunctionsDB()->RenameItem(findItem(DBmodel->item(index.row(), 2)->text().toInt()), DBmodel->item(index.row(), 0)->text());
+        this->getFunctionsDB()->RenameItem(
+            findItem(DBmodel->item(index.row(), 2)->text().toInt()),
+            DBmodel->item(index.row(), 0)->text());
     }
 }
 
 void Panel::infoToString()
 {
-    info.append(QString :: number(selectedFilesSize) + " KB ");
-    info.append("of " + QString :: number(currentDirSize) + " KB ");
-    info.append("files " + QString:: number(numberOfSelectedFiles) + " of " + QString::number(numberOfFiles) + " folders " +QString::number(numberOfSelectedFolders)+" of " + QString :: number(numberOfFolders));
+    info.append(QString ::number(selectedFilesSize) + " KB ");
+    info.append("of " + QString ::number(currentDirSize) + " KB ");
+    info.append(
+        "files " + QString::number(numberOfSelectedFiles) + " of " + QString::number(numberOfFiles)
+        + " folders " + QString::number(numberOfSelectedFolders) + " of "
+        + QString ::number(numberOfFolders));
     emit showInfo(info);
     info.clear();
 }
@@ -539,15 +553,13 @@ void Panel::arrowUp()
             int lastRow = model()->rowCount(currentIndex().parent()) - 1;
             setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
         }
-    }
-    else if (selectionMode() == QAbstractItemView::NoSelection) {
+    } else if (selectionMode() == QAbstractItemView::NoSelection) {
         selectionModel()->clearSelection();
         getList().clear();
 
         if ((currentIndex().row() - 1) >= 0) {
             setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
-        }
-        else {
+        } else {
             int lastRow = model()->rowCount(currentIndex().parent()) - 1;
             setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
         }
@@ -600,7 +612,6 @@ void Panel::arrowDown()
     }
 }
 
-
 void Panel::refreshDB()
 {
     this->ChangeFolderDB(current_folder_id);
@@ -622,8 +633,13 @@ void Panel::openFile(const QModelIndex &index)
         XmlParser parser;
         XmlParser::ParsedData parsedData = parser.readFileAndParse(filePath);
         viewip = new ViewIP;
-        viewip->setData(parsedData.id, parsedData.user, parsedData.date, parsedData.comment,
-                        parsedData.terms, parsedData.shingles);
+        viewip->setData(
+            parsedData.id,
+            parsedData.user,
+            parsedData.date,
+            parsedData.comment,
+            parsedData.terms,
+            parsedData.shingles);
         viewip->show();
     }
 }

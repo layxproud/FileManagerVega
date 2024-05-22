@@ -1,12 +1,12 @@
 #ifndef WORKSPACE_H
 #define WORKSPACE_H
 
-#include <panel.h>
-#include <filesystem.h>
-#include <QMessageBox>
-#include <iostream>
 #include "ipcompare.h"
 #include "servicehandler.h"
+#include <filesystem.h>
+#include <iostream>
+#include <panel.h>
+#include <QMessageBox>
 
 enum Button {
     Copy = 0,
@@ -32,18 +32,18 @@ private:
     ServiceHandler *serviceHandler;
     bool isLeftCurrent;
     IPCompare *ipCompare;
-    QList<QWidget*> widgetsList;
+    QList<QWidget *> widgetsList;
 
 private:
     void updatePanels();
 
-    void removeFilesystemEntries(Panel* panel);
-    void removeDatabaseEntries(Panel* panel);
+    void removeFilesystemEntries(Panel *panel);
+    void removeDatabaseEntries(Panel *panel);
 
-    void copyFilesystemToDatabase(Panel* sourcePanel, Panel* destinationPanel);
-    void copyFilesystemToFilesystem(Panel* sourcePanel, Panel* destinationPanel);
-    void copyDatabaseToDatabase(Panel* sourcePanel, Panel* destinationPanel);
-    void copyDatabaseToFilesystem(Panel* sourcePanel, Panel* destinationPanel);
+    void copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel);
+    void copyFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
+    void copyDatabaseToDatabase(Panel *sourcePanel, Panel *destinationPanel);
+    void copyDatabaseToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
 
     void moveFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel);
     void moveFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
@@ -54,8 +54,9 @@ private:
     void createDirDatabase(Panel *panel);
 
     void clearComparisonResults();
-    void calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
-                             const std::vector<TIPFullTermInfo *> &rightTerms);
+    void calculateComparisonParameters(
+        const std::vector<TIPFullTermInfo *> &leftTerms,
+        const std::vector<TIPFullTermInfo *> &rightTerms);
     void calculateComparisonCircles();
     void handleWidgetDestroyed(QObject *object);
 

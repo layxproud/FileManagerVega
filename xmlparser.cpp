@@ -1,10 +1,7 @@
 #include "xmlparser.h"
 #include <QDebug>
 
-XmlParser::XmlParser()
-{
-
-}
+XmlParser::XmlParser() {}
 
 XmlParser::ParsedData XmlParser::readFileAndParse(const QString &filePath)
 {
@@ -18,7 +15,6 @@ XmlParser::ParsedData XmlParser::readFileAndParse(const QString &filePath)
 
     QString xmlContent = file.readAll();
     file.close();
-
     parseXML(xmlContent, parsedData);
 
     return parsedData;

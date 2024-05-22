@@ -1,32 +1,34 @@
 #ifndef PANEL_H
 #define PANEL_H
 
-#include <QFileSystemModel>
-#include <QTreeView>
-#include <QInputDialog>
-#include <QStringList>
-#include <QKeyEvent>
-#include <QShortcut>
-#include <QFile>
-#include <QTreeWidgetItem>
 #include "QStandardItemModel"
 #include "tipdbshell.h"
+#include "viewip.h"
+#include "xmlparser.h"
 #include <filesystem.h>
 #include <iostream>
+#include <QFile>
+#include <QFileSystemModel>
 #include <QHeaderView>
-#include <QStyledItemDelegate>
-#include "xmlparser.h"
-#include "viewip.h"
+#include <QKeyEvent>
+#include <QShortcut>
 #include <QSortFilterProxyModel>
+#include <QStringList>
+#include <QStyledItemDelegate>
+#include <QTreeView>
+#include <QTreeWidgetItem>
 
-
-class EditableNameModel : public QStandardItemModel {
+class EditableNameModel : public QStandardItemModel
+{
     Q_OBJECT
 
 public:
-    EditableNameModel(QObject *parent = nullptr) : QStandardItemModel(parent) {}
+    EditableNameModel(QObject *parent = nullptr)
+        : QStandardItemModel(parent)
+    {}
 
-    Qt::ItemFlags flags(const QModelIndex &index) const override {
+    Qt::ItemFlags flags(const QModelIndex &index) const override
+    {
         Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
 
         // Можно редактировать только столбец с именем
@@ -38,14 +40,18 @@ public:
     }
 };
 
-
-class MyEditingDelegate : public QStyledItemDelegate {
+class MyEditingDelegate : public QStyledItemDelegate
+{
     Q_OBJECT
 
 public:
-    MyEditingDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    MyEditingDelegate(QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+    {}
 
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+    void setModelData(
+        QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
+    {
         QStyledItemDelegate::setModelData(editor, model, index);
         emit editingFinished(index);
     }
@@ -57,10 +63,13 @@ signals:
 class CustomSortFilterProxyModel : public QSortFilterProxyModel
 {
 public:
-    CustomSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent) {}
+    CustomSortFilterProxyModel(QObject *parent = nullptr)
+        : QSortFilterProxyModel(parent)
+    {}
 
 protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
+    {
         if (sourceModel()->data(left).toString() == "..") {
             return true;
         } else if (sourceModel()->data(right).toString() == "..") {
@@ -81,11 +90,9 @@ public:
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
-    void setIsleft(bool isLeft);
     void setIsDB(bool isDB);
     void setPath(QString path);
     bool getIsDB();
-
 
 private:
     bool isDB;
@@ -104,17 +111,17 @@ private:
 
     /* База данных */
     QStandardItemModel *DBmodel;
-    std::vector <TIPInfo*> items;
-    std::vector <folderinfo*> folders;
-    std::list <TIPInfo*> chosenItems;
-    std::list <folderinfo*> chosenFolders;
+    std::vector<TIPInfo *> items;
+    std::vector<folderinfo *> folders;
+    std::list<TIPInfo *> chosenItems;
+    std::list<folderinfo *> chosenFolders;
     unsigned int count_elements_DB;
     TIPDBShell *functions_of_current_BD;
     folderid current_folder_id;
     std::list<folderid> pathID;
 
     // Окно для отображения XML файлов
-    ViewIP* viewip;
+    ViewIP *viewip;
 
 signals:
     /* Обновление GUI */
@@ -128,7 +135,7 @@ public slots:
     QString getPath();
     QString getInfo();
     QModelIndexList &getList();
-    FileSystem* getFilesystem();
+    FileSystem *getFilesystem();
 
     void chooseButton();
     void choose(const QModelIndex &index);
@@ -137,25 +144,26 @@ public slots:
     void changeCountChosenFiles(bool isPlus);
     void changeCountChosenFolders(bool isPlus);
     void changeSize(bool isPlus, long long int delta);
-    void changeCurrentFolderInfo(QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount);
+    void changeCurrentFolderInfo(
+        QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount);
 
     void setFileSystem(FileSystem *filesystem);
     void ChangeFolderDB(folderid folder);
 
-    TIPDBShell* getFunctionsDB();
-    std::vector<TIPInfo*>* getItems();
-    std::vector<folderinfo*>* getFolders();
+    TIPDBShell *getFunctionsDB();
+    std::vector<TIPInfo *> *getItems();
+    std::vector<folderinfo *> *getFolders();
     void clearPanel();
-    QStandardItemModel* getDB();
+    QStandardItemModel *getDB();
     folderid getCurrentFolder();
     void setCurrentFolder(folderid folder);
     QString cdUp(QString path);
-    folderinfo* findFolder(folderid folder);
-    TIPInfo* findItem(folderid folder);
+    folderinfo *findFolder(folderid folder);
+    TIPInfo *findItem(folderid folder);
     void PushDB(QModelIndex index);
     void RemoveDB(QModelIndex index);
-    std::list <TIPInfo*> &getChosenItems();
-    std::list <folderinfo*> &getChosenFolders();
+    std::list<TIPInfo *> &getChosenItems();
+    std::list<folderinfo *> &getChosenFolders();
     void onEditFinished(const QModelIndex &index);
 
     void infoToString();

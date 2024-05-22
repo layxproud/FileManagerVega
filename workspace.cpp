@@ -1,12 +1,13 @@
 #include "workspace.h"
+#include <QInputDialog>
 
-Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent) :
-    QObject(parent),
-    leftPanel{left},
-    rightPanel{right},
-    fileSystem{filesystem},
-    isLeftCurrent{true},
-    serviceHandler{}
+Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent)
+    : QObject(parent)
+    , leftPanel(left)
+    , rightPanel(right)
+    , fileSystem(filesystem)
+    , isLeftCurrent(true)
+    , serviceHandler()
 {
     leftPanel->setFocus();
     leftPanel->setCurrentIndex(this->leftPanel->currentIndex());
@@ -17,13 +18,16 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject 
     connect(rightPanel, &Panel::changeFolder, this, &Workspace::updateFolder);
 }
 
-Workspace::~Workspace()
-{
-}
+Workspace::~Workspace() {}
 
-void Workspace::setServiceHandler(ServiceHandler* sh)
+void Workspace::setServiceHandler(ServiceHandler *sh)
 {
     this->serviceHandler = sh;
+}
+
+bool Workspace::getIsLeftCurrent()
+{
+    return isLeftCurrent;
 }
 
 void Workspace::updatePanels()
@@ -31,11 +35,13 @@ void Workspace::updatePanels()
     leftPanel->update();
     rightPanel->update();
 
-    if (leftPanel->getIsDB())
+    if (leftPanel->getIsDB()) {
         leftPanel->refreshDB();
+    }
 
-    if (rightPanel->getIsDB())
+    if (rightPanel->getIsDB()) {
         rightPanel->refreshDB();
+    }
 
     updateFolder(true, leftPanel->getPath(), leftPanel->getIsDB());
     updateFolder(false, rightPanel->getPath(), rightPanel->getIsDB());
@@ -43,254 +49,193 @@ void Workspace::updatePanels()
 
 void Workspace::choose()
 {
-    if (isLeftCurrent)
-    {
+    if (isLeftCurrent) {
         leftPanel->chooseButton();
-    }
-    else
-    {
+    } else {
         rightPanel->chooseButton();
     }
 }
 
-bool Workspace:: getIsLeftCurrent()
-{
-    return isLeftCurrent;
-}
-
 void Workspace::remove()
 {
-    if (isLeftCurrent)
-    {
-        if (!leftPanel->getIsDB())
-        {
+    if (isLeftCurrent) {
+        if (!leftPanel->getIsDB()) {
             removeFilesystemEntries(leftPanel);
-        }
-        else
-        {
+        } else {
             removeDatabaseEntries(leftPanel);
         }
-    }
-    else
-    {
-        if (!rightPanel->getIsDB())
-        {
+    } else {
+        if (!rightPanel->getIsDB()) {
             removeFilesystemEntries(rightPanel);
-        }
-        else
-        {
+        } else {
             removeDatabaseEntries(rightPanel);
         }
     }
 
     leftPanel->setSelectionMode(QAbstractItemView::NoSelection);
     rightPanel->setSelectionMode(QAbstractItemView::NoSelection);
-
     updatePanels();
 }
 
-void Workspace::removeFilesystemEntries(Panel* panel)
+void Workspace::removeFilesystemEntries(Panel *panel)
 {
-    QModelIndexList& selectedIndexes = panel->getList();
+    QModelIndexList &selectedIndexes = panel->getList();
 
-    foreach (const QModelIndex &index, selectedIndexes)
-    {
+    foreach (const QModelIndex &index, selectedIndexes) {
         fileSystem->removeIndex(index);
     }
-
     selectedIndexes.clear();
 }
 
-void Workspace::removeDatabaseEntries(Panel* panel)
+void Workspace::removeDatabaseEntries(Panel *panel)
 {
-    for (auto i = panel->getChosenItems().begin(); i != panel->getChosenItems().end(); i++)
-    {
+    for (auto i = panel->getChosenItems().begin(); i != panel->getChosenItems().end(); i++) {
         panel->getFunctionsDB()->DeleteItem(*i, panel->getCurrentFolder());
     }
     panel->getChosenItems().clear();
 
-    for (auto i = panel->getChosenFolders().begin(); i != panel->getChosenFolders().end(); i++)
-    {
+    for (auto i = panel->getChosenFolders().begin(); i != panel->getChosenFolders().end(); i++) {
         folderinfo *fi = *i;
-        if (fi)
+        if (fi) {
             panel->getFunctionsDB()->DeleteFolder(fi->first);
+        }
     }
     panel->getChosenFolders().clear();
 }
 
 void Workspace::copy()
 {
-    if (isLeftCurrent)
-    {
-        if (!leftPanel->getIsDB())
-        {
-            if (rightPanel->getIsDB())
-            {
+    if (isLeftCurrent) {
+        if (!leftPanel->getIsDB()) {
+            if (rightPanel->getIsDB()) {
                 copyFilesystemToDatabase(leftPanel, rightPanel);
-            }
-            else
-            {
+            } else {
                 copyFilesystemToFilesystem(leftPanel, rightPanel);
             }
-        }
-        else
-        {
-            if (rightPanel->getIsDB())
-            {
+        } else {
+            if (rightPanel->getIsDB()) {
                 copyDatabaseToDatabase(leftPanel, rightPanel);
-            }
-            else
-            {
+            } else {
                 copyDatabaseToFilesystem(leftPanel, rightPanel);
             }
         }
-    }
-    else
-    {
-        if (!rightPanel->getIsDB())
-        {
-            if (leftPanel->getIsDB())
-            {
+    } else {
+        if (!rightPanel->getIsDB()) {
+            if (leftPanel->getIsDB()) {
                 copyFilesystemToDatabase(rightPanel, leftPanel);
-            }
-            else
-            {
+            } else {
                 copyFilesystemToFilesystem(rightPanel, leftPanel);
             }
-        }
-        else
-        {
-            if (leftPanel->getIsDB())
-            {
+        } else {
+            if (leftPanel->getIsDB()) {
                 copyDatabaseToDatabase(rightPanel, leftPanel);
-            }
-            else
-            {
+            } else {
                 copyDatabaseToFilesystem(rightPanel, leftPanel);
             }
         }
     }
-
     updatePanels();
 }
 
-void Workspace::copyFilesystemToDatabase(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel)
 {
-    QModelIndexList& il = sourcePanel->getList();
-    for (auto i = il.begin(); i != il.end(); i++)
-    {
-        destinationPanel->getFunctionsDB()->CopyFileToDB(sourcePanel->getFilesystem()->fileInfo(*i).absoluteFilePath(), destinationPanel->getCurrentFolder());
+    QModelIndexList &il = sourcePanel->getList();
+    for (auto i = il.begin(); i != il.end(); i++) {
+        destinationPanel->getFunctionsDB()->CopyFileToDB(
+            sourcePanel->getFilesystem()->fileInfo(*i).absoluteFilePath(),
+            destinationPanel->getCurrentFolder());
     }
 }
 
-void Workspace::copyFilesystemToFilesystem(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::copyFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel)
 {
-    QModelIndexList& il = sourcePanel->getList();
-    for (QModelIndexList::iterator i = il.begin(); i != il.end(); i++)
-    {
+    QModelIndexList &il = sourcePanel->getList();
+    for (QModelIndexList::iterator i = il.begin(); i != il.end(); i++) {
         sourcePanel->getFilesystem()->copyIndex(*i, destinationPanel->getPath());
     }
 }
 
-void Workspace::copyDatabaseToDatabase(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::copyDatabaseToDatabase(Panel *sourcePanel, Panel *destinationPanel)
 {
-    if (sourcePanel->getFunctionsDB()->getDataBase()->databaseName() != destinationPanel->getFunctionsDB()->getDataBase()->databaseName())
-    {
-        for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end(); i++)
-        {
-            sourcePanel->getFunctionsDB()->CopyItemBetweenDatabases(*i,
-                                                                    sourcePanel->getFunctionsDB()->getDataBase(),
-                                                                    destinationPanel->getFunctionsDB()->getDataBase(),
-                                                                    destinationPanel->getCurrentFolder());
+    if (sourcePanel->getFunctionsDB()->getDataBase()->databaseName()
+        != destinationPanel->getFunctionsDB()->getDataBase()->databaseName()) {
+        for (auto i = sourcePanel->getChosenItems().begin();
+             i != sourcePanel->getChosenItems().end();
+             i++) {
+            sourcePanel->getFunctionsDB()->CopyItemBetweenDatabases(
+                *i,
+                sourcePanel->getFunctionsDB()->getDataBase(),
+                destinationPanel->getFunctionsDB()->getDataBase(),
+                destinationPanel->getCurrentFolder());
         }
-        for (auto i = sourcePanel->getChosenFolders().begin(); i != sourcePanel->getChosenFolders().end(); i++)
-        {
-            sourcePanel->getFunctionsDB()->CopyFolder((*i)->first,
-                                                      sourcePanel->getCurrentFolder(),
-                                                      destinationPanel->getCurrentFolder());
+        for (auto i = sourcePanel->getChosenFolders().begin();
+             i != sourcePanel->getChosenFolders().end();
+             i++) {
+            sourcePanel->getFunctionsDB()->CopyFolder(
+                (*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
         }
-    }
-    else
-    {
-        for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end(); i++)
-        {
-            sourcePanel->getFunctionsDB()->CopyItemWithinDatabase(*i,
-                                                                  sourcePanel->getCurrentFolder(),
-                                                                  destinationPanel->getCurrentFolder());
+    } else {
+        for (auto i = sourcePanel->getChosenItems().begin();
+             i != sourcePanel->getChosenItems().end();
+             i++) {
+            sourcePanel->getFunctionsDB()->CopyItemWithinDatabase(
+                *i, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
         }
-        for (auto i = sourcePanel->getChosenFolders().begin(); i != sourcePanel->getChosenFolders().end(); i++)
-        {
-            sourcePanel->getFunctionsDB()->CopyFolder((*i)->first,
-                                                      sourcePanel->getCurrentFolder(),
-                                                      destinationPanel->getCurrentFolder());
+        for (auto i = sourcePanel->getChosenFolders().begin();
+             i != sourcePanel->getChosenFolders().end();
+             i++) {
+            sourcePanel->getFunctionsDB()->CopyFolder(
+                (*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
         }
     }
 }
 
-void Workspace::copyDatabaseToFilesystem(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::copyDatabaseToFilesystem(Panel *sourcePanel, Panel *destinationPanel)
 {
-    for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end(); i++)
-    {
+    for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end();
+         i++) {
         QString string = destinationPanel->getPath();
         string.append("/");
         string.append((*i)->name.replace(':', '.').replace('/', '.').replace('\\', '.'));
         string.append(".xml");
         sourcePanel->getFunctionsDB()->CopyItemToFile(*i, string);
     }
-    for (auto i = sourcePanel->getChosenFolders().begin(); i != sourcePanel->getChosenFolders().end(); i++)
-    {
-        sourcePanel->getFunctionsDB()->CopyFolder((*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
+
+    for (auto i = sourcePanel->getChosenFolders().begin();
+         i != sourcePanel->getChosenFolders().end();
+         i++) {
+        sourcePanel->getFunctionsDB()->CopyFolder(
+            (*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
     }
 }
 
 void Workspace::move()
 {
-    if (isLeftCurrent)
-    {
-        if (!leftPanel->getIsDB())
-        {
-            if (rightPanel->getIsDB())
-            {
+    if (isLeftCurrent) {
+        if (!leftPanel->getIsDB()) {
+            if (rightPanel->getIsDB()) {
                 moveFilesystemToDatabase(leftPanel, rightPanel);
-            }
-            else
-            {
+            } else {
                 moveFilesystemToFilesystem(leftPanel, rightPanel);
             }
-        }
-        else
-        {
-            if (rightPanel->getIsDB())
-            {
+        } else {
+            if (rightPanel->getIsDB()) {
                 moveDatabaseToDatabase(leftPanel, rightPanel);
-            }
-            else
-            {
+            } else {
                 moveDatabaseToFilesystem(leftPanel, rightPanel);
             }
         }
-    }
-    else
-    {
-        if (!rightPanel->getIsDB())
-        {
-            if (leftPanel->getIsDB())
-            {
+    } else {
+        if (!rightPanel->getIsDB()) {
+            if (leftPanel->getIsDB()) {
                 moveFilesystemToDatabase(rightPanel, leftPanel);
-            }
-            else
-            {
+            } else {
                 moveFilesystemToFilesystem(rightPanel, leftPanel);
             }
-        }
-        else
-        {
-            if (leftPanel->getIsDB())
-            {
+        } else {
+            if (leftPanel->getIsDB()) {
                 moveDatabaseToDatabase(rightPanel, leftPanel);
-            }
-            else
-            {
+            } else {
                 moveDatabaseToFilesystem(rightPanel, leftPanel);
             }
         }
@@ -304,44 +249,45 @@ void Workspace::move()
     updatePanels();
 }
 
-void Workspace::moveFilesystemToDatabase(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::moveFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel)
 {
-    QModelIndexList& il = sourcePanel->getList();
-    for (auto i = il.begin(); i != il.end(); i++)
-    {
-        destinationPanel->getFunctionsDB()->CopyFileToDB(sourcePanel->getFilesystem()->fileInfo(*i).absoluteFilePath(), destinationPanel->getCurrentFolder());
+    QModelIndexList &il = sourcePanel->getList();
+    for (auto i = il.begin(); i != il.end(); i++) {
+        destinationPanel->getFunctionsDB()->CopyFileToDB(
+            sourcePanel->getFilesystem()->fileInfo(*i).absoluteFilePath(),
+            destinationPanel->getCurrentFolder());
         sourcePanel->getFilesystem()->removeIndex(*i);
     }
     sourcePanel->getList().clear();
 }
 
-void Workspace::moveFilesystemToFilesystem(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::moveFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel)
 {
-    QModelIndexList& il = sourcePanel->getList();
-    for (auto i = il.begin(); i != il.end(); i++)
-    {
+    QModelIndexList &il = sourcePanel->getList();
+    for (auto i = il.begin(); i != il.end(); i++) {
         sourcePanel->getFilesystem()->copyIndex(*i, destinationPanel->getPath());
         sourcePanel->getFilesystem()->removeIndex(*i);
     }
 }
 
-void Workspace::moveDatabaseToDatabase(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::moveDatabaseToDatabase(Panel *sourcePanel, Panel *destinationPanel)
 {
     copyDatabaseToDatabase(sourcePanel, destinationPanel);
-    for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end(); i++)
-    {
+    for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end();
+         i++) {
         sourcePanel->getFunctionsDB()->DeleteItem(*i, sourcePanel->getCurrentFolder());
     }
-    for (auto i = sourcePanel->getChosenFolders().begin(); i != sourcePanel->getChosenFolders().end(); i++)
-    {
+    for (auto i = sourcePanel->getChosenFolders().begin();
+         i != sourcePanel->getChosenFolders().end();
+         i++) {
         sourcePanel->getFunctionsDB()->DeleteFolder((*i)->first);
     }
 }
 
-void Workspace::moveDatabaseToFilesystem(Panel* sourcePanel, Panel* destinationPanel)
+void Workspace::moveDatabaseToFilesystem(Panel *sourcePanel, Panel *destinationPanel)
 {
-    for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end(); i++)
-    {
+    for (auto i = sourcePanel->getChosenItems().begin(); i != sourcePanel->getChosenItems().end();
+         i++) {
         QString string = destinationPanel->getPath();
         string.append("/");
         string.append((*i)->name.replace(':', '.').replace('/', '.').replace('\\', '.'));
@@ -349,76 +295,62 @@ void Workspace::moveDatabaseToFilesystem(Panel* sourcePanel, Panel* destinationP
         sourcePanel->getFunctionsDB()->CopyItemToFile(*i, string);
         sourcePanel->getFunctionsDB()->DeleteItem(*i, sourcePanel->getCurrentFolder());
     }
-    for (auto i = sourcePanel->getChosenFolders().begin(); i != sourcePanel->getChosenFolders().end(); i++)
-    {
-        sourcePanel->getFunctionsDB()->CopyFolder((*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
+
+    for (auto i = sourcePanel->getChosenFolders().begin();
+         i != sourcePanel->getChosenFolders().end();
+         i++) {
+        sourcePanel->getFunctionsDB()->CopyFolder(
+            (*i)->first, sourcePanel->getCurrentFolder(), destinationPanel->getCurrentFolder());
         sourcePanel->getFunctionsDB()->DeleteFolder((*i)->first);
     }
 }
 
 void Workspace::createDir()
 {
-    if (isLeftCurrent && !leftPanel->getIsDB())
-    {
+    if (isLeftCurrent && !leftPanel->getIsDB()) {
         createDirFileSystem(leftPanel);
-    }
-    else if (!isLeftCurrent && !rightPanel->getIsDB())
-    {
+    } else if (!isLeftCurrent && !rightPanel->getIsDB()) {
         createDirFileSystem(rightPanel);
-    }
-    else if (isLeftCurrent && leftPanel->getIsDB())
-    {
+    } else if (isLeftCurrent && leftPanel->getIsDB()) {
         createDirDatabase(leftPanel);
-    }
-    else if (!isLeftCurrent && rightPanel->getIsDB())
-    {
+    } else if (!isLeftCurrent && rightPanel->getIsDB()) {
         createDirDatabase(rightPanel);
     }
 
     updatePanels();
 }
 
-void Workspace::createDirFileSystem(Panel* panel)
+void Workspace::createDirFileSystem(Panel *panel)
 {
-    QString newCatalog = QInputDialog::getText(0,
-                                               tr("Новая папка"),
-                                               tr("Введите название: "),
-                                               QLineEdit::Normal,
-                                               "");
+    QString newCatalog = QInputDialog::getText(
+        0, tr("Новая папка"), tr("Введите название: "), QLineEdit::Normal, "");
     fileSystem->mkdir(panel->rootIndex(), newCatalog);
     updateFolder(isLeftCurrent, panel->getPath(), false);
 }
 
-void Workspace::createDirDatabase(Panel* panel)
+void Workspace::createDirDatabase(Panel *panel)
 {
-    QString newCatalog = QInputDialog::getText(0,
-                                               tr("Новая папка"),
-                                               tr("Введите название: "),
-                                               QLineEdit::Normal,
-                                               "");
+    QString newCatalog = QInputDialog::getText(
+        0, tr("Новая папка"), tr("Введите название: "), QLineEdit::Normal, "");
     int new_id = panel->getFunctionsDB()->NewFolder(newCatalog);
-    QStandardItem* id = new QStandardItem(QString::number(new_id));
-    QStandardItem* name = new QStandardItem(newCatalog);
+    QStandardItem *id = new QStandardItem(QString::number(new_id));
+    QStandardItem *name = new QStandardItem(newCatalog);
     name->setIcon(QIcon(":/icons/resources/folder.png"));
     panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 2, id);
     panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 0, name);
-    folderinfo* fold = new folderinfo;
+    folderinfo *fold = new folderinfo;
     fold->first = new_id;
     fold->second = newCatalog;
     panel->getFolders()->push_back(fold);
 }
 
-
 void Workspace::changeDir()
 {
-    if(isLeftCurrent)
-    {
+    if (isLeftCurrent) {
         leftPanel->changeDirectory(leftPanel->currentIndex());
         leftPanel->setFocus();
         leftPanel->setCurrentIndex(leftPanel->model()->index(0, 0, leftPanel->rootIndex()));
-    }
-    else
-    {
+    } else {
         rightPanel->changeDirectory(rightPanel->currentIndex());
         rightPanel->setFocus();
     }
@@ -426,49 +358,35 @@ void Workspace::changeDir()
 
 void Workspace::updateInfo(bool isLeft, bool isPlus, QModelIndex index)
 {
-    if (fileSystem->fileName(index) == "..")
+    if (fileSystem->fileName(index) == "..") {
         return;
-    if (isLeft)
-    {
+    }
+    if (isLeft) {
         isLeftCurrent = true;
-        if (!leftPanel->getIsDB())
-        {
-            if (fileSystem->isDir(index))
-            {
+        if (!leftPanel->getIsDB()) {
+            if (fileSystem->isDir(index)) {
                 leftPanel->changeSize(isPlus, 0);
                 leftPanel->changeCountChosenFolders(isPlus);
-            }
-            else
-            {
+            } else {
                 leftPanel->changeSize(isPlus, fileSystem->size(index) / 1024);
                 leftPanel->changeCountChosenFiles(isPlus);
             }
-        }
-        else
-        {
-            //С помощью функций tipdbshell получаем информацию об индексе и обновляем информацию.
+        } else {
+            // Обрабатывается в Panel
             return;
         }
-    }
-    else
-    {
+    } else {
         isLeftCurrent = false;
-        if (!rightPanel->getIsDB())
-        {
-            if (fileSystem->isDir(index))
-            {
+        if (!rightPanel->getIsDB()) {
+            if (fileSystem->isDir(index)) {
                 rightPanel->changeSize(isPlus, 0);
                 rightPanel->changeCountChosenFolders(isPlus);
-            }
-            else
-            {
+            } else {
                 rightPanel->changeSize(isPlus, fileSystem->size(index) / 1024);
                 rightPanel->changeCountChosenFiles(isPlus);
             }
-        }
-        else
-        {
-            //С помощью функций tipdbshell получаем информацию об индексе и обновляем информацию.
+        } else {
+            // Обрабатывается в Panel
             return;
         }
     }
@@ -487,8 +405,9 @@ void Workspace::updateFolder(bool isLeft, QString path, bool isDB)
 
         foreach (QFileInfo currEntry, currDir.entryInfoList()) {
             QString currEntryName(currEntry.fileName());
-            if (currEntryName == "." || currEntryName == ".." || currEntryName.isEmpty())
+            if (currEntryName == "." || currEntryName == ".." || currEntryName.isEmpty()) {
                 continue;
+            }
             if (currEntry.isDir()) {
                 countFolders++;
             } else {
@@ -503,19 +422,21 @@ void Workspace::updateFolder(bool isLeft, QString path, bool isDB)
             rightPanel->changeCurrentFolderInfo(path, size, countFiles, countFolders);
         }
     } else {
-        std::vector <TIPInfo*> items;
-        std::vector <folderinfo*> folders;
+        std::vector<TIPInfo *> items;
+        std::vector<folderinfo *> folders;
 
         if (isLeft) {
-            leftPanel->getFunctionsDB()->GetFolderContents(leftPanel->getCurrentFolder(), items, folders);
-            for (const auto& item : items) {
+            leftPanel->getFunctionsDB()
+                ->GetFolderContents(leftPanel->getCurrentFolder(), items, folders);
+            for (const auto &item : items) {
                 size += item->sizeInTerms;
             }
             qDebug() << size;
             leftPanel->changeCurrentFolderInfo(path, size, items.size(), folders.size());
         } else {
-            rightPanel->getFunctionsDB()->GetFolderContents(rightPanel->getCurrentFolder(), items, folders);
-            for (const auto& item : items) {
+            rightPanel->getFunctionsDB()
+                ->GetFolderContents(rightPanel->getCurrentFolder(), items, folders);
+            for (const auto &item : items) {
                 size += item->sizeInTerms;
             }
             rightPanel->changeCurrentFolderInfo(path, size, items.size(), folders.size());
@@ -525,13 +446,10 @@ void Workspace::updateFolder(bool isLeft, QString path, bool isDB)
 
 void Workspace::changeSelectionMode()
 {
-    if (isLeftCurrent)
-    {
+    if (isLeftCurrent) {
         leftPanel->selectionModel()->clear();
         leftPanel->changeSelectionMode();
-    }
-    else
-    {
+    } else {
         rightPanel->selectionModel()->clear();
         rightPanel->changeSelectionMode();
     }
@@ -539,19 +457,18 @@ void Workspace::changeSelectionMode()
 
 void Workspace::changeCurrentPanel()
 {
-    if (isLeftCurrent)
-    {
+    if (isLeftCurrent) {
         isLeftCurrent = false;
         rightPanel->setFocus();
-        if (!rightPanel->currentIndex().isValid())
+        if (!rightPanel->currentIndex().isValid()) {
             rightPanel->setCurrentIndex(rightPanel->model()->index(0, 0, rightPanel->rootIndex()));
-    }
-    else
-    {
+        }
+    } else {
         isLeftCurrent = true;
         leftPanel->setFocus();
-        if (!leftPanel->currentIndex().isValid())
+        if (!leftPanel->currentIndex().isValid()) {
             leftPanel->setCurrentIndex(leftPanel->model()->index(0, 0, leftPanel->rootIndex()));
+        }
     }
 }
 
@@ -562,13 +479,12 @@ void Workspace::comparePortraits()
         return;
     }
 
-    if (!leftPanel->getIsDB() || !rightPanel->getIsDB())
-    {
+    if (!leftPanel->getIsDB() || !rightPanel->getIsDB()) {
         qDebug() << "В обоих панелях должна быть открыта база данных";
         return;
     }
-    if (leftPanel->getChosenItems().empty() || rightPanel->getChosenItems().empty())
-    {
+
+    if (leftPanel->getChosenItems().empty() || rightPanel->getChosenItems().empty()) {
         qDebug() << "В одной из панелей не выбрано ни одного элемента";
         return;
     }
@@ -599,8 +515,9 @@ void Workspace::getXmlFile()
     serviceHandler->getXmlFile(url, filePath);
 }
 
-void Workspace::killChildren() {
-    foreach (QWidget* widget, widgetsList) {
+void Workspace::killChildren()
+{
+    foreach (QWidget *widget, widgetsList) {
         delete widget;
     }
     widgetsList.clear();
@@ -608,7 +525,7 @@ void Workspace::killChildren() {
 
 void Workspace::handleWidgetDestroyed(QObject *object)
 {
-    QWidget *widget = qobject_cast<QWidget*>(object);
+    QWidget *widget = qobject_cast<QWidget *>(object);
     if (widget && widgetsList.contains(widget)) {
         widgetsList.removeOne(widget);
     }

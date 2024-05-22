@@ -2,11 +2,11 @@
 #define IPCOMPARE_H
 
 #include "trmlshell.h"
-#include <QWidget>
-#include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsLineItem>
+#include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QWidget>
 
 namespace Ui {
 class IPCompare;

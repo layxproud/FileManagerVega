@@ -1,14 +1,14 @@
 #ifndef VIEWIP_H
 #define VIEWIP_H
 
-#include <QWidget>
-#include <QString>
+#include "trmlshell.h"
+#include <vector>
+#include <QCloseEvent>
+#include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGraphicsRectItem>
-#include <QCloseEvent>
-#include <vector>
-#include "trmlshell.h"
+#include <QString>
+#include <QWidget>
 
 #define HEADER "ID\nСлово\nВес\nВхождений"
 
@@ -26,13 +26,16 @@ class CustomGraphicsView : public QGraphicsView
     Q_OBJECT
 
 public:
-    explicit CustomGraphicsView(QWidget *parent = nullptr) : QGraphicsView(parent) {}
+    explicit CustomGraphicsView(QWidget *parent = nullptr)
+        : QGraphicsView(parent)
+    {}
 
 signals:
     void resized();
 
 protected:
-    void resizeEvent(QResizeEvent *event) override {
+    void resizeEvent(QResizeEvent *event) override
+    {
         QGraphicsView::resizeEvent(event);
         emit resized();
     }
@@ -46,7 +49,13 @@ public:
     explicit ViewIP(QWidget *parent = 0);
     ~ViewIP();
 
-    void setData(QString id, QString user, QString date, QString comment, vector<IPTerm*> terms, vector<IPShingle*> shingles);
+    void setData(
+        QString id,
+        QString user,
+        QString date,
+        QString comment,
+        vector<IPTerm *> terms,
+        vector<IPShingle *> shingles);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -56,8 +65,8 @@ private:
     QGraphicsScene *scene;
     double totalTermsWeight;
     double totalShinglesWeight;
-    std::vector<IPTerm*> top10Terms;
-    std::vector<IPShingle*> top10Shingles;
+    std::vector<IPTerm *> top10Terms;
+    std::vector<IPShingle *> top10Shingles;
     std::vector<double> percentages;
 
 private slots:

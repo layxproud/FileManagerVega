@@ -3,9 +3,9 @@
 #include <QDebug>
 #include <QMessageBox>
 
-LoginWindow::LoginWindow(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::LoginWindow)
+LoginWindow::LoginWindow(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::LoginWindow)
 {
     ui->setupUi(this);
     movie = new QMovie(":/gifs/resources/loading.gif");
@@ -50,4 +50,3 @@ void LoginWindow::on_pushButton_clicked()
 {
     this->accept();
 }
-

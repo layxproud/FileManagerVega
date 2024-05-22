@@ -1,9 +1,10 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include <QFile>
 #include <QDebug>
+#include <QFile>
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
     Q_UNUSED(context);
     QString txt;
     switch (type) {
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     setlocale(LC_ALL, "Russian");
-    QTextCodec* codec = QTextCodec::codecForName("Windows-1251");
+    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
     QTextCodec::setCodecForLocale(codec);
 
     MainWindow w;
