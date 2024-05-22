@@ -470,7 +470,8 @@ void Panel::PushDB(QModelIndex index)
         }
     } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
         chosenItems.push_back(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
-        selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
+        // selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
+        selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInTerms;
         this->numberOfSelectedFiles++;
     }
 }
@@ -484,7 +485,10 @@ void Panel::RemoveDB(QModelIndex index)
         this->numberOfSelectedFolders--;
     } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
         chosenItems.remove(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
-        selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
+        // selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
+        // Хотя верхняя строка корректная по отношению к размеру,
+        // Я пока не замечал файлов не с нулевым размером
+        selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInTerms;
         this->numberOfSelectedFiles--;
     }
 }
