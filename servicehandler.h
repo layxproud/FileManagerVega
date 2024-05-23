@@ -13,21 +13,24 @@
 class NetworkWorker : public QObject
 {
     Q_OBJECT
+
+    std::string accessToken;
+
 public:
     explicit NetworkWorker(QObject *parent = nullptr);
     ~NetworkWorker();
 
 public slots:
     void getAccessToken(const QString &login, const QString &pass);
-    void getXmlFile(const QString &url, const QString &filePath);
-    void indexFiles(const QMap<QString, DocumentData> &documents);
+    void getXmlFile(const QString &filePath, long id, const QString &dbName);
+    void indexFiles(
+        const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
 
 signals:
     void tokenReceived(bool success);
     void xmlFileDownloaded(bool success);
 
 private:
-    std::string accessToken;
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
     {
         ((std::string *) userp)->append((char *) contents, size * nmemb);
@@ -39,6 +42,9 @@ private:
         size_t written = fwrite(ptr, size, nmemb, stream);
         return written;
     }
+
+    QByteArray readFileToByteArray(const QString &filePath);
+    QJsonDocument mapToJsonDocument(const QMap<QString, DocumentData> &documentMap);
 };
 
 class ServiceHandler : public QObject
@@ -67,14 +73,17 @@ private:
     void calculateComparisonCircles();
 
 signals:
-    void tokenReceived(bool success);
+    void indexFilesSignal(
+        const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
+    void getAccessTokenSignal(const QString &login, const QString &pass);
+    void getXmlFileSignal(const QString &filePath, long id, const QString &dbName);
+    void tokenReceivedSignal(bool success);
 
 public slots:
-    void getAccessToken(const QString &login, const QString &pass);
-    void getXmlFile(const QString &url, const QString &filePath);
-    void indexFiles(const QMap<QString, DocumentData> &documents);
-
-    void onWorkerReceivedToken(bool success);
+    void getXmlFile(const QString &filePath, long id, const QString &dbName)
+    {
+        emit getXmlFileSignal(filePath, id, dbName);
+    }
     void onWorkerGotXmlFile(bool success);
 };
 

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "trmlshell.h"
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
@@ -48,6 +49,8 @@ int main(int argc, char *argv[])
     setlocale(LC_ALL, "Russian");
     QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
     QTextCodec::setCodecForLocale(codec);
+
+    qRegisterMetaType<QMap<QString, DocumentData>>("QMap<QString,DocumentData>");
 
     MainWindow w;
     w.show();

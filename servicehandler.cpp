@@ -10,7 +10,12 @@ ServiceHandler::ServiceHandler(QObject *parent)
 {
     worker->moveToThread(workerThread);
     connect(workerThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::onWorkerReceivedToken);
+
+    connect(this, &ServiceHandler::indexFilesSignal, worker, &NetworkWorker::indexFiles);
+    connect(this, &ServiceHandler::getAccessTokenSignal, worker, &NetworkWorker::getAccessToken);
+    connect(this, &ServiceHandler::getXmlFileSignal, worker, &NetworkWorker::getXmlFile);
+
+    connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
     workerThread->start();
 }
@@ -113,26 +118,6 @@ void ServiceHandler::calculateComparisonCircles()
     comparisonResults.d = d;
 }
 
-void ServiceHandler::getAccessToken(const QString &login, const QString &pass)
-{
-    QMetaObject::invokeMethod(worker, "getAccessToken", Q_ARG(QString, login), Q_ARG(QString, pass));
-}
-
-void ServiceHandler::getXmlFile(const QString &url, const QString &filePath)
-{
-    QMetaObject::invokeMethod(worker, "getXmlFile", Q_ARG(QString, url), Q_ARG(QString, filePath));
-}
-
-void ServiceHandler::indexFiles(const QMap<QString, DocumentData> &documents)
-{
-    worker->indexFiles(documents);
-}
-
-void ServiceHandler::onWorkerReceivedToken(bool success)
-{
-    emit tokenReceived(success);
-}
-
 void ServiceHandler::onWorkerGotXmlFile(bool success)
 {
     if (success) {
@@ -144,6 +129,7 @@ void ServiceHandler::onWorkerGotXmlFile(bool success)
 
 NetworkWorker::NetworkWorker(QObject *parent)
     : QObject{parent}
+    , accessToken("")
 {}
 
 NetworkWorker::~NetworkWorker() {}
@@ -192,43 +178,147 @@ void NetworkWorker::getAccessToken(const QString &login, const QString &pass)
     }
 }
 
-void NetworkWorker::getXmlFile(const QString &url, const QString &filePath)
+void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &dbName)
 {
     CURL *curl;
     FILE *fp;
     CURLcode res;
 
     curl = curl_easy_init();
-    if (curl) {
-        fp = fopen(filePath.toStdString().c_str(), "wb");
-        if (!fp) {
-            std::cerr << "Failed to open file " << filePath.toStdString() << std::endl;
-            emit xmlFileDownloaded(false);
-            return;
-        }
-
-        curl_easy_setopt(curl, CURLOPT_URL, url.toStdString().c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-            emit xmlFileDownloaded(false);
-            return;
-        }
-
-        fclose(fp);
-        curl_easy_cleanup(curl);
-
-        emit xmlFileDownloaded(true);
+    if (!curl) {
+        qDebug() << "Failed to initialize cURL";
+        emit xmlFileDownloaded(false);
         return;
     }
-    emit xmlFileDownloaded(false);
+
+    fp = fopen(filePath.toStdString().c_str(), "wb");
+    if (!fp) {
+        qDebug() << "Failed to open file " << filePath;
+        emit xmlFileDownloaded(false);
+        return;
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/index/xml/" + std::to_string(id);
+    if (!dbName.isEmpty()) {
+        url += "&db_name=" + dbName.toStdString();
+    }
+
+    qDebug() << QString::fromStdString(url);
+
+    // Заголовок авторизации
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK) {
+        std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+        emit xmlFileDownloaded(false);
+        return;
+    }
+
+    fclose(fp);
+    curl_easy_cleanup(curl);
+
+    emit xmlFileDownloaded(true);
     return;
 }
 
-void NetworkWorker::indexFiles(const QMap<QString, DocumentData> &documents)
+void NetworkWorker::indexFiles(
+    const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
 {
-    qDebug() << "Indexing";
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qDebug() << "Failed to initialize cURL";
+        return;
+    }
+
+    QJsonDocument jsonDoc = mapToJsonDocument(documents);
+    QByteArray jsonData = jsonDoc.toJson();
+
+    curl_mime *mime = curl_mime_init(curl);
+
+    // JSON
+    curl_mimepart *jsonPart = curl_mime_addpart(mime);
+    curl_mime_name(jsonPart, "json");
+    curl_mime_data(jsonPart, jsonData.constData(), jsonData.size());
+    curl_mime_type(jsonPart, "application/json");
+
+    // Файлы
+    for (auto it = documents.begin(); it != documents.end(); ++it) {
+        const QString &filePath = it.key();
+        QByteArray fileData = readFileToByteArray(filePath);
+
+        if (fileData.isEmpty()) {
+            continue;
+        }
+
+        curl_mimepart *filePart = curl_mime_addpart(mime);
+        curl_mime_name(filePart, "files");
+        curl_mime_data(filePart, fileData.constData(), fileData.size());
+        QFileInfo fileInfo(filePath);
+        curl_mime_filename(filePart, fileInfo.fileName().toStdString().c_str());
+        curl_mime_type(filePart, "text/plain");
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
+                      + std::string(calcWeightSim ? "true" : "false");
+    if (!dbName.isEmpty()) {
+        url += "&db_name=" + dbName.toStdString();
+    }
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    // Заголовок авторизации
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+
+    res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK) {
+        qDebug() << "cURL error: " << curl_easy_strerror(res);
+    }
+
+    curl_slist_free_all(headers);
+    curl_mime_free(mime);
+    curl_easy_cleanup(curl);
+
+    qDebug() << "SUCCESS";
+}
+
+QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Failed to open file:" << filePath;
+        return QByteArray();
+    }
+    return file.readAll();
+}
+
+QJsonDocument NetworkWorker::mapToJsonDocument(const QMap<QString, DocumentData> &documentMap)
+{
+    QJsonArray jsonArray;
+    for (const auto &docData : documentMap) {
+        jsonArray.append(docData.toJson());
+    }
+
+    QJsonObject mainObj;
+    mainObj["documents"] = jsonArray;
+
+    return QJsonDocument(mainObj);
 }

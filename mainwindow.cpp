@@ -29,9 +29,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     loginWindow = new LoginWindow(this);
     loginWindow->setModal(true);
-    connect(loginWindow, &LoginWindow::loginAttempt, serviceHandler, &ServiceHandler::getAccessToken);
     connect(
-        serviceHandler, &ServiceHandler::tokenReceived, loginWindow, &LoginWindow::onTokenReceived);
+        loginWindow,
+        &LoginWindow::loginAttempt,
+        serviceHandler,
+        &ServiceHandler::getAccessTokenSignal);
+    connect(
+        serviceHandler,
+        &ServiceHandler::tokenReceivedSignal,
+        loginWindow,
+        &LoginWindow::onTokenReceived);
     loginWindow->show();
 }
 

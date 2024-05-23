@@ -43,6 +43,9 @@ void IndexWindow::setFiles(const QStringList &files)
            "aaa",
            "aaa",
            "aaa",
+           "aaa",
+           QList<int>{1, 2, 3},
+           2,
            "aaa"};
 
     for (const QString &filePath : filePaths) {
@@ -50,6 +53,12 @@ void IndexWindow::setFiles(const QStringList &files)
     }
 
     populateListWidget();
+}
+
+void IndexWindow::setDbName(const QString &name)
+{
+    dbName = name;
+    ui->dbNameInput->setText(dbName);
 }
 
 void IndexWindow::addDocumentData(const QString &filePath, const DocumentData &data)
@@ -92,6 +101,21 @@ void IndexWindow::updateDocumentData(const QString &fileName)
     data.url = ui->urlInput->text();
     data.publishYear = ui->publishYearInput->text();
     data.publisher = ui->publisherInput->text();
+    QString partsInputText = ui->partsInput->text();
+    QStringList partsStringList = partsInputText.split(",", QString::SkipEmptyParts);
+    QList<int> parts;
+    for (const QString &partString : partsStringList) {
+        bool ok;
+        int part = partString.toInt(&ok);
+        if (ok) {
+            parts.append(part);
+        } else {
+            qDebug() << "Invalid input";
+        }
+    }
+    data.parts = parts;
+    data.shingle_length = ui->shingleLengthInput->text().toInt();
+    data.collection_id = ui->collectionIdInput->text();
 }
 
 void IndexWindow::loadFormData(const DocumentData &data)
@@ -112,6 +136,14 @@ void IndexWindow::loadFormData(const DocumentData &data)
     ui->urlInput->setText(data.url);
     ui->publishYearInput->setText(data.publishYear);
     ui->publisherInput->setText(data.publisher);
+    QStringList stringList;
+    for (int value : data.parts) {
+        stringList.append(QString::number(value));
+    }
+    QString partsString = stringList.join(",");
+    ui->partsInput->setText(partsString);
+    ui->shingleLengthInput->setText(QString::number(data.shingle_length));
+    ui->collectionIdInput->setText(data.collection_id);
 }
 
 void IndexWindow::onFileSelected(QListWidgetItem *item)
@@ -129,5 +161,6 @@ void IndexWindow::onFileSelected(QListWidgetItem *item)
 void IndexWindow::onApplyButtonClicked()
 {
     updateDocumentData(currFileName);
-    emit indexFiles(documentsData);
+    bool calcWeightSim = bool(ui->weightSimCombo->currentIndex());
+    emit indexFiles(dbName, calcWeightSim, documentsData);
 }

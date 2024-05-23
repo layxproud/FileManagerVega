@@ -15,6 +15,7 @@ class IndexWindow : public QDialog
 
     QStringList filePaths;
     QMap<QString, DocumentData> documentsData;
+    QString dbName;
     QString currFileName;
     QString prevFileName;
 
@@ -23,6 +24,7 @@ public:
     ~IndexWindow();
 
     void setFiles(const QStringList &files);
+    void setDbName(const QString &name);
     void addDocumentData(const QString &filePath, const DocumentData &data);
 
 private:
@@ -37,7 +39,8 @@ private slots:
     void onApplyButtonClicked();
 
 signals:
-    void indexFiles(const QMap<QString, DocumentData> &documentsData);
+    void indexFiles(
+        const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documentsData);
 };
 
 #endif // INDEXWINDOW_H

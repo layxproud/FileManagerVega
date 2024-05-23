@@ -3,6 +3,9 @@
 
 #include "Lemmatizer.h"
 #include "agramtab.h"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace std;
 typedef map<QString, QString> multyformmap;
@@ -204,6 +207,43 @@ struct DocumentData
     QString url;
     QString publishYear;
     QString publisher;
+    QList<int> parts;
+    int shingle_length;
+    QString collection_id;
+
+    QJsonObject toJson() const
+    {
+        QJsonObject jsonObj;
+        jsonObj["id"] = id;
+        jsonObj["title"] = title;
+        jsonObj["disciplines"] = disciplines;
+        jsonObj["themes"] = themes;
+        jsonObj["comment"] = comment;
+        jsonObj["mark"] = mark;
+        jsonObj["desc_header"] = descHeader;
+        jsonObj["desc_body"] = descBody;
+        jsonObj["authors"] = authors;
+        jsonObj["type_doc_id"] = typeDocId;
+        jsonObj["udk"] = udk;
+        jsonObj["bbk"] = bbk;
+        jsonObj["code"] = code;
+        jsonObj["url"] = url;
+        jsonObj["publish_year"] = publishYear;
+        jsonObj["publisher"] = publisher;
+
+        QJsonObject indexParam;
+        QJsonArray partsArray;
+        for (int part : parts) {
+            partsArray.append(part);
+        }
+        indexParam["parts"] = partsArray;
+        indexParam["shingle_length"] = shingle_length;
+        indexParam["collection-id"] = collection_id;
+
+        jsonObj["index_param"] = indexParam;
+
+        return jsonObj;
+    }
 };
 
 struct IPExtendedCompareResults : IPCompareResults

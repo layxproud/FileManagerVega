@@ -1,4 +1,5 @@
 #include "workspace.h"
+#include <QFileDialog>
 #include <QInputDialog>
 
 Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent)
@@ -154,16 +155,16 @@ void Workspace::copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationP
             continue;
         }
     }
+    qDebug() << filesToIndex;
 
     indexWindow = new IndexWindow();
     indexWindow->setModal(true);
     indexWindow->setFiles(filesToIndex);
+    indexWindow->setDbName(destinationPanel->getFunctionsDB()->getDataBase()->databaseName());
     connect(indexWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
-    connect(indexWindow, &IndexWindow::indexFiles, serviceHandler, &ServiceHandler::indexFiles);
+    connect(indexWindow, &IndexWindow::indexFiles, serviceHandler, &ServiceHandler::indexFilesSignal);
     indexWindow->show();
     widgetsList.append(indexWindow);
-
-    // serviceHandler->indexFiles(filesToIndex);
 
     for (const auto &file : xmlFiles) {
         destinationPanel->getFunctionsDB()->CopyFileToDB(
@@ -534,12 +535,33 @@ void Workspace::getXmlFile()
         return;
     }
 
-    QString url = "https://vega.mirea.ru/intservice/index/xml?access_key=good&input_doc_id=701";
-    QString filePath = "output.xml";
+    if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
+        qDebug() << "Хотя бы одна панель должна быть базой данных";
+        return;
+    }
 
-    // TODO: Добавить окно с выбором локации для сохранения файла.
+    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
+        qDebug() << "Не выбрано ни одного элемента";
+        return;
+    }
 
-    serviceHandler->getXmlFile(url, filePath);
+    QString filePath = QFileDialog::getSaveFileName(
+        nullptr, tr("Сохранение XML файла"), "", "XML files(*.xml);;All Files(*)");
+
+    if (filePath.isEmpty()) {
+        qDebug() << "No file selected.";
+        return;
+    }
+
+    if (isLeftCurrent) {
+        QString dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
+        auto leftPortrait = *(leftPanel->getChosenItems().rbegin());
+        serviceHandler->getXmlFile(filePath, leftPortrait->id, dbName);
+    } else {
+        QString dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
+        auto rightPortrait = *(rightPanel->getChosenItems().rbegin());
+        serviceHandler->getXmlFile(filePath, rightPortrait->id, dbName);
+    }
 }
 
 void Workspace::killChildren()
