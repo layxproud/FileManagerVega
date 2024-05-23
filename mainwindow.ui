@@ -16,6 +16,10 @@
   <property name="windowTitle">
    <string>IPManager</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="res.qrc">
+    <normaloff>:/icons/resources/main-icon.png</normaloff>:/icons/resources/main-icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">

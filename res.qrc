@@ -7,5 +7,6 @@
         <file>resources/redo.png</file>
         <file>resources/undo.png</file>
         <file>resources/compare.png</file>
+        <file>resources/main-icon.png</file>
     </qresource>
 </RCC>
