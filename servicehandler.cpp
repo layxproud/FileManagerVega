@@ -216,11 +216,17 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
     res = curl_easy_perform(curl);
-    if (res != CURLE_OK) {
+    if (res!= CURLE_OK) {
         std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
         emit xmlFileDownloaded(false);
         return;
+    } else {
+        qDebug() << "HTTP Response Code:" << httpResponseCode;
     }
 
     fclose(fp);

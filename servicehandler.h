@@ -43,6 +43,15 @@ private:
         return written;
     }
 
+    static size_t handle_header(void* ptr, size_t size, size_t nmemb, void* userdata) {
+        std::string header((char*)ptr, size * nmemb);
+        if (header.find("HTTP/") == 0) {
+            int responseCode = std::stoi(header.substr(9, 3));
+            *((int*)userdata) = responseCode;
+        }
+        return size * nmemb;
+    }
+
     QByteArray readFileToByteArray(const QString &filePath);
     QJsonDocument mapToJsonDocument(const QMap<QString, DocumentData> &documentMap);
 };
