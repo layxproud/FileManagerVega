@@ -1,14 +1,13 @@
 #ifndef WORKSPACE_H
 #define WORKSPACE_H
 
-#include <panel.h>
-#include <filesystem.h>
-#include <QMessageBox>
-#include <iostream>
-#include "trmlshell.h"
-#include <unordered_map>
-#include <algorithm>
+#include "indexwindow.h"
 #include "ipcompare.h"
+#include "servicehandler.h"
+#include <filesystem.h>
+#include <iostream>
+#include <panel.h>
+#include <QMessageBox>
 
 enum Button {
     Copy = 0,
@@ -25,25 +24,28 @@ public:
     Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject *parent = nullptr);
     ~Workspace();
 
+    void setServiceHandler(ServiceHandler *sh);
+
 private:
     Panel *leftPanel;
     Panel *rightPanel;
     FileSystem *fileSystem;
+    ServiceHandler *serviceHandler;
     bool isLeftCurrent;
-    IPCompareResults comparisonResults;
     IPCompare *ipCompare;
-    QList<QWidget*> widgetsList;
+    IndexWindow *indexWindow;
+    QList<QWidget *> widgetsList;
 
 private:
     void updatePanels();
 
-    void removeFilesystemEntries(Panel* panel);
-    void removeDatabaseEntries(Panel* panel);
+    void removeFilesystemEntries(Panel *panel);
+    void removeDatabaseEntries(Panel *panel);
 
-    void copyFilesystemToDatabase(Panel* sourcePanel, Panel* destinationPanel);
-    void copyFilesystemToFilesystem(Panel* sourcePanel, Panel* destinationPanel);
-    void copyDatabaseToDatabase(Panel* sourcePanel, Panel* destinationPanel);
-    void copyDatabaseToFilesystem(Panel* sourcePanel, Panel* destinationPanel);
+    void copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel);
+    void copyFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
+    void copyDatabaseToDatabase(Panel *sourcePanel, Panel *destinationPanel);
+    void copyDatabaseToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
 
     void moveFilesystemToDatabase(Panel *sourcePanel, Panel *destinationPanel);
     void moveFilesystemToFilesystem(Panel *sourcePanel, Panel *destinationPanel);
@@ -54,8 +56,9 @@ private:
     void createDirDatabase(Panel *panel);
 
     void clearComparisonResults();
-    void calculateComparisonParameters(const std::vector<TIPFullTermInfo *> &leftTerms,
-                             const std::vector<TIPFullTermInfo *> &rightTerms);
+    void calculateComparisonParameters(
+        const std::vector<TIPFullTermInfo *> &leftTerms,
+        const std::vector<TIPFullTermInfo *> &rightTerms);
     void calculateComparisonCircles();
     void handleWidgetDestroyed(QObject *object);
 
@@ -68,12 +71,15 @@ public slots:
     void createDir();
     void changeDir();
     void updateInfo(bool isLeft, bool isPlus, QModelIndex index);
-    void updateInfoDB(bool isLeft, bool isPlus);
-    void updateFolder(bool isLeft, QString path);
-    void indexToString(bool isLeft, QModelIndex index);
+    void updateFolder(bool isLeft, QString path, bool isDB);
     void changeSelectionMode();
     void changeCurrentPanel();
+
+    // Семантические функции
     void comparePortraits();
+    void getXmlFile();
+
+    // GUI
     void killChildren();
 };
 

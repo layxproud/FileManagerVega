@@ -21,447 +21,450 @@
 
 struct IDispatch;
 
-
 // Referenced namespace
 
 namespace AGRAMTABLib {
 
-    enum __MIDL___MIDL_itf_agramtab_0000_0001_0001 {
-        VERB_PERS_T             = 0,
-        ADVERB_PARTICIPLE_T     = 1,
-        PARTICIPLE_SHORT_T      = 2,
-        ADJ_SHORT_T             = 3,
-        PREDK_T                 = 4,
-        PARTICIPLE_T            = 5,
-        INFINITIVE_T            = 6,
-        INP_T                   = 7,
-        DASH_T                  = 8,
-        UNDETACHED_ADJ_PATIC    = 9,
-        COMPARATIVE_T           = 10,
-        COPUL_T                 = 11
-    };
+enum __MIDL___MIDL_itf_agramtab_0000_0001_0001 {
+    VERB_PERS_T = 0,
+    ADVERB_PARTICIPLE_T = 1,
+    PARTICIPLE_SHORT_T = 2,
+    ADJ_SHORT_T = 3,
+    PREDK_T = 4,
+    PARTICIPLE_T = 5,
+    INFINITIVE_T = 6,
+    INP_T = 7,
+    DASH_T = 8,
+    UNDETACHED_ADJ_PATIC = 9,
+    COMPARATIVE_T = 10,
+    COPUL_T = 11
+};
 
-    enum __MIDL___MIDL_itf_agramtab_0000_0001_0002 {
-        VERBSATZ_T              = 0,
-        PARTIZIPIALSATZ_T       = 1,
-        INFINITIVSATZ_T         = 2
-    };
+enum __MIDL___MIDL_itf_agramtab_0000_0001_0002 {
+    VERBSATZ_T = 0,
+    PARTIZIPIALSATZ_T = 1,
+    INFINITIVSATZ_T = 2
+};
 
-    enum eGrammems {
-        eSingular               = 0,
-        ePlural                 = 1,
-        eMasculinum             = 2,
-        eFeminum                = 3,
-        eAnimative              = 4,
-        ePerfective             = 5,
-        eNominative             = 6,
-        eObjectCase             = 7,
-        eNarrative              = 8,
-        eGeographics            = 9,
-        eProper                 = 10,
-        ePersonalPronoun        = 11,
-        ePossessive             = 12,
-        ePredicative            = 13,
-        eUncountable            = 14,
-        eReflexivePronoun       = 15,
-        eDemonstrativePronoun   = 16,
-        eMass                   = 17,
-        eComparativ             = 18,
-        eSupremum               = 19,
-        eFirstPerson            = 20,
-        eSecondPerson           = 21,
-        eThirdPerson            = 22,
-        ePresentIndef           = 23,
-        eInfinitive             = 24,
-        ePastIndef              = 25,
-        ePastParticiple         = 26,
-        eGerund                 = 27,
-        eFuturum                = 28,
-        eConditional            = 29,
-        eApostropheS            = 30,
-        eApostrophe             = 31,
-        eNames                  = 32,
-        eOrganisation           = 33
-    };
+enum eGrammems {
+    eSingular = 0,
+    ePlural = 1,
+    eMasculinum = 2,
+    eFeminum = 3,
+    eAnimative = 4,
+    ePerfective = 5,
+    eNominative = 6,
+    eObjectCase = 7,
+    eNarrative = 8,
+    eGeographics = 9,
+    eProper = 10,
+    ePersonalPronoun = 11,
+    ePossessive = 12,
+    ePredicative = 13,
+    eUncountable = 14,
+    eReflexivePronoun = 15,
+    eDemonstrativePronoun = 16,
+    eMass = 17,
+    eComparativ = 18,
+    eSupremum = 19,
+    eFirstPerson = 20,
+    eSecondPerson = 21,
+    eThirdPerson = 22,
+    ePresentIndef = 23,
+    eInfinitive = 24,
+    ePastIndef = 25,
+    ePastParticiple = 26,
+    eGerund = 27,
+    eFuturum = 28,
+    eConditional = 29,
+    eApostropheS = 30,
+    eApostrophe = 31,
+    eNames = 32,
+    eOrganisation = 33
+};
 
-    enum ePartOfSpeeches {
-        eNOUN                   = 0,
-        eADJ                    = 1,
-        eVERB                   = 2,
-        eVBE                    = 3,
-        eMOD                    = 4,
-        eNUMERAL                = 5,
-        eCONJ                   = 6,
-        eINTERJ                 = 7,
-        ePREP                   = 8,
-        ePARTICLE               = 9,
-        eART                    = 10,
-        eADV                    = 11,
-        ePN                     = 12,
-        eORDNUM                 = 13,
-        ePRON                   = 14,
-        ePOSS                   = 15,
-        ePN_ADJ                 = 16
-    };
+enum ePartOfSpeeches {
+    eNOUN = 0,
+    eADJ = 1,
+    eVERB = 2,
+    eVBE = 3,
+    eMOD = 4,
+    eNUMERAL = 5,
+    eCONJ = 6,
+    eINTERJ = 7,
+    ePREP = 8,
+    ePARTICLE = 9,
+    eART = 10,
+    eADV = 11,
+    ePN = 12,
+    eORDNUM = 13,
+    ePRON = 14,
+    ePOSS = 15,
+    ePN_ADJ = 16
+};
 
-    enum gGrammems {
-        gNoaUnk                 = 0,
-        gPredikBenutz           = 1,
-        gProUnk                 = 2,
-        gTmpUnk                 = 3,
-        gNac                    = 4,
-        gMou                    = 5,
-        gCou                    = 6,
-        gGeo                    = 7,
-        gWasser                 = 8,
-        gGeb                    = 9,
-        gStd                    = 10,
-        gLok                    = 11,
-        gVor                    = 12,
-        gSichAcc                = 13,
-        gSichDat                = 14,
-        gSchwach                = 15,
-        gNichtSchwach           = 16,
-        gModal                  = 17,
-        gAuxiliar               = 18,
-        gKonj1                  = 19,
-        gKonj2                  = 20,
-        gPartizip1              = 21,
-        gPartizip2              = 22,
-        gZuVerbForm             = 23,
-        gImperativ              = 24,
-        gPraeteritum            = 25,
-        gPrasens                = 26,
-        gGrundform              = 27,
-        gKomparativ             = 28,
-        gSuperlativ             = 29,
-        gProportionalKonjunktion= 30,
-        gInfinitiv              = 31,
-        gVergleichsKonjunktion  = 32,
-        gNebenordnende          = 33,
-        gUnterordnende          = 34,
-        gPersonal               = 35,
-        gDemonstrativ           = 36,
-        gInterrogativ           = 37,
-        gPossessiv              = 38,
-        gReflexiv               = 39,
-        gRinPronomen            = 40,
-        gAlgPronomen            = 41,
-        gAdjektiveOhneArtikel   = 42,
-        gAdjektiveMitUnbestimmte= 43,
-        gAdjektiveMitBestimmte  = 44,
-        gErstePerson            = 45,
-        gZweitePerson           = 46,
-        gDrittePerson           = 47,
-        gFeminin                = 48,
-        gMaskulin               = 49,
-        gNeutrum                = 50,
-        gPlural                 = 51,
-        gSingular               = 52,
-        gNominativ              = 53,
-        gGenitiv                = 54,
-        gDativ                  = 55,
-        gAkkusativ              = 56,
-        gAbbreviation           = 57,
-        gEinwohner              = 58,
-        gTransitiv              = 59,
-        gIntransitiv            = 60,
-        gImpersonal             = 61
-    };
+enum gGrammems {
+    gNoaUnk = 0,
+    gPredikBenutz = 1,
+    gProUnk = 2,
+    gTmpUnk = 3,
+    gNac = 4,
+    gMou = 5,
+    gCou = 6,
+    gGeo = 7,
+    gWasser = 8,
+    gGeb = 9,
+    gStd = 10,
+    gLok = 11,
+    gVor = 12,
+    gSichAcc = 13,
+    gSichDat = 14,
+    gSchwach = 15,
+    gNichtSchwach = 16,
+    gModal = 17,
+    gAuxiliar = 18,
+    gKonj1 = 19,
+    gKonj2 = 20,
+    gPartizip1 = 21,
+    gPartizip2 = 22,
+    gZuVerbForm = 23,
+    gImperativ = 24,
+    gPraeteritum = 25,
+    gPrasens = 26,
+    gGrundform = 27,
+    gKomparativ = 28,
+    gSuperlativ = 29,
+    gProportionalKonjunktion = 30,
+    gInfinitiv = 31,
+    gVergleichsKonjunktion = 32,
+    gNebenordnende = 33,
+    gUnterordnende = 34,
+    gPersonal = 35,
+    gDemonstrativ = 36,
+    gInterrogativ = 37,
+    gPossessiv = 38,
+    gReflexiv = 39,
+    gRinPronomen = 40,
+    gAlgPronomen = 41,
+    gAdjektiveOhneArtikel = 42,
+    gAdjektiveMitUnbestimmte = 43,
+    gAdjektiveMitBestimmte = 44,
+    gErstePerson = 45,
+    gZweitePerson = 46,
+    gDrittePerson = 47,
+    gFeminin = 48,
+    gMaskulin = 49,
+    gNeutrum = 50,
+    gPlural = 51,
+    gSingular = 52,
+    gNominativ = 53,
+    gGenitiv = 54,
+    gDativ = 55,
+    gAkkusativ = 56,
+    gAbbreviation = 57,
+    gEinwohner = 58,
+    gTransitiv = 59,
+    gIntransitiv = 60,
+    gImpersonal = 61
+};
 
-    enum gPartOfSpeeches {
-        gART                    = 0,
-        gADJ                    = 1,
-        gADV                    = 2,
-        gEIG                    = 3,
-        gSUB                    = 4,
-        gVER                    = 5,
-        gPA1                    = 6,
-        gPA2                    = 7,
-        gPRONOMEN               = 8,
-        gPRP                    = 9,
-        gKON                    = 10,
-        gNEG                    = 11,
-        gINJ                    = 12,
-        gZAL                    = 13,
-        gZUS                    = 14,
-        gPRO_BEG                = 15,
-        gZU_INFINITIV           = 16
-    };
+enum gPartOfSpeeches {
+    gART = 0,
+    gADJ = 1,
+    gADV = 2,
+    gEIG = 3,
+    gSUB = 4,
+    gVER = 5,
+    gPA1 = 6,
+    gPA2 = 7,
+    gPRONOMEN = 8,
+    gPRP = 9,
+    gKON = 10,
+    gNEG = 11,
+    gINJ = 12,
+    gZAL = 13,
+    gZUS = 14,
+    gPRO_BEG = 15,
+    gZU_INFINITIV = 16
+};
 
-    enum rGrammems {
-        rPlural                 = 0,
-        rSingular               = 1,
-        rAllNumbers             = 3,
-        rNominativ              = 2,
-        rGenitiv                = 3,
-        rDativ                  = 4,
-        rAccusativ              = 5,
-        rInstrumentalis         = 6,
-        rLocativ                = 7,
-        rVocativ                = 8,
-        rAllCases               = 508,
-        rMasculinum             = 9,
-        rFeminum                = 10,
-        rNeutrum                = 11,
-        rMascFem                = 12,
-        rAllGenders             = 3584,
-        rPresentTense           = 13,
-        rFutureTense            = 14,
-        rPastTense              = 15,
-        rAllTimes               = 57344,
-        rFirstPerson            = 16,
-        rSecondPerson           = 17,
-        rThirdPerson            = 18,
-        rAllPersons             = 458752,
-        rImperative             = 19,
-        rAnimative              = 20,
-        rNonAnimative           = 21,
-        rAllAnimative           = 3145728,
-        rComparative            = 22,
-        rPerfective             = 23,
-        rNonPerfective          = 24,
-        rNonTransitive          = 25,
-        rTransitive             = 26,
-        rActiveVoice            = 27,
-        rPassiveVoice           = 28,
-        rIndeclinable           = 29,
-        rInitialism             = 30,
-        rPatronymic             = 31,
-        rToponym                = 32,
-        rOrganisation           = 33,
-        rQualitative            = 34,
-        rDeFactoSingTantum      = 35,
-        rInterrogative          = 36,
-        rDemonstrative          = 37,
-        rName                   = 38,
-        rSurName                = 39,
-        rImpersonal             = 40,
-        rSlang                  = 41,
-        rMisprint               = 42,
-        rColloquial             = 43,
-        rPossessive             = 44,
-        rArchaism               = 45,
-        rSecondCase             = 46,
-        rPoetry                 = 47,
-        rProfession             = 48,
-        rSuperlative            = 49,
-        rPositive               = 50
-    };
+enum rGrammems {
+    rPlural = 0,
+    rSingular = 1,
+    rAllNumbers = 3,
+    rNominativ = 2,
+    rGenitiv = 3,
+    rDativ = 4,
+    rAccusativ = 5,
+    rInstrumentalis = 6,
+    rLocativ = 7,
+    rVocativ = 8,
+    rAllCases = 508,
+    rMasculinum = 9,
+    rFeminum = 10,
+    rNeutrum = 11,
+    rMascFem = 12,
+    rAllGenders = 3584,
+    rPresentTense = 13,
+    rFutureTense = 14,
+    rPastTense = 15,
+    rAllTimes = 57344,
+    rFirstPerson = 16,
+    rSecondPerson = 17,
+    rThirdPerson = 18,
+    rAllPersons = 458752,
+    rImperative = 19,
+    rAnimative = 20,
+    rNonAnimative = 21,
+    rAllAnimative = 3145728,
+    rComparative = 22,
+    rPerfective = 23,
+    rNonPerfective = 24,
+    rNonTransitive = 25,
+    rTransitive = 26,
+    rActiveVoice = 27,
+    rPassiveVoice = 28,
+    rIndeclinable = 29,
+    rInitialism = 30,
+    rPatronymic = 31,
+    rToponym = 32,
+    rOrganisation = 33,
+    rQualitative = 34,
+    rDeFactoSingTantum = 35,
+    rInterrogative = 36,
+    rDemonstrative = 37,
+    rName = 38,
+    rSurName = 39,
+    rImpersonal = 40,
+    rSlang = 41,
+    rMisprint = 42,
+    rColloquial = 43,
+    rPossessive = 44,
+    rArchaism = 45,
+    rSecondCase = 46,
+    rPoetry = 47,
+    rProfession = 48,
+    rSuperlative = 49,
+    rPositive = 50
+};
 
-    enum rPartOfSpeeches {
-        NOUN                    = 0,
-        ADJ_FULL                = 1,
-        VERB                    = 2,
-        PRONOUN                 = 3,
-        PRONOUN_P               = 4,
-        PRONOUN_PREDK           = 5,
-        NUMERAL                 = 6,
-        NUMERAL_P               = 7,
-        ADV                     = 8,
-        PREDK                   = 9,
-        PREP                    = 10,
-        POSL                    = 11,
-        CONJ                    = 12,
-        INTERJ                  = 13,
-        INP                     = 14,
-        PHRASE                  = 15,
-        PARTICLE                = 16,
-        ADJ_SHORT               = 17,
-        PARTICIPLE              = 18,
-        ADVERB_PARTICIPLE       = 19,
-        PARTICIPLE_SHORT        = 20,
-        INFINITIVE              = 21
-    };
+enum rPartOfSpeeches {
+    NOUN = 0,
+    ADJ_FULL = 1,
+    VERB = 2,
+    PRONOUN = 3,
+    PRONOUN_P = 4,
+    PRONOUN_PREDK = 5,
+    NUMERAL = 6,
+    NUMERAL_P = 7,
+    ADV = 8,
+    PREDK = 9,
+    PREP = 10,
+    POSL = 11,
+    CONJ = 12,
+    INTERJ = 13,
+    INP = 14,
+    PHRASE = 15,
+    PARTICLE = 16,
+    ADJ_SHORT = 17,
+    PARTICIPLE = 18,
+    ADVERB_PARTICIPLE = 19,
+    PARTICIPLE_SHORT = 20,
+    INFINITIVE = 21
+};
 
 // forward declarations
-    enum rPartOfSpeeches;
-    enum rGrammems;
-    enum __MIDL___MIDL_itf_agramtab_0000_0001_0001;
-    enum gPartOfSpeeches;
-    enum gGrammems;
-    enum __MIDL___MIDL_itf_agramtab_0000_0001_0002;
-    enum ePartOfSpeeches;
-    enum eGrammems;
-    enum rPartOfSpeeches;
-    enum rGrammems;
-    enum __MIDL___MIDL_itf_agramtab_0000_0001_0001;
-    enum gPartOfSpeeches;
-    enum gGrammems;
-    enum __MIDL___MIDL_itf_agramtab_0000_0001_0002;
-    enum ePartOfSpeeches;
-    enum eGrammems;
+enum rPartOfSpeeches;
+enum rGrammems;
+enum __MIDL___MIDL_itf_agramtab_0000_0001_0001;
+enum gPartOfSpeeches;
+enum gGrammems;
+enum __MIDL___MIDL_itf_agramtab_0000_0001_0002;
+enum ePartOfSpeeches;
+enum eGrammems;
+enum rPartOfSpeeches;
+enum rGrammems;
+enum __MIDL___MIDL_itf_agramtab_0000_0001_0001;
+enum gPartOfSpeeches;
+enum gGrammems;
+enum __MIDL___MIDL_itf_agramtab_0000_0001_0002;
+enum ePartOfSpeeches;
+enum eGrammems;
 
 class AGRAMTABLIB_EXPORT IGramTab : public QAxObject
 {
 public:
     IGramTab(IDispatch *subobject = 0, QAxObject *parent = 0)
-    : QAxObject((IUnknown*)subobject, parent)
+        : QAxObject((IUnknown *) subobject, parent)
     {
         internalRelease();
     }
 
     /*
-    Property GrammemsCount
+  Property GrammemsCount
 
-    property GrammemsCount
+  property GrammemsCount
 
-    */
-    inline int GrammemsCount() const; //Returns the value of GrammemsCount
-
-    /*
-    Property PartOfSpeechCount
-
-    property PartOfSpeechCount
-
-    */
-    inline uint PartOfSpeechCount() const; //Returns the value of PartOfSpeechCount
+  */
+    inline int GrammemsCount() const; // Returns the value of GrammemsCount
 
     /*
-    Method FindGrammem
+  Property PartOfSpeechCount
 
-    method FindGrammem
+  property PartOfSpeechCount
 
-    */
-    inline int FindGrammem(const QString& gram_codes, qlonglong grammems);
-
-    /*
-    Method GetAllGrammems
-
-    method GetAllGrammems
-
-    */
-    inline qlonglong GetAllGrammems(const QString& gram_code);
+  */
+    inline uint PartOfSpeechCount() const; // Returns the value of PartOfSpeechCount
 
     /*
-    Method GetClauseNameByType
+  Method FindGrammem
 
-    method GetClauseNameByType
+  method FindGrammem
 
-    */
+  */
+    inline int FindGrammem(const QString &gram_codes, qlonglong grammems);
+
+    /*
+  Method GetAllGrammems
+
+  method GetAllGrammems
+
+  */
+    inline qlonglong GetAllGrammems(const QString &gram_code);
+
+    /*
+  Method GetClauseNameByType
+
+  method GetClauseNameByType
+
+  */
     inline QString GetClauseNameByType(int type);
 
     /*
-    Method GetClauseTypeByName
+  Method GetClauseTypeByName
 
-    method GetClauseTypeByName
+  method GetClauseTypeByName
 
-    */
-    inline int GetClauseTypeByName(const QString& bstrTypeName);
-
-    /*
-    Method GetClauseTypeByNameIfCan
-
-    method GetClauseTypeByNameIfCan
-
-    */
-    inline int GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType);
+  */
+    inline int GetClauseTypeByName(const QString &bstrTypeName);
 
     /*
-    Method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  Method GetClauseTypeByNameIfCan
 
-    method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  method GetClauseTypeByNameIfCan
 
-    */
-    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes);
-
-    /*
-    Method GetGrammems
-
-    method GetGrammems
-
-    */
-    inline qlonglong GetGrammems(const QString& gram_code);
+  */
+    inline int GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType);
 
     /*
-    Method GetPartOfSpeech
+  Method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    method GetPartOfSpeech
+  method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    */
-    inline uint GetPartOfSpeech(const QString& gram_code);
+  */
+    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(
+        uint Pos, qlonglong grammems, QString &gramcodes);
 
     /*
-    Method GetPartOfSpeechStr
+  Method GetGrammems
 
-    method GetPartOfSpeechStr
+  method GetGrammems
 
-    */
+  */
+    inline qlonglong GetGrammems(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeech
+
+  method GetPartOfSpeech
+
+  */
+    inline uint GetPartOfSpeech(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeechStr
+
+  method GetPartOfSpeechStr
+
+  */
     inline QString GetPartOfSpeechStr(uint PartOfSpeech);
 
     /*
-    Method GleicheCaseNumber
+  Method GleicheCaseNumber
 
-    method GleicheCaseNumber
+  method GleicheCaseNumber
 
-    */
-    inline int GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2);
-
-    /*
-    Method GleicheGenderNumber
-
-    method GleicheGenderNumber
-
-    */
-    inline int GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GleicheGenderNumberCase
+  Method GleicheGenderNumber
 
-    method GleicheGenderNumberCase
+  method GleicheGenderNumber
 
-    */
-    inline int GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code);
-
-    /*
-    Method GleicheSubjectPredicate
-
-    method GleicheSubjectPredicate
-
-    */
-    inline int GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GrammemsToStr
+  Method GleicheGenderNumberCase
 
-    method GrammemsToStr
+  method GleicheGenderNumberCase
 
-    */
+  */
+    inline int GleicheGenderNumberCase(
+        const QString &common_noun_gram_code,
+        const QString &noun_gram_code,
+        const QString &adj_gram_code);
+
+    /*
+  Method GleicheSubjectPredicate
+
+  method GleicheSubjectPredicate
+
+  */
+    inline int GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2);
+
+    /*
+  Method GrammemsToStr
+
+  method GrammemsToStr
+
+  */
     inline QString GrammemsToStr(qlonglong grammems);
 
     /*
-    Method HaveEqualPartOfSpeech
+  Method HaveEqualPartOfSpeech
 
-    method HaveEqualPartOfSpeech
+  method HaveEqualPartOfSpeech
 
-    */
-    inline int HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method Load
+  Method Load
 
-    method Load
+  method Load
 
-    */
+  */
     inline void Load();
 
     /*
-    Method ProcessPOSAndGrammems
+  Method ProcessPOSAndGrammems
 
-    method ProcessPOSAndGrammems
+  method ProcessPOSAndGrammems
 
-    */
-    inline void ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline void ProcessPOSAndGrammems(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
     /*
-    Method ProcessPOSAndGrammemsIfCan
+  Method ProcessPOSAndGrammemsIfCan
 
-    method ProcessPOSAndGrammemsIfCan
+  method ProcessPOSAndGrammemsIfCan
 
-    */
-    inline int ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline int ProcessPOSAndGrammemsIfCan(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -472,179 +475,183 @@ class AGRAMTABLIB_EXPORT RusGramTab : public QAxObject
 {
 public:
     RusGramTab(QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         setControl(QStringLiteral("{ecd62f7e-19b6-11d3-a77a-2679a7000000}"));
     }
 
     RusGramTab(IGramTab *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property GrammemsCount
+  Property GrammemsCount
 
-    property GrammemsCount
+  property GrammemsCount
 
-    */
-    inline int GrammemsCount() const; //Returns the value of GrammemsCount
-
-    /*
-    Property PartOfSpeechCount
-
-    property PartOfSpeechCount
-
-    */
-    inline uint PartOfSpeechCount() const; //Returns the value of PartOfSpeechCount
+  */
+    inline int GrammemsCount() const; // Returns the value of GrammemsCount
 
     /*
-    Method FindGrammem
+  Property PartOfSpeechCount
 
-    method FindGrammem
+  property PartOfSpeechCount
 
-    */
-    inline int FindGrammem(const QString& gram_codes, qlonglong grammems);
-
-    /*
-    Method GetAllGrammems
-
-    method GetAllGrammems
-
-    */
-    inline qlonglong GetAllGrammems(const QString& gram_code);
+  */
+    inline uint PartOfSpeechCount() const; // Returns the value of PartOfSpeechCount
 
     /*
-    Method GetClauseNameByType
+  Method FindGrammem
 
-    method GetClauseNameByType
+  method FindGrammem
 
-    */
+  */
+    inline int FindGrammem(const QString &gram_codes, qlonglong grammems);
+
+    /*
+  Method GetAllGrammems
+
+  method GetAllGrammems
+
+  */
+    inline qlonglong GetAllGrammems(const QString &gram_code);
+
+    /*
+  Method GetClauseNameByType
+
+  method GetClauseNameByType
+
+  */
     inline QString GetClauseNameByType(int type);
 
     /*
-    Method GetClauseTypeByName
+  Method GetClauseTypeByName
 
-    method GetClauseTypeByName
+  method GetClauseTypeByName
 
-    */
-    inline int GetClauseTypeByName(const QString& bstrTypeName);
-
-    /*
-    Method GetClauseTypeByNameIfCan
-
-    method GetClauseTypeByNameIfCan
-
-    */
-    inline int GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType);
+  */
+    inline int GetClauseTypeByName(const QString &bstrTypeName);
 
     /*
-    Method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  Method GetClauseTypeByNameIfCan
 
-    method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  method GetClauseTypeByNameIfCan
 
-    */
-    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes);
-
-    /*
-    Method GetGrammems
-
-    method GetGrammems
-
-    */
-    inline qlonglong GetGrammems(const QString& gram_code);
+  */
+    inline int GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType);
 
     /*
-    Method GetPartOfSpeech
+  Method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    method GetPartOfSpeech
+  method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    */
-    inline uint GetPartOfSpeech(const QString& gram_code);
+  */
+    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(
+        uint Pos, qlonglong grammems, QString &gramcodes);
 
     /*
-    Method GetPartOfSpeechStr
+  Method GetGrammems
 
-    method GetPartOfSpeechStr
+  method GetGrammems
 
-    */
+  */
+    inline qlonglong GetGrammems(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeech
+
+  method GetPartOfSpeech
+
+  */
+    inline uint GetPartOfSpeech(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeechStr
+
+  method GetPartOfSpeechStr
+
+  */
     inline QString GetPartOfSpeechStr(uint PartOfSpeech);
 
     /*
-    Method GleicheCaseNumber
+  Method GleicheCaseNumber
 
-    method GleicheCaseNumber
+  method GleicheCaseNumber
 
-    */
-    inline int GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2);
-
-    /*
-    Method GleicheGenderNumber
-
-    method GleicheGenderNumber
-
-    */
-    inline int GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GleicheGenderNumberCase
+  Method GleicheGenderNumber
 
-    method GleicheGenderNumberCase
+  method GleicheGenderNumber
 
-    */
-    inline int GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code);
-
-    /*
-    Method GleicheSubjectPredicate
-
-    method GleicheSubjectPredicate
-
-    */
-    inline int GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GrammemsToStr
+  Method GleicheGenderNumberCase
 
-    method GrammemsToStr
+  method GleicheGenderNumberCase
 
-    */
+  */
+    inline int GleicheGenderNumberCase(
+        const QString &common_noun_gram_code,
+        const QString &noun_gram_code,
+        const QString &adj_gram_code);
+
+    /*
+  Method GleicheSubjectPredicate
+
+  method GleicheSubjectPredicate
+
+  */
+    inline int GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2);
+
+    /*
+  Method GrammemsToStr
+
+  method GrammemsToStr
+
+  */
     inline QString GrammemsToStr(qlonglong grammems);
 
     /*
-    Method HaveEqualPartOfSpeech
+  Method HaveEqualPartOfSpeech
 
-    method HaveEqualPartOfSpeech
+  method HaveEqualPartOfSpeech
 
-    */
-    inline int HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method Load
+  Method Load
 
-    method Load
+  method Load
 
-    */
+  */
     inline void Load();
 
     /*
-    Method ProcessPOSAndGrammems
+  Method ProcessPOSAndGrammems
 
-    method ProcessPOSAndGrammems
+  method ProcessPOSAndGrammems
 
-    */
-    inline void ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline void ProcessPOSAndGrammems(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
     /*
-    Method ProcessPOSAndGrammemsIfCan
+  Method ProcessPOSAndGrammemsIfCan
 
-    method ProcessPOSAndGrammemsIfCan
+  method ProcessPOSAndGrammemsIfCan
 
-    */
-    inline int ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline int ProcessPOSAndGrammemsIfCan(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -654,179 +661,183 @@ class AGRAMTABLIB_EXPORT EngGramTab : public QAxObject
 {
 public:
     EngGramTab(QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         setControl(QStringLiteral("{3b09aa0a-27a7-11d3-a791-bcd3b4000000}"));
     }
 
     EngGramTab(IGramTab *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property GrammemsCount
+  Property GrammemsCount
 
-    property GrammemsCount
+  property GrammemsCount
 
-    */
-    inline int GrammemsCount() const; //Returns the value of GrammemsCount
-
-    /*
-    Property PartOfSpeechCount
-
-    property PartOfSpeechCount
-
-    */
-    inline uint PartOfSpeechCount() const; //Returns the value of PartOfSpeechCount
+  */
+    inline int GrammemsCount() const; // Returns the value of GrammemsCount
 
     /*
-    Method FindGrammem
+  Property PartOfSpeechCount
 
-    method FindGrammem
+  property PartOfSpeechCount
 
-    */
-    inline int FindGrammem(const QString& gram_codes, qlonglong grammems);
-
-    /*
-    Method GetAllGrammems
-
-    method GetAllGrammems
-
-    */
-    inline qlonglong GetAllGrammems(const QString& gram_code);
+  */
+    inline uint PartOfSpeechCount() const; // Returns the value of PartOfSpeechCount
 
     /*
-    Method GetClauseNameByType
+  Method FindGrammem
 
-    method GetClauseNameByType
+  method FindGrammem
 
-    */
+  */
+    inline int FindGrammem(const QString &gram_codes, qlonglong grammems);
+
+    /*
+  Method GetAllGrammems
+
+  method GetAllGrammems
+
+  */
+    inline qlonglong GetAllGrammems(const QString &gram_code);
+
+    /*
+  Method GetClauseNameByType
+
+  method GetClauseNameByType
+
+  */
     inline QString GetClauseNameByType(int type);
 
     /*
-    Method GetClauseTypeByName
+  Method GetClauseTypeByName
 
-    method GetClauseTypeByName
+  method GetClauseTypeByName
 
-    */
-    inline int GetClauseTypeByName(const QString& bstrTypeName);
-
-    /*
-    Method GetClauseTypeByNameIfCan
-
-    method GetClauseTypeByNameIfCan
-
-    */
-    inline int GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType);
+  */
+    inline int GetClauseTypeByName(const QString &bstrTypeName);
 
     /*
-    Method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  Method GetClauseTypeByNameIfCan
 
-    method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  method GetClauseTypeByNameIfCan
 
-    */
-    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes);
-
-    /*
-    Method GetGrammems
-
-    method GetGrammems
-
-    */
-    inline qlonglong GetGrammems(const QString& gram_code);
+  */
+    inline int GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType);
 
     /*
-    Method GetPartOfSpeech
+  Method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    method GetPartOfSpeech
+  method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    */
-    inline uint GetPartOfSpeech(const QString& gram_code);
+  */
+    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(
+        uint Pos, qlonglong grammems, QString &gramcodes);
 
     /*
-    Method GetPartOfSpeechStr
+  Method GetGrammems
 
-    method GetPartOfSpeechStr
+  method GetGrammems
 
-    */
+  */
+    inline qlonglong GetGrammems(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeech
+
+  method GetPartOfSpeech
+
+  */
+    inline uint GetPartOfSpeech(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeechStr
+
+  method GetPartOfSpeechStr
+
+  */
     inline QString GetPartOfSpeechStr(uint PartOfSpeech);
 
     /*
-    Method GleicheCaseNumber
+  Method GleicheCaseNumber
 
-    method GleicheCaseNumber
+  method GleicheCaseNumber
 
-    */
-    inline int GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2);
-
-    /*
-    Method GleicheGenderNumber
-
-    method GleicheGenderNumber
-
-    */
-    inline int GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GleicheGenderNumberCase
+  Method GleicheGenderNumber
 
-    method GleicheGenderNumberCase
+  method GleicheGenderNumber
 
-    */
-    inline int GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code);
-
-    /*
-    Method GleicheSubjectPredicate
-
-    method GleicheSubjectPredicate
-
-    */
-    inline int GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GrammemsToStr
+  Method GleicheGenderNumberCase
 
-    method GrammemsToStr
+  method GleicheGenderNumberCase
 
-    */
+  */
+    inline int GleicheGenderNumberCase(
+        const QString &common_noun_gram_code,
+        const QString &noun_gram_code,
+        const QString &adj_gram_code);
+
+    /*
+  Method GleicheSubjectPredicate
+
+  method GleicheSubjectPredicate
+
+  */
+    inline int GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2);
+
+    /*
+  Method GrammemsToStr
+
+  method GrammemsToStr
+
+  */
     inline QString GrammemsToStr(qlonglong grammems);
 
     /*
-    Method HaveEqualPartOfSpeech
+  Method HaveEqualPartOfSpeech
 
-    method HaveEqualPartOfSpeech
+  method HaveEqualPartOfSpeech
 
-    */
-    inline int HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method Load
+  Method Load
 
-    method Load
+  method Load
 
-    */
+  */
     inline void Load();
 
     /*
-    Method ProcessPOSAndGrammems
+  Method ProcessPOSAndGrammems
 
-    method ProcessPOSAndGrammems
+  method ProcessPOSAndGrammems
 
-    */
-    inline void ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline void ProcessPOSAndGrammems(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
     /*
-    Method ProcessPOSAndGrammemsIfCan
+  Method ProcessPOSAndGrammemsIfCan
 
-    method ProcessPOSAndGrammemsIfCan
+  method ProcessPOSAndGrammemsIfCan
 
-    */
-    inline int ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline int ProcessPOSAndGrammemsIfCan(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -836,179 +847,183 @@ class AGRAMTABLIB_EXPORT GerGramTab : public QAxObject
 {
 public:
     GerGramTab(QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         setControl(QStringLiteral("{2b33f700-3899-4fb3-9ef6-c714926bc700}"));
     }
 
     GerGramTab(IGramTab *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property GrammemsCount
+  Property GrammemsCount
 
-    property GrammemsCount
+  property GrammemsCount
 
-    */
-    inline int GrammemsCount() const; //Returns the value of GrammemsCount
-
-    /*
-    Property PartOfSpeechCount
-
-    property PartOfSpeechCount
-
-    */
-    inline uint PartOfSpeechCount() const; //Returns the value of PartOfSpeechCount
+  */
+    inline int GrammemsCount() const; // Returns the value of GrammemsCount
 
     /*
-    Method FindGrammem
+  Property PartOfSpeechCount
 
-    method FindGrammem
+  property PartOfSpeechCount
 
-    */
-    inline int FindGrammem(const QString& gram_codes, qlonglong grammems);
-
-    /*
-    Method GetAllGrammems
-
-    method GetAllGrammems
-
-    */
-    inline qlonglong GetAllGrammems(const QString& gram_code);
+  */
+    inline uint PartOfSpeechCount() const; // Returns the value of PartOfSpeechCount
 
     /*
-    Method GetClauseNameByType
+  Method FindGrammem
 
-    method GetClauseNameByType
+  method FindGrammem
 
-    */
+  */
+    inline int FindGrammem(const QString &gram_codes, qlonglong grammems);
+
+    /*
+  Method GetAllGrammems
+
+  method GetAllGrammems
+
+  */
+    inline qlonglong GetAllGrammems(const QString &gram_code);
+
+    /*
+  Method GetClauseNameByType
+
+  method GetClauseNameByType
+
+  */
     inline QString GetClauseNameByType(int type);
 
     /*
-    Method GetClauseTypeByName
+  Method GetClauseTypeByName
 
-    method GetClauseTypeByName
+  method GetClauseTypeByName
 
-    */
-    inline int GetClauseTypeByName(const QString& bstrTypeName);
-
-    /*
-    Method GetClauseTypeByNameIfCan
-
-    method GetClauseTypeByNameIfCan
-
-    */
-    inline int GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType);
+  */
+    inline int GetClauseTypeByName(const QString &bstrTypeName);
 
     /*
-    Method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  Method GetClauseTypeByNameIfCan
 
-    method GetGramCodeByGrammemsAndPartofSpeechIfCan
+  method GetClauseTypeByNameIfCan
 
-    */
-    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes);
-
-    /*
-    Method GetGrammems
-
-    method GetGrammems
-
-    */
-    inline qlonglong GetGrammems(const QString& gram_code);
+  */
+    inline int GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType);
 
     /*
-    Method GetPartOfSpeech
+  Method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    method GetPartOfSpeech
+  method GetGramCodeByGrammemsAndPartofSpeechIfCan
 
-    */
-    inline uint GetPartOfSpeech(const QString& gram_code);
+  */
+    inline int GetGramCodeByGrammemsAndPartofSpeechIfCan(
+        uint Pos, qlonglong grammems, QString &gramcodes);
 
     /*
-    Method GetPartOfSpeechStr
+  Method GetGrammems
 
-    method GetPartOfSpeechStr
+  method GetGrammems
 
-    */
+  */
+    inline qlonglong GetGrammems(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeech
+
+  method GetPartOfSpeech
+
+  */
+    inline uint GetPartOfSpeech(const QString &gram_code);
+
+    /*
+  Method GetPartOfSpeechStr
+
+  method GetPartOfSpeechStr
+
+  */
     inline QString GetPartOfSpeechStr(uint PartOfSpeech);
 
     /*
-    Method GleicheCaseNumber
+  Method GleicheCaseNumber
 
-    method GleicheCaseNumber
+  method GleicheCaseNumber
 
-    */
-    inline int GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2);
-
-    /*
-    Method GleicheGenderNumber
-
-    method GleicheGenderNumber
-
-    */
-    inline int GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GleicheGenderNumberCase
+  Method GleicheGenderNumber
 
-    method GleicheGenderNumberCase
+  method GleicheGenderNumber
 
-    */
-    inline int GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code);
-
-    /*
-    Method GleicheSubjectPredicate
-
-    method GleicheSubjectPredicate
-
-    */
-    inline int GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method GrammemsToStr
+  Method GleicheGenderNumberCase
 
-    method GrammemsToStr
+  method GleicheGenderNumberCase
 
-    */
+  */
+    inline int GleicheGenderNumberCase(
+        const QString &common_noun_gram_code,
+        const QString &noun_gram_code,
+        const QString &adj_gram_code);
+
+    /*
+  Method GleicheSubjectPredicate
+
+  method GleicheSubjectPredicate
+
+  */
+    inline int GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2);
+
+    /*
+  Method GrammemsToStr
+
+  method GrammemsToStr
+
+  */
     inline QString GrammemsToStr(qlonglong grammems);
 
     /*
-    Method HaveEqualPartOfSpeech
+  Method HaveEqualPartOfSpeech
 
-    method HaveEqualPartOfSpeech
+  method HaveEqualPartOfSpeech
 
-    */
-    inline int HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2);
+  */
+    inline int HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2);
 
     /*
-    Method Load
+  Method Load
 
-    method Load
+  method Load
 
-    */
+  */
     inline void Load();
 
     /*
-    Method ProcessPOSAndGrammems
+  Method ProcessPOSAndGrammems
 
-    method ProcessPOSAndGrammems
+  method ProcessPOSAndGrammems
 
-    */
-    inline void ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline void ProcessPOSAndGrammems(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
     /*
-    Method ProcessPOSAndGrammemsIfCan
+  Method ProcessPOSAndGrammemsIfCan
 
-    method ProcessPOSAndGrammemsIfCan
+  method ProcessPOSAndGrammemsIfCan
 
-    */
-    inline int ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems);
+  */
+    inline int ProcessPOSAndGrammemsIfCan(const QString &in, uint &PartOfSpeech, qlonglong &grammems);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -1020,28 +1035,28 @@ inline int RusGramTab::GrammemsCount() const
 {
     QVariant qax_result = property("GrammemsCount");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline uint RusGramTab::PartOfSpeechCount() const
 {
     QVariant qax_result = property("PartOfSpeechCount");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
-inline int RusGramTab::FindGrammem(const QString& gram_codes, qlonglong grammems)
+inline int RusGramTab::FindGrammem(const QString &gram_codes, qlonglong grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_codes, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_codes, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline qlonglong RusGramTab::GetAllGrammems(const QString& gram_code)
+inline qlonglong RusGramTab::GetAllGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
@@ -1049,47 +1064,48 @@ inline qlonglong RusGramTab::GetAllGrammems(const QString& gram_code)
 inline QString RusGramTab::GetClauseNameByType(int type)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&type};
+    void *_a[] = {(void *) &qax_result, (void *) &type};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GetClauseTypeByName(const QString& bstrTypeName)
+inline int RusGramTab::GetClauseTypeByName(const QString &bstrTypeName)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType)
+inline int RusGramTab::GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName, (void*)&lType};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName, (void *) &lType};
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes)
+inline int RusGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(
+    uint Pos, qlonglong grammems, QString &gramcodes)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Pos, (void*)&grammems, (void*)&gramcodes};
+    void *_a[] = {(void *) &qax_result, (void *) &Pos, (void *) &grammems, (void *) &gramcodes};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
     return qax_result;
 }
 
-inline qlonglong RusGramTab::GetGrammems(const QString& gram_code)
+inline qlonglong RusGramTab::GetGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 14, _a);
     return qax_result;
 }
 
-inline uint RusGramTab::GetPartOfSpeech(const QString& gram_code)
+inline uint RusGramTab::GetPartOfSpeech(const QString &gram_code)
 {
     uint qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 15, _a);
     return qax_result;
 }
@@ -1097,39 +1113,46 @@ inline uint RusGramTab::GetPartOfSpeech(const QString& gram_code)
 inline QString RusGramTab::GetPartOfSpeechStr(uint PartOfSpeech)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&PartOfSpeech};
+    void *_a[] = {(void *) &qax_result, (void *) &PartOfSpeech};
     qt_metacall(QMetaObject::InvokeMetaMethod, 16, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2)
+inline int RusGramTab::GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 17, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2)
+inline int RusGramTab::GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 18, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code)
+inline int RusGramTab::GleicheGenderNumberCase(
+    const QString &common_noun_gram_code,
+    const QString &noun_gram_code,
+    const QString &adj_gram_code)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&common_noun_gram_code, (void*)&noun_gram_code, (void*)&adj_gram_code};
+    void *_a[]
+        = {(void *) &qax_result,
+           (void *) &common_noun_gram_code,
+           (void *) &noun_gram_code,
+           (void *) &adj_gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 19, _a);
     return qax_result;
 }
 
-inline int RusGramTab::GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2)
+inline int RusGramTab::GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 20, _a);
     return qax_result;
 }
@@ -1137,15 +1160,15 @@ inline int RusGramTab::GleicheSubjectPredicate(const QString& gram_code1, const 
 inline QString RusGramTab::GrammemsToStr(qlonglong grammems)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 21, _a);
     return qax_result;
 }
 
-inline int RusGramTab::HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2)
+inline int RusGramTab::HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 22, _a);
     return qax_result;
 }
@@ -1156,47 +1179,48 @@ inline void RusGramTab::Load()
     qt_metacall(QMetaObject::InvokeMetaMethod, 23, _a);
 }
 
-inline void RusGramTab::ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline void RusGramTab::ProcessPOSAndGrammems(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
-    void *_a[] = {0, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {0, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 24, _a);
 }
 
-inline int RusGramTab::ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline int RusGramTab::ProcessPOSAndGrammemsIfCan(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 25, _a);
     return qax_result;
 }
-
 
 inline int IGramTab::GrammemsCount() const
 {
     QVariant qax_result = property("GrammemsCount");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline uint IGramTab::PartOfSpeechCount() const
 {
     QVariant qax_result = property("PartOfSpeechCount");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
-inline int IGramTab::FindGrammem(const QString& gram_codes, qlonglong grammems)
+inline int IGramTab::FindGrammem(const QString &gram_codes, qlonglong grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_codes, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_codes, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline qlonglong IGramTab::GetAllGrammems(const QString& gram_code)
+inline qlonglong IGramTab::GetAllGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
@@ -1204,47 +1228,48 @@ inline qlonglong IGramTab::GetAllGrammems(const QString& gram_code)
 inline QString IGramTab::GetClauseNameByType(int type)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&type};
+    void *_a[] = {(void *) &qax_result, (void *) &type};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline int IGramTab::GetClauseTypeByName(const QString& bstrTypeName)
+inline int IGramTab::GetClauseTypeByName(const QString &bstrTypeName)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
 
-inline int IGramTab::GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType)
+inline int IGramTab::GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName, (void*)&lType};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName, (void *) &lType};
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
     return qax_result;
 }
 
-inline int IGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes)
+inline int IGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(
+    uint Pos, qlonglong grammems, QString &gramcodes)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Pos, (void*)&grammems, (void*)&gramcodes};
+    void *_a[] = {(void *) &qax_result, (void *) &Pos, (void *) &grammems, (void *) &gramcodes};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
     return qax_result;
 }
 
-inline qlonglong IGramTab::GetGrammems(const QString& gram_code)
+inline qlonglong IGramTab::GetGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 14, _a);
     return qax_result;
 }
 
-inline uint IGramTab::GetPartOfSpeech(const QString& gram_code)
+inline uint IGramTab::GetPartOfSpeech(const QString &gram_code)
 {
     uint qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 15, _a);
     return qax_result;
 }
@@ -1252,39 +1277,46 @@ inline uint IGramTab::GetPartOfSpeech(const QString& gram_code)
 inline QString IGramTab::GetPartOfSpeechStr(uint PartOfSpeech)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&PartOfSpeech};
+    void *_a[] = {(void *) &qax_result, (void *) &PartOfSpeech};
     qt_metacall(QMetaObject::InvokeMetaMethod, 16, _a);
     return qax_result;
 }
 
-inline int IGramTab::GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2)
+inline int IGramTab::GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 17, _a);
     return qax_result;
 }
 
-inline int IGramTab::GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2)
+inline int IGramTab::GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 18, _a);
     return qax_result;
 }
 
-inline int IGramTab::GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code)
+inline int IGramTab::GleicheGenderNumberCase(
+    const QString &common_noun_gram_code,
+    const QString &noun_gram_code,
+    const QString &adj_gram_code)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&common_noun_gram_code, (void*)&noun_gram_code, (void*)&adj_gram_code};
+    void *_a[]
+        = {(void *) &qax_result,
+           (void *) &common_noun_gram_code,
+           (void *) &noun_gram_code,
+           (void *) &adj_gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 19, _a);
     return qax_result;
 }
 
-inline int IGramTab::GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2)
+inline int IGramTab::GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 20, _a);
     return qax_result;
 }
@@ -1292,15 +1324,15 @@ inline int IGramTab::GleicheSubjectPredicate(const QString& gram_code1, const QS
 inline QString IGramTab::GrammemsToStr(qlonglong grammems)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 21, _a);
     return qax_result;
 }
 
-inline int IGramTab::HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2)
+inline int IGramTab::HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 22, _a);
     return qax_result;
 }
@@ -1311,47 +1343,48 @@ inline void IGramTab::Load()
     qt_metacall(QMetaObject::InvokeMetaMethod, 23, _a);
 }
 
-inline void IGramTab::ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline void IGramTab::ProcessPOSAndGrammems(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
-    void *_a[] = {0, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {0, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 24, _a);
 }
 
-inline int IGramTab::ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline int IGramTab::ProcessPOSAndGrammemsIfCan(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 25, _a);
     return qax_result;
 }
-
 
 inline int EngGramTab::GrammemsCount() const
 {
     QVariant qax_result = property("GrammemsCount");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline uint EngGramTab::PartOfSpeechCount() const
 {
     QVariant qax_result = property("PartOfSpeechCount");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
-inline int EngGramTab::FindGrammem(const QString& gram_codes, qlonglong grammems)
+inline int EngGramTab::FindGrammem(const QString &gram_codes, qlonglong grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_codes, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_codes, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline qlonglong EngGramTab::GetAllGrammems(const QString& gram_code)
+inline qlonglong EngGramTab::GetAllGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
@@ -1359,47 +1392,48 @@ inline qlonglong EngGramTab::GetAllGrammems(const QString& gram_code)
 inline QString EngGramTab::GetClauseNameByType(int type)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&type};
+    void *_a[] = {(void *) &qax_result, (void *) &type};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GetClauseTypeByName(const QString& bstrTypeName)
+inline int EngGramTab::GetClauseTypeByName(const QString &bstrTypeName)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType)
+inline int EngGramTab::GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName, (void*)&lType};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName, (void *) &lType};
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes)
+inline int EngGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(
+    uint Pos, qlonglong grammems, QString &gramcodes)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Pos, (void*)&grammems, (void*)&gramcodes};
+    void *_a[] = {(void *) &qax_result, (void *) &Pos, (void *) &grammems, (void *) &gramcodes};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
     return qax_result;
 }
 
-inline qlonglong EngGramTab::GetGrammems(const QString& gram_code)
+inline qlonglong EngGramTab::GetGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 14, _a);
     return qax_result;
 }
 
-inline uint EngGramTab::GetPartOfSpeech(const QString& gram_code)
+inline uint EngGramTab::GetPartOfSpeech(const QString &gram_code)
 {
     uint qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 15, _a);
     return qax_result;
 }
@@ -1407,39 +1441,46 @@ inline uint EngGramTab::GetPartOfSpeech(const QString& gram_code)
 inline QString EngGramTab::GetPartOfSpeechStr(uint PartOfSpeech)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&PartOfSpeech};
+    void *_a[] = {(void *) &qax_result, (void *) &PartOfSpeech};
     qt_metacall(QMetaObject::InvokeMetaMethod, 16, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2)
+inline int EngGramTab::GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 17, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2)
+inline int EngGramTab::GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 18, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code)
+inline int EngGramTab::GleicheGenderNumberCase(
+    const QString &common_noun_gram_code,
+    const QString &noun_gram_code,
+    const QString &adj_gram_code)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&common_noun_gram_code, (void*)&noun_gram_code, (void*)&adj_gram_code};
+    void *_a[]
+        = {(void *) &qax_result,
+           (void *) &common_noun_gram_code,
+           (void *) &noun_gram_code,
+           (void *) &adj_gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 19, _a);
     return qax_result;
 }
 
-inline int EngGramTab::GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2)
+inline int EngGramTab::GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 20, _a);
     return qax_result;
 }
@@ -1447,15 +1488,15 @@ inline int EngGramTab::GleicheSubjectPredicate(const QString& gram_code1, const 
 inline QString EngGramTab::GrammemsToStr(qlonglong grammems)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 21, _a);
     return qax_result;
 }
 
-inline int EngGramTab::HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2)
+inline int EngGramTab::HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 22, _a);
     return qax_result;
 }
@@ -1466,47 +1507,48 @@ inline void EngGramTab::Load()
     qt_metacall(QMetaObject::InvokeMetaMethod, 23, _a);
 }
 
-inline void EngGramTab::ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline void EngGramTab::ProcessPOSAndGrammems(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
-    void *_a[] = {0, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {0, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 24, _a);
 }
 
-inline int EngGramTab::ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline int EngGramTab::ProcessPOSAndGrammemsIfCan(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 25, _a);
     return qax_result;
 }
-
 
 inline int GerGramTab::GrammemsCount() const
 {
     QVariant qax_result = property("GrammemsCount");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline uint GerGramTab::PartOfSpeechCount() const
 {
     QVariant qax_result = property("PartOfSpeechCount");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
-inline int GerGramTab::FindGrammem(const QString& gram_codes, qlonglong grammems)
+inline int GerGramTab::FindGrammem(const QString &gram_codes, qlonglong grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_codes, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_codes, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline qlonglong GerGramTab::GetAllGrammems(const QString& gram_code)
+inline qlonglong GerGramTab::GetAllGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
@@ -1514,47 +1556,48 @@ inline qlonglong GerGramTab::GetAllGrammems(const QString& gram_code)
 inline QString GerGramTab::GetClauseNameByType(int type)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&type};
+    void *_a[] = {(void *) &qax_result, (void *) &type};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GetClauseTypeByName(const QString& bstrTypeName)
+inline int GerGramTab::GetClauseTypeByName(const QString &bstrTypeName)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GetClauseTypeByNameIfCan(const QString& bstrTypeName, int& lType)
+inline int GerGramTab::GetClauseTypeByNameIfCan(const QString &bstrTypeName, int &lType)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&bstrTypeName, (void*)&lType};
+    void *_a[] = {(void *) &qax_result, (void *) &bstrTypeName, (void *) &lType};
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(uint Pos, qlonglong grammems, QString& gramcodes)
+inline int GerGramTab::GetGramCodeByGrammemsAndPartofSpeechIfCan(
+    uint Pos, qlonglong grammems, QString &gramcodes)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Pos, (void*)&grammems, (void*)&gramcodes};
+    void *_a[] = {(void *) &qax_result, (void *) &Pos, (void *) &grammems, (void *) &gramcodes};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
     return qax_result;
 }
 
-inline qlonglong GerGramTab::GetGrammems(const QString& gram_code)
+inline qlonglong GerGramTab::GetGrammems(const QString &gram_code)
 {
     qlonglong qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 14, _a);
     return qax_result;
 }
 
-inline uint GerGramTab::GetPartOfSpeech(const QString& gram_code)
+inline uint GerGramTab::GetPartOfSpeech(const QString &gram_code)
 {
     uint qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 15, _a);
     return qax_result;
 }
@@ -1562,39 +1605,46 @@ inline uint GerGramTab::GetPartOfSpeech(const QString& gram_code)
 inline QString GerGramTab::GetPartOfSpeechStr(uint PartOfSpeech)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&PartOfSpeech};
+    void *_a[] = {(void *) &qax_result, (void *) &PartOfSpeech};
     qt_metacall(QMetaObject::InvokeMetaMethod, 16, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GleicheCaseNumber(const QString& gram_code1, const QString& gram_code2)
+inline int GerGramTab::GleicheCaseNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 17, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GleicheGenderNumber(const QString& gram_code1, const QString& gram_code2)
+inline int GerGramTab::GleicheGenderNumber(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 18, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GleicheGenderNumberCase(const QString& common_noun_gram_code, const QString& noun_gram_code, const QString& adj_gram_code)
+inline int GerGramTab::GleicheGenderNumberCase(
+    const QString &common_noun_gram_code,
+    const QString &noun_gram_code,
+    const QString &adj_gram_code)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&common_noun_gram_code, (void*)&noun_gram_code, (void*)&adj_gram_code};
+    void *_a[]
+        = {(void *) &qax_result,
+           (void *) &common_noun_gram_code,
+           (void *) &noun_gram_code,
+           (void *) &adj_gram_code};
     qt_metacall(QMetaObject::InvokeMetaMethod, 19, _a);
     return qax_result;
 }
 
-inline int GerGramTab::GleicheSubjectPredicate(const QString& gram_code1, const QString& gram_code2)
+inline int GerGramTab::GleicheSubjectPredicate(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 20, _a);
     return qax_result;
 }
@@ -1602,15 +1652,15 @@ inline int GerGramTab::GleicheSubjectPredicate(const QString& gram_code1, const 
 inline QString GerGramTab::GrammemsToStr(qlonglong grammems)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 21, _a);
     return qax_result;
 }
 
-inline int GerGramTab::HaveEqualPartOfSpeech(const QString& gram_code1, const QString& gram_code2)
+inline int GerGramTab::HaveEqualPartOfSpeech(const QString &gram_code1, const QString &gram_code2)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&gram_code1, (void*)&gram_code2};
+    void *_a[] = {(void *) &qax_result, (void *) &gram_code1, (void *) &gram_code2};
     qt_metacall(QMetaObject::InvokeMetaMethod, 22, _a);
     return qax_result;
 }
@@ -1621,35 +1671,36 @@ inline void GerGramTab::Load()
     qt_metacall(QMetaObject::InvokeMetaMethod, 23, _a);
 }
 
-inline void GerGramTab::ProcessPOSAndGrammems(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline void GerGramTab::ProcessPOSAndGrammems(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
-    void *_a[] = {0, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {0, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 24, _a);
 }
 
-inline int GerGramTab::ProcessPOSAndGrammemsIfCan(const QString& in, uint& PartOfSpeech, qlonglong& grammems)
+inline int GerGramTab::ProcessPOSAndGrammemsIfCan(
+    const QString &in, uint &PartOfSpeech, qlonglong &grammems)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&in, (void*)&PartOfSpeech, (void*)&grammems};
+    void *_a[] = {(void *) &qax_result, (void *) &in, (void *) &PartOfSpeech, (void *) &grammems};
     qt_metacall(QMetaObject::InvokeMetaMethod, 25, _a);
     return qax_result;
 }
 
-
-
 #endif
 
-}
+} // namespace AGRAMTABLib
 
 QT_BEGIN_NAMESPACE
 
 namespace QtMetaTypePrivate {
 template<>
-struct QMetaTypeFunctionHelper<AGRAMTABLib::RusGramTab, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<AGRAMTABLib::RusGramTab, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<AGRAMTABLib::RusGramTab*>(t)->AGRAMTABLib::RusGramTab::~RusGramTab();
+        static_cast<AGRAMTABLib::RusGramTab *>(t)->AGRAMTABLib::RusGramTab::~RusGramTab();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1658,17 +1709,24 @@ struct QMetaTypeFunctionHelper<AGRAMTABLib::RusGramTab, /* Accepted */ true> {
         return new (where) AGRAMTABLib::RusGramTab;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const AGRAMTABLib::RusGramTab*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<AGRAMTABLib::RusGramTab*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const AGRAMTABLib::RusGramTab *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<AGRAMTABLib::RusGramTab *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<AGRAMTABLib::IGramTab, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<AGRAMTABLib::IGramTab, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<AGRAMTABLib::IGramTab*>(t)->AGRAMTABLib::IGramTab::~IGramTab();
+        static_cast<AGRAMTABLib::IGramTab *>(t)->AGRAMTABLib::IGramTab::~IGramTab();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1677,17 +1735,24 @@ struct QMetaTypeFunctionHelper<AGRAMTABLib::IGramTab, /* Accepted */ true> {
         return new (where) AGRAMTABLib::IGramTab;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const AGRAMTABLib::IGramTab*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<AGRAMTABLib::IGramTab*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const AGRAMTABLib::IGramTab *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<AGRAMTABLib::IGramTab *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<AGRAMTABLib::EngGramTab, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<AGRAMTABLib::EngGramTab, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<AGRAMTABLib::EngGramTab*>(t)->AGRAMTABLib::EngGramTab::~EngGramTab();
+        static_cast<AGRAMTABLib::EngGramTab *>(t)->AGRAMTABLib::EngGramTab::~EngGramTab();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1696,17 +1761,24 @@ struct QMetaTypeFunctionHelper<AGRAMTABLib::EngGramTab, /* Accepted */ true> {
         return new (where) AGRAMTABLib::EngGramTab;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const AGRAMTABLib::EngGramTab*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<AGRAMTABLib::EngGramTab*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const AGRAMTABLib::EngGramTab *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<AGRAMTABLib::EngGramTab *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<AGRAMTABLib::GerGramTab, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<AGRAMTABLib::GerGramTab, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<AGRAMTABLib::GerGramTab*>(t)->AGRAMTABLib::GerGramTab::~GerGramTab();
+        static_cast<AGRAMTABLib::GerGramTab *>(t)->AGRAMTABLib::GerGramTab::~GerGramTab();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1715,8 +1787,14 @@ struct QMetaTypeFunctionHelper<AGRAMTABLib::GerGramTab, /* Accepted */ true> {
         return new (where) AGRAMTABLib::GerGramTab;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const AGRAMTABLib::GerGramTab*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<AGRAMTABLib::GerGramTab*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const AGRAMTABLib::GerGramTab *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<AGRAMTABLib::GerGramTab *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
@@ -1724,4 +1802,3 @@ struct QMetaTypeFunctionHelper<AGRAMTABLib::GerGramTab, /* Accepted */ true> {
 QT_END_NAMESPACE
 
 #endif
-

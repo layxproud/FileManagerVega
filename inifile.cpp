@@ -1,17 +1,17 @@
 #include "inifile.h"
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <cmath>
-#include <vector>
-#include <iomanip>
 #include <algorithm>
 #include <bitset>
 #include <cctype>
-#include <functional>
-#include <locale>
+#include <cmath>
 #include <cstdlib>
+#include <fstream>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <locale>
+#include <sstream>
+#include <vector>
 
 #ifndef _WIN32
 #include <unistd.h>
@@ -29,21 +29,24 @@
 
 using namespace std;
 
-struct dot_separator : numpunct<char> {
+struct dot_separator : numpunct<char>
+{
     char do_decimal_point() const { return '.'; } // разделитель - точка
 };
-struct comma_separator : numpunct<char> {
+struct comma_separator : numpunct<char>
+{
     char do_decimal_point() const { return ','; } // разделитель - запятая
 };
 
 //*******************************************************************
-template <class TypeName> bool TIniFile::Write(const string& section, const string& key, const TypeName& Value)
+template<class TypeName>
+bool TIniFile::Write(const string &section, const string &key, const TypeName &Value)
 {
     // Если не указана секция/ключ или если файл есть, но прав писать в него нет
     if (section.empty() || key.empty() || (FileExists(filename) && !CanWrite(filename)))
         return false;
 
-    //TypeName to string
+    // TypeName to string
     stringstream ss;
     ss << fixed;
     ss << Value;
@@ -54,22 +57,21 @@ template <class TypeName> bool TIniFile::Write(const string& section, const stri
     string keyName;
 
     size_t ndx = ProceedToSection(section, lines);
-    if (ndx < lines.size())
-    {
+    if (ndx < lines.size()) {
         string comment;
         bool keyExist = false;
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
         {
-            if(Equal(GetKeyName(lines[ndx]), key))
-            {
+            if (Equal(GetKeyName(lines[ndx]), key)) {
                 comment = GetComment(lines[ndx]);
-                lines[ndx] = key + " = " + val + (comment.empty()? string(): (" " + comment));
+                lines[ndx] = key + " = " + val + (comment.empty() ? string() : (" " + comment));
                 keyExist = true;
                 break;
             }
             ++ndx;
         }
-        if (!keyExist) //Нет ключа "key"
+        if (!keyExist) // Нет ключа "key"
         {
             keyName = key + " = " + val;
 
@@ -78,8 +80,7 @@ template <class TypeName> bool TIniFile::Write(const string& section, const stri
                 ndx--;
             lines.insert(lines.begin() + ndx, keyName);
         }
-    }
-    else // Нет секции с именем "section"
+    } else // Нет секции с именем "section"
     {
         sectionName = "[" + section + "]";
         lines.push_back(move(sectionName));
@@ -91,24 +92,24 @@ template <class TypeName> bool TIniFile::Write(const string& section, const stri
 }
 
 //********************************************************************
-template <class TypeName> string TIniFile::Read(const string& section, const string& key, const TypeName& DefaultValue)
+template<class TypeName>
+string TIniFile::Read(const string &section, const string &key, const TypeName &DefaultValue)
 {
-    //TypeName to string
+    // TypeName to string
     stringstream ss;
     ss << DefaultValue;
     string value = ss.str();
 
-    if (!section.empty() && !key.empty())
-    {
+    if (!section.empty() && !key.empty()) {
         string tempVal;
         vector<string> lines = move(ReadFileContents());
         size_t ndx = ProceedToSection(section, lines);
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
         {
-            if(Equal(GetKeyName(lines[ndx]), key))
-            {
+            if (Equal(GetKeyName(lines[ndx]), key)) {
                 tempVal = GetValue(lines[ndx]);
-                if(!tempVal.empty())
+                if (!tempVal.empty())
                     value = move(TrimQuotes(move(tempVal)));
                 break;
             }
@@ -125,11 +126,11 @@ string TIniFile::Trim(string str) const
         return str;
 
     string::iterator it = str.begin();
-    while(it != str.end() && isspace((unsigned char)*it))
+    while (it != str.end() && isspace((unsigned char) *it))
         it++;
 
     string::reverse_iterator rit = str.rbegin();
-    while(rit != str.rend() && isspace((unsigned char)*rit))
+    while (rit != str.rend() && isspace((unsigned char) *rit))
         rit++;
 
     // сначала затираем все пробельные символы с конца строки, потом - с начала (если там что осталось)
@@ -142,26 +143,24 @@ string TIniFile::Trim(string str) const
 //********************************************************************
 string TIniFile::TrimQuotes(string str) const
 {
-    if (str.length() > 1)
-    {
-        if ((str[0] == '\"' && str[str.length() - 1] == '\"') || (str[0] == '\'' && str[str.length() - 1] == '\''))
+    if (str.length() > 1) {
+        if ((str[0] == '\"' && str[str.length() - 1] == '\"')
+            || (str[0] == '\'' && str[str.length() - 1] == '\''))
             str = str.substr(1, str.length() - 2);
     }
     return str;
 }
 
 //********************************************************************
-string TIniFile::GetSectionName(const string& str) const
+string TIniFile::GetSectionName(const string &str) const
 {
     size_t begin = str.find_first_of('[');
-    if (begin != string::npos)
-    {
+    if (begin != string::npos) {
         size_t end = str.find_last_of(']');
-        if (end != string::npos)
-        {
-            size_t comment = str.find_first_of(";#=");//комменты и поля секций
+        if (end != string::npos) {
+            size_t comment = str.find_first_of(";#="); // комменты и поля секций
             string sName;
-            if(comment == string::npos || (comment > begin && comment > end))
+            if (comment == string::npos || (comment > begin && comment > end))
                 sName = str.substr(begin + 1, end - begin - 1);
             return Trim(move(sName));
         }
@@ -176,24 +175,22 @@ string TIniFile::SectionName(unsigned int index)
 
     string SectionName;
     int count = -1;
-    for(size_t i = 0; i < lines.size(); ++i)
-    {
+    for (size_t i = 0; i < lines.size(); ++i) {
         SectionName = GetSectionName(lines[i]);
-        if(!SectionName.empty())
+        if (!SectionName.empty())
             ++count;
-        if((unsigned int)count == index)
+        if ((unsigned int) count == index)
             return SectionName;
     }
     return string();
 }
 
 //********************************************************************
-string TIniFile::GetKeyName(const string& str) const
+string TIniFile::GetKeyName(const string &str) const
 {
     string key;
     size_t end = str.find_first_of('=');
-    if (end != string::npos)
-    {
+    if (end != string::npos) {
         size_t comment = str.find_first_of(";#");
         if (comment == string::npos || (comment != string::npos && comment > end))
             key = str.substr(0, end);
@@ -202,26 +199,23 @@ string TIniFile::GetKeyName(const string& str) const
 }
 
 //********************************************************************
-string TIniFile::GetValue(const string& str) const
+string TIniFile::GetValue(const string &str) const
 {
     string value;
     size_t begin = str.find_first_of('=');
-    if (begin != string::npos)
-    {
+    if (begin != string::npos) {
         size_t comment = str.find_first_of(";#");
-        if (comment != string::npos)
-        {
-            if(comment > begin)
+        if (comment != string::npos) {
+            if (comment > begin)
                 value = str.substr(begin + 1, comment - begin - 1);
-        }
-        else
+        } else
             value = str.substr(begin + 1);
     }
     return Trim(move(value));
 }
 
 //********************************************************************
-string TIniFile::GetComment(const string& str) const
+string TIniFile::GetComment(const string &str) const
 {
     size_t pos = str.find_first_of(";#");
     if (pos != string::npos)
@@ -233,28 +227,25 @@ string TIniFile::GetComment(const string& str) const
 //********************************************************************
 vector<string> TIniFile::ReadFileContents()
 {
-    if(CacheEnabled() && !cache.empty())
+    if (CacheEnabled() && !cache.empty())
         return cache;
 
     vector<string> lines;
 
-    if(!FileExists(filename) || !CanRead(filename))
+    if (!FileExists(filename) || !CanRead(filename))
         return lines;
 
     ifstream file(filename.c_str());
-    if (file.is_open())
-    {
+    if (file.is_open()) {
         string line;
-        while(getline(file, line))
+        while (getline(file, line))
             lines.push_back(move(Trim(move(line))));
         file.close();
 
-        //Multi-line
-        for(size_t i = 0 ; i < lines.size() ; ++i)
-        {
+        // Multi-line
+        for (size_t i = 0; i < lines.size(); ++i) {
             int lineSize = lines[i].size();
-            if (lineSize > 1 && lines[i][lineSize - 1] == '\\' && lines[i][lineSize - 2] == '\\')
-            {
+            if (lineSize > 1 && lines[i][lineSize - 1] == '\\' && lines[i][lineSize - 2] == '\\') {
                 lines[i].erase(lines[i].end() - 1);
                 if (i < lines.size() - 1)
                     lines[i] += lines[i + 1];
@@ -270,16 +261,15 @@ vector<string> TIniFile::ReadFileContents()
 }
 
 //********************************************************************
-void TIniFile::updateCache(std::vector<std::string>& lines)
+void TIniFile::updateCache(std::vector<std::string> &lines)
 {
-    if(!CacheEnabled())
+    if (!CacheEnabled())
         return;
 
     cache = lines;
     sections.clear();
 
-    for(size_t i = 0; i < lines.size(); ++i)
-    {
+    for (size_t i = 0; i < lines.size(); ++i) {
         string sect = GetSectionName(lines[i]);
         if (!sect.empty())
             sections[sect] = i;
@@ -287,10 +277,10 @@ void TIniFile::updateCache(std::vector<std::string>& lines)
 }
 
 //********************************************************************
-size_t TIniFile::ProceedToSection(const string& section, vector<string>& lines)
+size_t TIniFile::ProceedToSection(const string &section, vector<string> &lines)
 {
     if (CacheEnabled())
-        return sections.count(section)? sections[section] + 1: cache.size();
+        return sections.count(section) ? sections[section] + 1 : cache.size();
 
     size_t ndx = 0;
     while (ndx < lines.size() && !Equal(GetSectionName(lines[ndx]), section))
@@ -301,24 +291,22 @@ size_t TIniFile::ProceedToSection(const string& section, vector<string>& lines)
 }
 
 //********************************************************************
-bool TIniFile::RewriteFile(vector<string>& lines)
+bool TIniFile::RewriteFile(vector<string> &lines)
 {
-    //затираем все пустые строки с конца файла
-    while(lines.back().empty())
+    // затираем все пустые строки с конца файла
+    while (lines.back().empty())
         lines.pop_back();
 
     updateCache(lines);
 
-    if(CacheEnabled())
+    if (CacheEnabled())
         return true;
 
     ofstream newFile(filename.c_str());
-    if(newFile.is_open())
-    {
-        for(size_t i = 0; i < lines.size(); ++i)
+    if (newFile.is_open()) {
+        for (size_t i = 0; i < lines.size(); ++i)
             newFile << lines[i] << endl;
-    }
-    else
+    } else
         return false;
     newFile.close();
 
@@ -339,8 +327,7 @@ int TIniFile::GetSectionCount()
     vector<string> lines = move(ReadFileContents());
 
     int SectionCount = 0;
-    for(size_t i = 0; i < lines.size(); ++i)
-    {
+    for (size_t i = 0; i < lines.size(); ++i) {
         if (!GetSectionName(lines[i]).empty())
             SectionCount++;
     }
@@ -354,11 +341,11 @@ int TIniFile::GetKeyCount(string section)
     vector<string> lines = move(ReadFileContents());
 
     size_t ndx = ProceedToSection(section, lines);
-    if (ndx < lines.size())
-    {
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+    if (ndx < lines.size()) {
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
         {
-            if(!GetKeyName(lines[ndx]).empty())
+            if (!GetKeyName(lines[ndx]).empty())
                 keyCount++;
             ++ndx;
         }
@@ -372,14 +359,14 @@ string TIniFile::KeyName(string section, unsigned int KeyIndex)
     vector<string> lines = move(ReadFileContents());
 
     size_t ndx = ProceedToSection(section, lines);
-    if (ndx < lines.size())
-    {
+    if (ndx < lines.size()) {
         int keyCount = -1;
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
         {
-            if(!GetKeyName(lines[ndx]).empty())
+            if (!GetKeyName(lines[ndx]).empty())
                 keyCount++;
-            if ((unsigned int)keyCount == KeyIndex)
+            if ((unsigned int) keyCount == KeyIndex)
                 return GetKeyName(lines[ndx]);
             ++ndx;
         }
@@ -391,8 +378,7 @@ string TIniFile::KeyName(string section, unsigned int KeyIndex)
 bool TIniFile::sectionExists(string section)
 {
     vector<string> sect(GetSections());
-    for(size_t i = 0; i < sect.size(); ++i)
-    {
+    for (size_t i = 0; i < sect.size(); ++i) {
         if (sect[i] == section)
             return true;
     }
@@ -403,8 +389,7 @@ bool TIniFile::sectionExists(string section)
 bool TIniFile::keyExists(string section, string key)
 {
     vector<string> keys(GetKeys(section));
-    for(size_t i = 0; i < keys.size(); ++i)
-    {
+    for (size_t i = 0; i < keys.size(); ++i) {
         if (keys[i] == key)
             return true;
     }
@@ -416,16 +401,14 @@ std::vector<string> TIniFile::GetSections()
 {
     vector<string> res;
 
-    if (CacheEnabled())
-    {
-        for(std::map <std::string, int>::iterator it = sections.begin(); it != sections.end(); ++it)
+    if (CacheEnabled()) {
+        for (std::map<std::string, int>::iterator it = sections.begin(); it != sections.end(); ++it)
             res.push_back(it->first);
         return res;
     }
 
     vector<string> lines = move(ReadFileContents());
-    for(size_t i = 0; i < lines.size(); ++i)
-    {
+    for (size_t i = 0; i < lines.size(); ++i) {
         string sect = GetSectionName(lines[i]);
         if (!sect.empty())
             res.push_back(move(sect));
@@ -440,9 +423,9 @@ std::vector<string> TIniFile::GetKeys(string section)
     vector<string> keys;
 
     size_t ndx = ProceedToSection(section, lines);
-    if (ndx < lines.size())
-    {
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+    if (ndx < lines.size()) {
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
         {
             string key = GetKeyName(lines[ndx]);
             if (!key.empty())
@@ -460,9 +443,9 @@ std::vector<string> TIniFile::GetValues(string section)
     vector<string> values;
 
     size_t ndx = ProceedToSection(section, lines);
-    if (ndx < lines.size())
-    {
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+    if (ndx < lines.size()) {
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
         {
             string value = GetValue(lines[ndx]);
             if (!value.empty())
@@ -478,7 +461,7 @@ TIniFile::TIniFile(string fname, bool enCache)
     filename = fname;
     enableCache = enCache;
 
-    if(CacheEnabled())
+    if (CacheEnabled())
         ReadFileContents();
 }
 
@@ -504,12 +487,10 @@ bool TIniFile::CacheEnabled() const
 bool TIniFile::Commit()
 {
     ofstream newFile(filename.c_str());
-    if(newFile.is_open())
-    {
-        for(size_t i = 0; i < cache.size(); ++i)
+    if (newFile.is_open()) {
+        for (size_t i = 0; i < cache.size(); ++i)
             newFile << cache[i] << endl;
-    }
-    else
+    } else
         return false;
     newFile.close();
 
@@ -520,7 +501,7 @@ bool TIniFile::Commit()
 int TIniFile::ReadInteger(string section, string key, int defval)
 {
     string str = Read(section, key, defval);
-    char* parseEnd = NULL;
+    char *parseEnd = NULL;
     int val = strtol(str.c_str(), &parseEnd, 10);
     if (parseEnd != str.c_str() && parseEnd <= str.c_str() + str.length())
         return val;
@@ -529,7 +510,7 @@ int TIniFile::ReadInteger(string section, string key, int defval)
 }
 
 //********************************************************************
-bool  TIniFile::ReadBool(string section, string key, bool defval)
+bool TIniFile::ReadBool(string section, string key, bool defval)
 {
     char c = Read(section, key, defval).c_str()[0];
     return (c == '1' || tolower(c) == 't');
@@ -548,7 +529,8 @@ double TIniFile::ReadFloat(string section, string key, double defval)
 
     double r1 = defval;
     istringstream text1(str);
-    text1.imbue(locale(text1.getloc(), new dot_separator));// утечек памяти тут нет, локаль удалит сама
+    text1.imbue(
+        locale(text1.getloc(), new dot_separator)); // утечек памяти тут нет, локаль удалит сама
     text1 >> r1;
 
     double r2 = defval;
@@ -557,12 +539,10 @@ double TIniFile::ReadFloat(string section, string key, double defval)
     text2 >> r2;
 
     double res = defval;
-    if (!text1.fail() && !text2.fail())
-    {
+    if (!text1.fail() && !text2.fail()) {
         // если в одной локали сконвертилось в целое, а в другой в нормальное, надо отдавать большее по модулю
-        res = (fabs(r1) > fabs(r2))? r1: r2;
-    }
-    else if (!text1.fail())
+        res = (fabs(r1) > fabs(r2)) ? r1 : r2;
+    } else if (!text1.fail())
         res = r1;
     else if (!text2.fail())
         res = r2;
@@ -581,18 +561,17 @@ int TIniFile::ReadColor(string section, string key, int defval)
 }
 
 //********************************************************************
-void* TIniFile::ReadStruct(string section, string key, void *ptr, unsigned int size)
+void *TIniFile::ReadStruct(string section, string key, void *ptr, unsigned int size)
 {
     string str = Read(section, key, string());
     if (str.empty())
         return NULL;
 
-    char* chPtr = static_cast<char*>(ptr);
+    char *chPtr = static_cast<char *>(ptr);
     stringstream raw(str);
     char s[3];
     size_t len = min(str.length() / 2, static_cast<size_t>(size));
-    for (size_t i = 0; i < len; ++i)
-    {
+    for (size_t i = 0; i < len; ++i) {
         raw.get(s, sizeof(s));
         chPtr[i] = strtol(s, NULL, 16);
     }
@@ -604,37 +583,37 @@ string TIniFile::ReadStringS(string section, string key, string defval, unsigned
 {
     string ret = Read(section, key, defval);
     if (ret != defval && ret.size() > strSize)
-        ret = defval;//ret.resize(strSize);
+        ret = defval; // ret.resize(strSize);
 
     return ret;
 }
 
 //***************************************************************************
-bool  TIniFile::WriteInteger(string section, string key, int val)
+bool TIniFile::WriteInteger(string section, string key, int val)
 {
     return Write(section, key, val);
 }
 
 //********************************************************************
-bool  TIniFile::WriteString (string section, string key, string val)
+bool TIniFile::WriteString(string section, string key, string val)
 {
     return Write(section, key, val);
 }
 
 //********************************************************************
-bool  TIniFile::WriteBool(string section, string key, bool val)
+bool TIniFile::WriteBool(string section, string key, bool val)
 {
     return Write(section, key, val);
 }
 
 //********************************************************************
-bool  TIniFile::WriteFloat(string section, string key, double val)
+bool TIniFile::WriteFloat(string section, string key, double val)
 {
     return Write(section, key, val);
 }
 
 //********************************************************************
-bool TIniFile::WriteColor(string section,string key, int val)
+bool TIniFile::WriteColor(string section, string key, int val)
 {
     string newValue;
     stringstream ss;
@@ -646,13 +625,12 @@ bool TIniFile::WriteColor(string section,string key, int val)
 //*********************************************************************
 bool TIniFile::WriteStruct(string section, string key, void *ptr, unsigned int size)
 {
-    char* chPtr = static_cast<char*>(ptr);
+    char *chPtr = static_cast<char *>(ptr);
     stringstream ss;
     ss << setfill('0') << hex << noshowbase;
     unsigned char ch;
-    for(unsigned int i = 0; i < size; ++i)
-    {
-        ch = (chPtr[i])? chPtr[i]: 0;
+    for (unsigned int i = 0; i < size; ++i) {
+        ch = (chPtr[i]) ? chPtr[i] : 0;
         ss << setw(2) << static_cast<unsigned short>(ch);
     }
     string str = ss.str();
@@ -696,10 +674,10 @@ bool TIniFile::DeleteSection(string section)
 
     vector<string> lines = move(ReadFileContents());
     size_t ndx = ProceedToSection(section, lines);
-    if (ndx < lines.size())
-    {
+    if (ndx < lines.size()) {
         vector<string>::iterator itStart = lines.begin() + ndx - 1;
-        while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+        while (ndx < lines.size()
+               && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
             ++ndx;
         vector<string>::iterator itEnd = lines.begin() + ndx;
         lines.erase(itStart, itEnd);
@@ -715,10 +693,10 @@ bool TIniFile::DeleteKey(string section, string key)
 
     bool erased = false;
     size_t ndx = ProceedToSection(section, lines);
-    while (ndx < lines.size() && GetSectionName(lines[ndx]).empty())// пока не добрались до следующей секции
+    while (ndx < lines.size()
+           && GetSectionName(lines[ndx]).empty()) // пока не добрались до следующей секции
     {
-        if(Equal(GetKeyName(lines[ndx]), key))
-        {
+        if (Equal(GetKeyName(lines[ndx]), key)) {
             lines.erase(lines.begin() + ndx);
             erased = RewriteFile(lines);
             break;
@@ -742,10 +720,9 @@ uint64_t TIniFile::ReadBitSet(string section, string key, uint64_t defval)
 
 #ifndef __linux__
     uint64_t res = defval;
-    char* tmp = (char*)&res;
+    char *tmp = (char *) &res;
 
-    for (int i = 0; i < 8; ++i)
-    {
+    for (int i = 0; i < 8; ++i) {
         bitset<8> part(bits.substr(i * 8, 8));
         tmp[7 - i] = part.to_ulong();
     }

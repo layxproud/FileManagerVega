@@ -21,154 +21,153 @@
 
 struct IDispatch;
 
-
 // Referenced namespace
 
 namespace LEMMATIZERLib {
 
-    enum __MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 {
-        idlFinance              = 1,
-        idlComputer             = 2,
-        idlLiterature           = 4
-    };
+enum __MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 {
+    idlFinance = 1,
+    idlComputer = 2,
+    idlLiterature = 4
+};
 
 // forward declarations
-    enum __MIDL___MIDL_itf_Lemmatizer_0000_0000_0001;
-    class IParadigm;
-    class IParadigmCollection;
-    enum __MIDL___MIDL_itf_Lemmatizer_0000_0000_0001;
-    class ILemmatizer;
+enum __MIDL___MIDL_itf_Lemmatizer_0000_0000_0001;
+class IParadigm;
+class IParadigmCollection;
+enum __MIDL___MIDL_itf_Lemmatizer_0000_0000_0001;
+class ILemmatizer;
 
 class LEMMATIZERLIB_EXPORT IParadigm : public QAxObject
 {
 public:
     IParadigm(IDispatch *subobject = 0, QAxObject *parent = 0)
-    : QAxObject((IUnknown*)subobject, parent)
+        : QAxObject((IUnknown *) subobject, parent)
     {
         internalRelease();
     }
 
     /*
-    Property BaseLength
+  Property BaseLength
 
-    property BaseLength
+  property BaseLength
 
-    */
-    inline uint BaseLength() const; //Returns the value of BaseLength
-
-    /*
-    Property Count
-
-    property Count
-
-    */
-    inline uint Count() const; //Returns the value of Count
+  */
+    inline uint BaseLength() const; // Returns the value of BaseLength
 
     /*
-    Property Founded
+  Property Count
 
-    property Founded
+  property Count
 
-    */
-    inline int Founded() const; //Returns the value of Founded
-
-    /*
-    Property HomonymWeight
-
-    property HomonymWeight
-
-    */
-    inline int HomonymWeight() const; //Returns the value of HomonymWeight
+  */
+    inline uint Count() const; // Returns the value of Count
 
     /*
-    Property LemmaPrefixLength
+  Property Founded
 
-    property LemmaPrefixLength
+  property Founded
 
-    */
-    inline int LemmaPrefixLength() const; //Returns the value of LemmaPrefixLength
-
-    /*
-    Property Norm
-
-    property Norm
-
-    */
-    inline QString Norm() const; //Returns the value of Norm
+  */
+    inline int Founded() const; // Returns the value of Founded
 
     /*
-    Property ParadigmID
+  Property HomonymWeight
 
-    property ParadigmID
+  property HomonymWeight
 
-    */
-    inline uint ParadigmID() const; //Returns the value of ParadigmID
-
-    /*
-    Property SrcAncode
-
-    property SrcAncode
-
-    */
-    inline QString SrcAncode() const; //Returns the value of SrcAncode
+  */
+    inline int HomonymWeight() const; // Returns the value of HomonymWeight
 
     /*
-    Property SrcNorm
+  Property LemmaPrefixLength
 
-    property SrcNorm
+  property LemmaPrefixLength
 
-    */
-    inline QString SrcNorm() const; //Returns the value of SrcNorm
-
-    /*
-    Property TypeAncode
-
-    property TypeAncode
-
-    */
-    inline QString TypeAncode() const; //Returns the value of TypeAncode
+  */
+    inline int LemmaPrefixLength() const; // Returns the value of LemmaPrefixLength
 
     /*
-    Property WordWeight
+  Property Norm
 
-    property WordWeight
+  property Norm
 
-    */
-    inline int WordWeight() const; //Returns the value of WordWeight
+  */
+    inline QString Norm() const; // Returns the value of Norm
 
     /*
-    Method Accent
+  Property ParadigmID
 
-    property Accent
+  property ParadigmID
 
-    */
+  */
+    inline uint ParadigmID() const; // Returns the value of ParadigmID
+
+    /*
+  Property SrcAncode
+
+  property SrcAncode
+
+  */
+    inline QString SrcAncode() const; // Returns the value of SrcAncode
+
+    /*
+  Property SrcNorm
+
+  property SrcNorm
+
+  */
+    inline QString SrcNorm() const; // Returns the value of SrcNorm
+
+    /*
+  Property TypeAncode
+
+  property TypeAncode
+
+  */
+    inline QString TypeAncode() const; // Returns the value of TypeAncode
+
+    /*
+  Property WordWeight
+
+  property WordWeight
+
+  */
+    inline int WordWeight() const; // Returns the value of WordWeight
+
+    /*
+  Method Accent
+
+  property Accent
+
+  */
     inline uint Accent(uint pos);
 
     /*
-    Method Ancode
+  Method Ancode
 
-    property Ancode
+  property Ancode
 
-    */
+  */
     inline QString Ancode(uint pos);
 
     /*
-    Method Form
+  Method Form
 
-    property Form
+  property Form
 
-    */
+  */
     inline QString Form(uint pos);
 
     /*
-    Method HomonymWeightWithForm
+  Method HomonymWeightWithForm
 
-    property HomonymWeightWithForm
+  property HomonymWeightWithForm
 
-    */
+  */
     inline int HomonymWeightWithForm(uint pos);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -178,28 +177,28 @@ class LEMMATIZERLIB_EXPORT IParadigmCollection : public QAxObject
 {
 public:
     IParadigmCollection(IDispatch *subobject = 0, QAxObject *parent = 0)
-    : QAxObject((IUnknown*)subobject, parent)
+        : QAxObject((IUnknown *) subobject, parent)
     {
         internalRelease();
     }
 
     /*
-    Property Count
+  Property Count
 
-    property Count
+  property Count
 
-    */
-    inline int Count() const; //Returns the value of Count
+  */
+    inline int Count() const; // Returns the value of Count
 
     /*
-    Method Item
+  Method Item
 
-    property Item
+  property Item
 
-    */
-    inline LEMMATIZERLib::IParadigm* Item(int pos);
+  */
+    inline LEMMATIZERLib::IParadigm *Item(int pos);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -209,78 +208,81 @@ class LEMMATIZERLIB_EXPORT ILemmatizer : public QAxObject
 {
 public:
     ILemmatizer(IDispatch *subobject = 0, QAxObject *parent = 0)
-    : QAxObject((IUnknown*)subobject, parent)
+        : QAxObject((IUnknown *) subobject, parent)
     {
         internalRelease();
     }
 
     /*
-    Property MaximalPrediction
+  Property MaximalPrediction
 
-    property MaximalPrediction
+  property MaximalPrediction
 
-    */
-    inline int MaximalPrediction() const; //Returns the value of MaximalPrediction
-    inline void SetMaximalPrediction(int value); //Sets the value of the MaximalPrediction property
-
-    /*
-    Property UseStatistic
-
-    property UseStatistic
-
-    */
-    inline int UseStatistic() const; //Returns the value of UseStatistic
-    inline void SetUseStatistic(int value); //Sets the value of the UseStatistic property
+  */
+    inline int MaximalPrediction() const;        // Returns the value of MaximalPrediction
+    inline void SetMaximalPrediction(int value); // Sets the value of the MaximalPrediction property
 
     /*
-    Method CheckABC
+  Property UseStatistic
 
-    method CheckABC
+  property UseStatistic
 
-    */
-    inline int CheckABC(const QString& Word);
-
-    /*
-    Method CreateParadigmCollectionFromForm
-
-    method CreateParadigmCollectionFromForm
-
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction);
+  */
+    inline int UseStatistic() const;        // Returns the value of UseStatistic
+    inline void SetUseStatistic(int value); // Sets the value of the UseStatistic property
 
     /*
-    Method CreateParadigmCollectionFromNorm
+  Method CheckABC
 
-    method CreateParadigmCollectionFromNorm
+  method CheckABC
 
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction);
-
-    /*
-    Method CreateParadigmFromID
-
-    method CreateParadigmFromID
-
-    */
-    inline LEMMATIZERLib::IParadigm* CreateParadigmFromID(int id);
+  */
+    inline int CheckABC(const QString &Word);
 
     /*
-    Method LoadDictionariesRegistry
+  Method CreateParadigmCollectionFromForm
 
-    method LoadDictionariesRegistry
+  method CreateParadigmCollectionFromForm
 
-    */
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromForm(
+        const QString &Form, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmCollectionFromNorm
+
+  method CreateParadigmCollectionFromNorm
+
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromNorm(
+        const QString &Norm, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmFromID
+
+  method CreateParadigmFromID
+
+  */
+    inline LEMMATIZERLib::IParadigm *CreateParadigmFromID(int id);
+
+    /*
+  Method LoadDictionariesRegistry
+
+  method LoadDictionariesRegistry
+
+  */
     inline void LoadDictionariesRegistry();
 
     /*
-    Method LoadStatisticRegistry
+  Method LoadStatisticRegistry
 
-    method LoadStatisticRegistry
+  method LoadStatisticRegistry
 
-    */
-    inline void LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
+  */
+    inline void LoadStatisticRegistry(
+        LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -290,89 +292,89 @@ class LEMMATIZERLIB_EXPORT IPLMLineCollection : public QAxObject
 {
 public:
     IPLMLineCollection(IDispatch *subobject = 0, QAxObject *parent = 0)
-    : QAxObject((IUnknown*)subobject, parent)
+        : QAxObject((IUnknown *) subobject, parent)
     {
         internalRelease();
     }
 
     /*
-    Property Count
+  Property Count
 
-    property Count
+  property Count
 
-    */
-    inline int Count() const; //Returns the value of Count
-
-    /*
-    Method AttachLemmatizer
-
-    method AttachLemmatizer
-
-    */
-    inline void AttachLemmatizer(LEMMATIZERLib::ILemmatizer* pVal);
+  */
+    inline int Count() const; // Returns the value of Count
 
     /*
-    Method Clear
+  Method AttachLemmatizer
 
-    method Clear
+  method AttachLemmatizer
 
-    */
+  */
+    inline void AttachLemmatizer(LEMMATIZERLib::ILemmatizer *pVal);
+
+    /*
+  Method Clear
+
+  method Clear
+
+  */
     inline void Clear();
 
     /*
-    Method CopyItems
+  Method CopyItems
 
-    method CopyItems
+  method CopyItems
 
-    */
-    inline void CopyItems(IUnknown* piPlmLinesFrom);
+  */
+    inline void CopyItems(IUnknown *piPlmLinesFrom);
 
     /*
-    Method Item
+  Method Item
 
-    property Item
+  property Item
 
-    */
+  */
     inline QString Item(int pos);
 
     /*
-    Method ProcessHyphenWords
+  Method ProcessHyphenWords
 
-    method ProcessHyphenWords
+  method ProcessHyphenWords
 
-    */
-    inline void ProcessHyphenWords(IUnknown* piGraphan);
-
-    /*
-    Method ProcessPlmLines
-
-    method ProcessPlmLines
-
-    */
-    inline void ProcessPlmLines(IUnknown* piGraphmatFile);
+  */
+    inline void ProcessHyphenWords(IUnknown *piGraphan);
 
     /*
-    Method Remove
+  Method ProcessPlmLines
 
-    method Remove
+  method ProcessPlmLines
 
-    */
+  */
+    inline void ProcessPlmLines(IUnknown *piGraphmatFile);
+
+    /*
+  Method Remove
+
+  method Remove
+
+  */
     inline void Remove(int pos);
 
     /*
-    Method SaveToFile
+  Method SaveToFile
 
-    method SaveToFile
+  method SaveToFile
 
-    */
-    inline void SaveToFile(const QString& filename);
+  */
+    inline void SaveToFile(const QString &filename);
 
     /*
-    Method SetItem
-    */
-    inline void SetItem(int pos, const QString& rhs);
+  Method SetItem
+  */
+    inline void SetItem(int pos, const QString &rhs);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -383,139 +385,139 @@ class LEMMATIZERLIB_EXPORT Paradigm : public QAxObject
 {
 public:
     Paradigm(QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         setControl(QStringLiteral("{6b232504-1816-11d3-9cc6-00105a68baf2}"));
     }
 
     Paradigm(IParadigm *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property BaseLength
+  Property BaseLength
 
-    property BaseLength
+  property BaseLength
 
-    */
-    inline uint BaseLength() const; //Returns the value of BaseLength
-
-    /*
-    Property Count
-
-    property Count
-
-    */
-    inline uint Count() const; //Returns the value of Count
+  */
+    inline uint BaseLength() const; // Returns the value of BaseLength
 
     /*
-    Property Founded
+  Property Count
 
-    property Founded
+  property Count
 
-    */
-    inline int Founded() const; //Returns the value of Founded
-
-    /*
-    Property HomonymWeight
-
-    property HomonymWeight
-
-    */
-    inline int HomonymWeight() const; //Returns the value of HomonymWeight
+  */
+    inline uint Count() const; // Returns the value of Count
 
     /*
-    Property LemmaPrefixLength
+  Property Founded
 
-    property LemmaPrefixLength
+  property Founded
 
-    */
-    inline int LemmaPrefixLength() const; //Returns the value of LemmaPrefixLength
-
-    /*
-    Property Norm
-
-    property Norm
-
-    */
-    inline QString Norm() const; //Returns the value of Norm
+  */
+    inline int Founded() const; // Returns the value of Founded
 
     /*
-    Property ParadigmID
+  Property HomonymWeight
 
-    property ParadigmID
+  property HomonymWeight
 
-    */
-    inline uint ParadigmID() const; //Returns the value of ParadigmID
-
-    /*
-    Property SrcAncode
-
-    property SrcAncode
-
-    */
-    inline QString SrcAncode() const; //Returns the value of SrcAncode
+  */
+    inline int HomonymWeight() const; // Returns the value of HomonymWeight
 
     /*
-    Property SrcNorm
+  Property LemmaPrefixLength
 
-    property SrcNorm
+  property LemmaPrefixLength
 
-    */
-    inline QString SrcNorm() const; //Returns the value of SrcNorm
-
-    /*
-    Property TypeAncode
-
-    property TypeAncode
-
-    */
-    inline QString TypeAncode() const; //Returns the value of TypeAncode
+  */
+    inline int LemmaPrefixLength() const; // Returns the value of LemmaPrefixLength
 
     /*
-    Property WordWeight
+  Property Norm
 
-    property WordWeight
+  property Norm
 
-    */
-    inline int WordWeight() const; //Returns the value of WordWeight
+  */
+    inline QString Norm() const; // Returns the value of Norm
 
     /*
-    Method Accent
+  Property ParadigmID
 
-    property Accent
+  property ParadigmID
 
-    */
+  */
+    inline uint ParadigmID() const; // Returns the value of ParadigmID
+
+    /*
+  Property SrcAncode
+
+  property SrcAncode
+
+  */
+    inline QString SrcAncode() const; // Returns the value of SrcAncode
+
+    /*
+  Property SrcNorm
+
+  property SrcNorm
+
+  */
+    inline QString SrcNorm() const; // Returns the value of SrcNorm
+
+    /*
+  Property TypeAncode
+
+  property TypeAncode
+
+  */
+    inline QString TypeAncode() const; // Returns the value of TypeAncode
+
+    /*
+  Property WordWeight
+
+  property WordWeight
+
+  */
+    inline int WordWeight() const; // Returns the value of WordWeight
+
+    /*
+  Method Accent
+
+  property Accent
+
+  */
     inline uint Accent(uint pos);
 
     /*
-    Method Ancode
+  Method Ancode
 
-    property Ancode
+  property Ancode
 
-    */
+  */
     inline QString Ancode(uint pos);
 
     /*
-    Method Form
+  Method Form
 
-    property Form
+  property Form
 
-    */
+  */
     inline QString Form(uint pos);
 
     /*
-    Method HomonymWeightWithForm
+  Method HomonymWeightWithForm
 
-    property HomonymWeightWithForm
+  property HomonymWeightWithForm
 
-    */
+  */
     inline int HomonymWeightWithForm(uint pos);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -525,35 +527,35 @@ class LEMMATIZERLIB_EXPORT ParadigmCollection : public QAxObject
 {
 public:
     ParadigmCollection(QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         setControl(QStringLiteral("{6b232506-1816-11d3-9cc6-00105a68baf2}"));
     }
 
     ParadigmCollection(IParadigmCollection *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property Count
+  Property Count
 
-    property Count
+  property Count
 
-    */
-    inline int Count() const; //Returns the value of Count
+  */
+    inline int Count() const; // Returns the value of Count
 
     /*
-    Method Item
+  Method Item
 
-    property Item
+  property Item
 
-    */
-    inline LEMMATIZERLib::IParadigm* Item(int pos);
+  */
+    inline LEMMATIZERLib::IParadigm *Item(int pos);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -563,85 +565,88 @@ class LEMMATIZERLIB_EXPORT LemmatizerRussian : public QAxObject
 {
 public:
     LemmatizerRussian(QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         setControl(QStringLiteral("{6b23250f-1816-11d3-9cc6-00105a68baf2}"));
     }
 
     LemmatizerRussian(ILemmatizer *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property MaximalPrediction
+  Property MaximalPrediction
 
-    property MaximalPrediction
+  property MaximalPrediction
 
-    */
-    inline int MaximalPrediction() const; //Returns the value of MaximalPrediction
-    inline void SetMaximalPrediction(int value); //Sets the value of the MaximalPrediction property
-
-    /*
-    Property UseStatistic
-
-    property UseStatistic
-
-    */
-    inline int UseStatistic() const; //Returns the value of UseStatistic
-    inline void SetUseStatistic(int value); //Sets the value of the UseStatistic property
+  */
+    inline int MaximalPrediction() const;        // Returns the value of MaximalPrediction
+    inline void SetMaximalPrediction(int value); // Sets the value of the MaximalPrediction property
 
     /*
-    Method CheckABC
+  Property UseStatistic
 
-    method CheckABC
+  property UseStatistic
 
-    */
-    inline int CheckABC(const QString& Word);
-
-    /*
-    Method CreateParadigmCollectionFromForm
-
-    method CreateParadigmCollectionFromForm
-
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction);
+  */
+    inline int UseStatistic() const;        // Returns the value of UseStatistic
+    inline void SetUseStatistic(int value); // Sets the value of the UseStatistic property
 
     /*
-    Method CreateParadigmCollectionFromNorm
+  Method CheckABC
 
-    method CreateParadigmCollectionFromNorm
+  method CheckABC
 
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction);
-
-    /*
-    Method CreateParadigmFromID
-
-    method CreateParadigmFromID
-
-    */
-    inline LEMMATIZERLib::IParadigm* CreateParadigmFromID(int id);
+  */
+    inline int CheckABC(const QString &Word);
 
     /*
-    Method LoadDictionariesRegistry
+  Method CreateParadigmCollectionFromForm
 
-    method LoadDictionariesRegistry
+  method CreateParadigmCollectionFromForm
 
-    */
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromForm(
+        const QString &Form, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmCollectionFromNorm
+
+  method CreateParadigmCollectionFromNorm
+
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromNorm(
+        const QString &Norm, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmFromID
+
+  method CreateParadigmFromID
+
+  */
+    inline LEMMATIZERLib::IParadigm *CreateParadigmFromID(int id);
+
+    /*
+  Method LoadDictionariesRegistry
+
+  method LoadDictionariesRegistry
+
+  */
     inline void LoadDictionariesRegistry();
 
     /*
-    Method LoadStatisticRegistry
+  Method LoadStatisticRegistry
 
-    method LoadStatisticRegistry
+  method LoadStatisticRegistry
 
-    */
-    inline void LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
+  */
+    inline void LoadStatisticRegistry(
+        LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -651,7 +656,7 @@ class LEMMATIZERLIB_EXPORT LemmatizerEnglish : public QAxObject
 {
 public:
     LemmatizerEnglish(const QString &licenseKey = QString(), QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         if (licenseKey.isEmpty())
             setControl(QStringLiteral("{6b232511-1816-11d3-9cc6-00105a68baf2}"));
@@ -660,79 +665,82 @@ public:
     }
 
     LemmatizerEnglish(ILemmatizer *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property MaximalPrediction
+  Property MaximalPrediction
 
-    property MaximalPrediction
+  property MaximalPrediction
 
-    */
-    inline int MaximalPrediction() const; //Returns the value of MaximalPrediction
-    inline void SetMaximalPrediction(int value); //Sets the value of the MaximalPrediction property
-
-    /*
-    Property UseStatistic
-
-    property UseStatistic
-
-    */
-    inline int UseStatistic() const; //Returns the value of UseStatistic
-    inline void SetUseStatistic(int value); //Sets the value of the UseStatistic property
+  */
+    inline int MaximalPrediction() const;        // Returns the value of MaximalPrediction
+    inline void SetMaximalPrediction(int value); // Sets the value of the MaximalPrediction property
 
     /*
-    Method CheckABC
+  Property UseStatistic
 
-    method CheckABC
+  property UseStatistic
 
-    */
-    inline int CheckABC(const QString& Word);
-
-    /*
-    Method CreateParadigmCollectionFromForm
-
-    method CreateParadigmCollectionFromForm
-
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction);
+  */
+    inline int UseStatistic() const;        // Returns the value of UseStatistic
+    inline void SetUseStatistic(int value); // Sets the value of the UseStatistic property
 
     /*
-    Method CreateParadigmCollectionFromNorm
+  Method CheckABC
 
-    method CreateParadigmCollectionFromNorm
+  method CheckABC
 
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction);
-
-    /*
-    Method CreateParadigmFromID
-
-    method CreateParadigmFromID
-
-    */
-    inline LEMMATIZERLib::IParadigm* CreateParadigmFromID(int id);
+  */
+    inline int CheckABC(const QString &Word);
 
     /*
-    Method LoadDictionariesRegistry
+  Method CreateParadigmCollectionFromForm
 
-    method LoadDictionariesRegistry
+  method CreateParadigmCollectionFromForm
 
-    */
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromForm(
+        const QString &Form, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmCollectionFromNorm
+
+  method CreateParadigmCollectionFromNorm
+
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromNorm(
+        const QString &Norm, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmFromID
+
+  method CreateParadigmFromID
+
+  */
+    inline LEMMATIZERLib::IParadigm *CreateParadigmFromID(int id);
+
+    /*
+  Method LoadDictionariesRegistry
+
+  method LoadDictionariesRegistry
+
+  */
     inline void LoadDictionariesRegistry();
 
     /*
-    Method LoadStatisticRegistry
+  Method LoadStatisticRegistry
 
-    method LoadStatisticRegistry
+  method LoadStatisticRegistry
 
-    */
-    inline void LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
+  */
+    inline void LoadStatisticRegistry(
+        LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -742,7 +750,7 @@ class LEMMATIZERLIB_EXPORT LemmatizerGerman : public QAxObject
 {
 public:
     LemmatizerGerman(const QString &licenseKey = QString(), QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         if (licenseKey.isEmpty())
             setControl(QStringLiteral("{d26721ac-5ba9-4a1e-bbd0-a74cf86437e7}"));
@@ -751,79 +759,82 @@ public:
     }
 
     LemmatizerGerman(ILemmatizer *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property MaximalPrediction
+  Property MaximalPrediction
 
-    property MaximalPrediction
+  property MaximalPrediction
 
-    */
-    inline int MaximalPrediction() const; //Returns the value of MaximalPrediction
-    inline void SetMaximalPrediction(int value); //Sets the value of the MaximalPrediction property
-
-    /*
-    Property UseStatistic
-
-    property UseStatistic
-
-    */
-    inline int UseStatistic() const; //Returns the value of UseStatistic
-    inline void SetUseStatistic(int value); //Sets the value of the UseStatistic property
+  */
+    inline int MaximalPrediction() const;        // Returns the value of MaximalPrediction
+    inline void SetMaximalPrediction(int value); // Sets the value of the MaximalPrediction property
 
     /*
-    Method CheckABC
+  Property UseStatistic
 
-    method CheckABC
+  property UseStatistic
 
-    */
-    inline int CheckABC(const QString& Word);
-
-    /*
-    Method CreateParadigmCollectionFromForm
-
-    method CreateParadigmCollectionFromForm
-
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction);
+  */
+    inline int UseStatistic() const;        // Returns the value of UseStatistic
+    inline void SetUseStatistic(int value); // Sets the value of the UseStatistic property
 
     /*
-    Method CreateParadigmCollectionFromNorm
+  Method CheckABC
 
-    method CreateParadigmCollectionFromNorm
+  method CheckABC
 
-    */
-    inline LEMMATIZERLib::IParadigmCollection* CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction);
-
-    /*
-    Method CreateParadigmFromID
-
-    method CreateParadigmFromID
-
-    */
-    inline LEMMATIZERLib::IParadigm* CreateParadigmFromID(int id);
+  */
+    inline int CheckABC(const QString &Word);
 
     /*
-    Method LoadDictionariesRegistry
+  Method CreateParadigmCollectionFromForm
 
-    method LoadDictionariesRegistry
+  method CreateParadigmCollectionFromForm
 
-    */
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromForm(
+        const QString &Form, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmCollectionFromNorm
+
+  method CreateParadigmCollectionFromNorm
+
+  */
+    inline LEMMATIZERLib::IParadigmCollection *CreateParadigmCollectionFromNorm(
+        const QString &Norm, int capital, int UsePrediction);
+
+    /*
+  Method CreateParadigmFromID
+
+  method CreateParadigmFromID
+
+  */
+    inline LEMMATIZERLib::IParadigm *CreateParadigmFromID(int id);
+
+    /*
+  Method LoadDictionariesRegistry
+
+  method LoadDictionariesRegistry
+
+  */
     inline void LoadDictionariesRegistry();
 
     /*
-    Method LoadStatisticRegistry
+  Method LoadStatisticRegistry
 
-    method LoadStatisticRegistry
+  method LoadStatisticRegistry
 
-    */
-    inline void LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
+  */
+    inline void LoadStatisticRegistry(
+        LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -833,7 +844,7 @@ class LEMMATIZERLIB_EXPORT PLMLineCollection : public QAxObject
 {
 public:
     PLMLineCollection(const QString &licenseKey = QString(), QObject *parent = 0)
-    : QAxObject(parent)
+        : QAxObject(parent)
     {
         if (licenseKey.isEmpty())
             setControl(QStringLiteral("{34e94e25-6c26-11d3-9d4a-00105a68baf2}"));
@@ -842,90 +853,90 @@ public:
     }
 
     PLMLineCollection(IPLMLineCollection *iface)
-    : QAxObject()
+        : QAxObject()
     {
         initializeFrom(iface);
         delete iface;
     }
 
     /*
-    Property Count
+  Property Count
 
-    property Count
+  property Count
 
-    */
-    inline int Count() const; //Returns the value of Count
-
-    /*
-    Method AttachLemmatizer
-
-    method AttachLemmatizer
-
-    */
-    inline void AttachLemmatizer(LEMMATIZERLib::ILemmatizer* pVal);
+  */
+    inline int Count() const; // Returns the value of Count
 
     /*
-    Method Clear
+  Method AttachLemmatizer
 
-    method Clear
+  method AttachLemmatizer
 
-    */
+  */
+    inline void AttachLemmatizer(LEMMATIZERLib::ILemmatizer *pVal);
+
+    /*
+  Method Clear
+
+  method Clear
+
+  */
     inline void Clear();
 
     /*
-    Method CopyItems
+  Method CopyItems
 
-    method CopyItems
+  method CopyItems
 
-    */
-    inline void CopyItems(IUnknown* piPlmLinesFrom);
+  */
+    inline void CopyItems(IUnknown *piPlmLinesFrom);
 
     /*
-    Method Item
+  Method Item
 
-    property Item
+  property Item
 
-    */
+  */
     inline QString Item(int pos);
 
     /*
-    Method ProcessHyphenWords
+  Method ProcessHyphenWords
 
-    method ProcessHyphenWords
+  method ProcessHyphenWords
 
-    */
-    inline void ProcessHyphenWords(IUnknown* piGraphan);
-
-    /*
-    Method ProcessPlmLines
-
-    method ProcessPlmLines
-
-    */
-    inline void ProcessPlmLines(IUnknown* piGraphmatFile);
+  */
+    inline void ProcessHyphenWords(IUnknown *piGraphan);
 
     /*
-    Method Remove
+  Method ProcessPlmLines
 
-    method Remove
+  method ProcessPlmLines
 
-    */
+  */
+    inline void ProcessPlmLines(IUnknown *piGraphmatFile);
+
+    /*
+  Method Remove
+
+  method Remove
+
+  */
     inline void Remove(int pos);
 
     /*
-    Method SaveToFile
+  Method SaveToFile
 
-    method SaveToFile
+  method SaveToFile
 
-    */
-    inline void SaveToFile(const QString& filename);
+  */
+    inline void SaveToFile(const QString &filename);
 
     /*
-    Method SetItem
-    */
-    inline void SetItem(int pos, const QString& rhs);
+  Method SetItem
+  */
+    inline void SetItem(int pos, const QString &rhs);
 
-// meta object functions
+    // meta object functions
     static const QMetaObject staticMetaObject;
     virtual const QMetaObject *metaObject() const { return &staticMetaObject; }
     virtual void *qt_metacast(const char *);
@@ -937,83 +948,83 @@ inline uint Paradigm::BaseLength() const
 {
     QVariant qax_result = property("BaseLength");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
 inline uint Paradigm::Count() const
 {
     QVariant qax_result = property("Count");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
 inline int Paradigm::Founded() const
 {
     QVariant qax_result = property("Founded");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline int Paradigm::HomonymWeight() const
 {
     QVariant qax_result = property("HomonymWeight");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline int Paradigm::LemmaPrefixLength() const
 {
     QVariant qax_result = property("LemmaPrefixLength");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline QString Paradigm::Norm() const
 {
     QVariant qax_result = property("Norm");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline uint Paradigm::ParadigmID() const
 {
     QVariant qax_result = property("ParadigmID");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
 inline QString Paradigm::SrcAncode() const
 {
     QVariant qax_result = property("SrcAncode");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline QString Paradigm::SrcNorm() const
 {
     QVariant qax_result = property("SrcNorm");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline QString Paradigm::TypeAncode() const
 {
     QVariant qax_result = property("TypeAncode");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline int Paradigm::WordWeight() const
 {
     QVariant qax_result = property("WordWeight");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline uint Paradigm::Accent(uint pos)
 {
     uint qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
@@ -1021,7 +1032,7 @@ inline uint Paradigm::Accent(uint pos)
 inline QString Paradigm::Ancode(uint pos)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
@@ -1029,7 +1040,7 @@ inline QString Paradigm::Ancode(uint pos)
 inline QString Paradigm::Form(uint pos)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
@@ -1037,93 +1048,92 @@ inline QString Paradigm::Form(uint pos)
 inline int Paradigm::HomonymWeightWithForm(uint pos)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
-
 
 inline uint IParadigm::BaseLength() const
 {
     QVariant qax_result = property("BaseLength");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
 inline uint IParadigm::Count() const
 {
     QVariant qax_result = property("Count");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
 inline int IParadigm::Founded() const
 {
     QVariant qax_result = property("Founded");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline int IParadigm::HomonymWeight() const
 {
     QVariant qax_result = property("HomonymWeight");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline int IParadigm::LemmaPrefixLength() const
 {
     QVariant qax_result = property("LemmaPrefixLength");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline QString IParadigm::Norm() const
 {
     QVariant qax_result = property("Norm");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline uint IParadigm::ParadigmID() const
 {
     QVariant qax_result = property("ParadigmID");
     Q_ASSERT(qax_result.isValid());
-    return *(uint*)qax_result.constData();
+    return *(uint *) qax_result.constData();
 }
 
 inline QString IParadigm::SrcAncode() const
 {
     QVariant qax_result = property("SrcAncode");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline QString IParadigm::SrcNorm() const
 {
     QVariant qax_result = property("SrcNorm");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline QString IParadigm::TypeAncode() const
 {
     QVariant qax_result = property("TypeAncode");
     Q_ASSERT(qax_result.isValid());
-    return *(QString*)qax_result.constData();
+    return *(QString *) qax_result.constData();
 }
 
 inline int IParadigm::WordWeight() const
 {
     QVariant qax_result = property("WordWeight");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
 inline uint IParadigm::Accent(uint pos)
 {
     uint qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
@@ -1131,7 +1141,7 @@ inline uint IParadigm::Accent(uint pos)
 inline QString IParadigm::Ancode(uint pos)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
@@ -1139,7 +1149,7 @@ inline QString IParadigm::Ancode(uint pos)
 inline QString IParadigm::Form(uint pos)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
@@ -1147,98 +1157,103 @@ inline QString IParadigm::Form(uint pos)
 inline int IParadigm::HomonymWeightWithForm(uint pos)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
-
 
 inline int ParadigmCollection::Count() const
 {
     QVariant qax_result = property("Count");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
-inline LEMMATIZERLib::IParadigm* ParadigmCollection::Item(int pos)
+inline LEMMATIZERLib::IParadigm *ParadigmCollection::Item(int pos)
 {
-    LEMMATIZERLib::IParadigm* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigm*>("IParadigm*", &qax_result);
+    LEMMATIZERLib::IParadigm *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigm *>("IParadigm*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigm>("IParadigm", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
-
 
 inline int IParadigmCollection::Count() const
 {
     QVariant qax_result = property("Count");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
-inline LEMMATIZERLib::IParadigm* IParadigmCollection::Item(int pos)
+inline LEMMATIZERLib::IParadigm *IParadigmCollection::Item(int pos)
 {
-    LEMMATIZERLib::IParadigm* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigm*>("IParadigm*", &qax_result);
+    LEMMATIZERLib::IParadigm *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigm *>("IParadigm*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigm>("IParadigm", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
-
 
 inline int LemmatizerRussian::MaximalPrediction() const
 {
     QVariant qax_result = property("MaximalPrediction");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void LemmatizerRussian::SetMaximalPrediction(int value){ setProperty("MaximalPrediction", QVariant(value)); }
+inline void LemmatizerRussian::SetMaximalPrediction(int value)
+{
+    setProperty("MaximalPrediction", QVariant(value));
+}
 
 inline int LemmatizerRussian::UseStatistic() const
 {
     QVariant qax_result = property("UseStatistic");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void LemmatizerRussian::SetUseStatistic(int value){ setProperty("UseStatistic", QVariant(value)); }
+inline void LemmatizerRussian::SetUseStatistic(int value)
+{
+    setProperty("UseStatistic", QVariant(value));
+}
 
-inline int LemmatizerRussian::CheckABC(const QString& Word)
+inline int LemmatizerRussian::CheckABC(const QString &Word)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Word};
+    void *_a[] = {(void *) &qax_result, (void *) &Word};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* LemmatizerRussian::CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *LemmatizerRussian::CreateParadigmCollectionFromForm(
+    const QString &Form, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Form, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Form, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* LemmatizerRussian::CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *LemmatizerRussian::CreateParadigmCollectionFromNorm(
+    const QString &Norm, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Norm, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Norm, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigm* LemmatizerRussian::CreateParadigmFromID(int id)
+inline LEMMATIZERLib::IParadigm *LemmatizerRussian::CreateParadigmFromID(int id)
 {
-    LEMMATIZERLib::IParadigm* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigm*>("IParadigm*", &qax_result);
+    LEMMATIZERLib::IParadigm *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigm *>("IParadigm*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigm>("IParadigm", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&id};
+    void *_a[] = {(void *) &qax_result, (void *) &id};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
@@ -1249,63 +1264,71 @@ inline void LemmatizerRussian::LoadDictionariesRegistry()
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
 }
 
-inline void LemmatizerRussian::LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
+inline void LemmatizerRussian::LoadStatisticRegistry(
+    LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
 {
-    void *_a[] = {0, (void*)&subj};
+    void *_a[] = {0, (void *) &subj};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
 }
-
 
 inline int ILemmatizer::MaximalPrediction() const
 {
     QVariant qax_result = property("MaximalPrediction");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void ILemmatizer::SetMaximalPrediction(int value){ setProperty("MaximalPrediction", QVariant(value)); }
+inline void ILemmatizer::SetMaximalPrediction(int value)
+{
+    setProperty("MaximalPrediction", QVariant(value));
+}
 
 inline int ILemmatizer::UseStatistic() const
 {
     QVariant qax_result = property("UseStatistic");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void ILemmatizer::SetUseStatistic(int value){ setProperty("UseStatistic", QVariant(value)); }
+inline void ILemmatizer::SetUseStatistic(int value)
+{
+    setProperty("UseStatistic", QVariant(value));
+}
 
-inline int ILemmatizer::CheckABC(const QString& Word)
+inline int ILemmatizer::CheckABC(const QString &Word)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Word};
+    void *_a[] = {(void *) &qax_result, (void *) &Word};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* ILemmatizer::CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *ILemmatizer::CreateParadigmCollectionFromForm(
+    const QString &Form, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Form, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Form, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* ILemmatizer::CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *ILemmatizer::CreateParadigmCollectionFromNorm(
+    const QString &Norm, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Norm, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Norm, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigm* ILemmatizer::CreateParadigmFromID(int id)
+inline LEMMATIZERLib::IParadigm *ILemmatizer::CreateParadigmFromID(int id)
 {
-    LEMMATIZERLib::IParadigm* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigm*>("IParadigm*", &qax_result);
+    LEMMATIZERLib::IParadigm *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigm *>("IParadigm*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigm>("IParadigm", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&id};
+    void *_a[] = {(void *) &qax_result, (void *) &id};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
@@ -1316,63 +1339,71 @@ inline void ILemmatizer::LoadDictionariesRegistry()
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
 }
 
-inline void ILemmatizer::LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
+inline void ILemmatizer::LoadStatisticRegistry(
+    LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
 {
-    void *_a[] = {0, (void*)&subj};
+    void *_a[] = {0, (void *) &subj};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
 }
-
 
 inline int LemmatizerEnglish::MaximalPrediction() const
 {
     QVariant qax_result = property("MaximalPrediction");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void LemmatizerEnglish::SetMaximalPrediction(int value){ setProperty("MaximalPrediction", QVariant(value)); }
+inline void LemmatizerEnglish::SetMaximalPrediction(int value)
+{
+    setProperty("MaximalPrediction", QVariant(value));
+}
 
 inline int LemmatizerEnglish::UseStatistic() const
 {
     QVariant qax_result = property("UseStatistic");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void LemmatizerEnglish::SetUseStatistic(int value){ setProperty("UseStatistic", QVariant(value)); }
+inline void LemmatizerEnglish::SetUseStatistic(int value)
+{
+    setProperty("UseStatistic", QVariant(value));
+}
 
-inline int LemmatizerEnglish::CheckABC(const QString& Word)
+inline int LemmatizerEnglish::CheckABC(const QString &Word)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Word};
+    void *_a[] = {(void *) &qax_result, (void *) &Word};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* LemmatizerEnglish::CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *LemmatizerEnglish::CreateParadigmCollectionFromForm(
+    const QString &Form, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Form, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Form, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* LemmatizerEnglish::CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *LemmatizerEnglish::CreateParadigmCollectionFromNorm(
+    const QString &Norm, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Norm, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Norm, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigm* LemmatizerEnglish::CreateParadigmFromID(int id)
+inline LEMMATIZERLib::IParadigm *LemmatizerEnglish::CreateParadigmFromID(int id)
 {
-    LEMMATIZERLib::IParadigm* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigm*>("IParadigm*", &qax_result);
+    LEMMATIZERLib::IParadigm *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigm *>("IParadigm*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigm>("IParadigm", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&id};
+    void *_a[] = {(void *) &qax_result, (void *) &id};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
@@ -1383,63 +1414,71 @@ inline void LemmatizerEnglish::LoadDictionariesRegistry()
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
 }
 
-inline void LemmatizerEnglish::LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
+inline void LemmatizerEnglish::LoadStatisticRegistry(
+    LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
 {
-    void *_a[] = {0, (void*)&subj};
+    void *_a[] = {0, (void *) &subj};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
 }
-
 
 inline int LemmatizerGerman::MaximalPrediction() const
 {
     QVariant qax_result = property("MaximalPrediction");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void LemmatizerGerman::SetMaximalPrediction(int value){ setProperty("MaximalPrediction", QVariant(value)); }
+inline void LemmatizerGerman::SetMaximalPrediction(int value)
+{
+    setProperty("MaximalPrediction", QVariant(value));
+}
 
 inline int LemmatizerGerman::UseStatistic() const
 {
     QVariant qax_result = property("UseStatistic");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
-inline void LemmatizerGerman::SetUseStatistic(int value){ setProperty("UseStatistic", QVariant(value)); }
+inline void LemmatizerGerman::SetUseStatistic(int value)
+{
+    setProperty("UseStatistic", QVariant(value));
+}
 
-inline int LemmatizerGerman::CheckABC(const QString& Word)
+inline int LemmatizerGerman::CheckABC(const QString &Word)
 {
     int qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&Word};
+    void *_a[] = {(void *) &qax_result, (void *) &Word};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* LemmatizerGerman::CreateParadigmCollectionFromForm(const QString& Form, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *LemmatizerGerman::CreateParadigmCollectionFromForm(
+    const QString &Form, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Form, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Form, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigmCollection* LemmatizerGerman::CreateParadigmCollectionFromNorm(const QString& Norm, int capital, int UsePrediction)
+inline LEMMATIZERLib::IParadigmCollection *LemmatizerGerman::CreateParadigmCollectionFromNorm(
+    const QString &Norm, int capital, int UsePrediction)
 {
-    LEMMATIZERLib::IParadigmCollection* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection*>("IParadigmCollection*", &qax_result);
+    LEMMATIZERLib::IParadigmCollection *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigmCollection *>("IParadigmCollection*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigmCollection>("IParadigmCollection", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&Norm, (void*)&capital, (void*)&UsePrediction};
+    void *_a[] = {(void *) &qax_result, (void *) &Norm, (void *) &capital, (void *) &UsePrediction};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
     return qax_result;
 }
 
-inline LEMMATIZERLib::IParadigm* LemmatizerGerman::CreateParadigmFromID(int id)
+inline LEMMATIZERLib::IParadigm *LemmatizerGerman::CreateParadigmFromID(int id)
 {
-    LEMMATIZERLib::IParadigm* qax_result = 0;
-    qRegisterMetaType<LEMMATIZERLib::IParadigm*>("IParadigm*", &qax_result);
+    LEMMATIZERLib::IParadigm *qax_result = 0;
+    qRegisterMetaType<LEMMATIZERLib::IParadigm *>("IParadigm*", &qax_result);
     qRegisterMetaType<LEMMATIZERLib::IParadigm>("IParadigm", qax_result);
-    void *_a[] = {(void*)&qax_result, (void*)&id};
+    void *_a[] = {(void *) &qax_result, (void *) &id};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
@@ -1450,23 +1489,23 @@ inline void LemmatizerGerman::LoadDictionariesRegistry()
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
 }
 
-inline void LemmatizerGerman::LoadStatisticRegistry(LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
+inline void LemmatizerGerman::LoadStatisticRegistry(
+    LEMMATIZERLib::__MIDL___MIDL_itf_Lemmatizer_0000_0000_0001 subj)
 {
-    void *_a[] = {0, (void*)&subj};
+    void *_a[] = {0, (void *) &subj};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
 }
-
 
 inline int PLMLineCollection::Count() const
 {
     QVariant qax_result = property("Count");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
-inline void PLMLineCollection::AttachLemmatizer(LEMMATIZERLib::ILemmatizer* pVal)
+inline void PLMLineCollection::AttachLemmatizer(LEMMATIZERLib::ILemmatizer *pVal)
 {
-    void *_a[] = {0, (void*)&pVal};
+    void *_a[] = {0, (void *) &pVal};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
 }
 
@@ -1476,61 +1515,60 @@ inline void PLMLineCollection::Clear()
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
 }
 
-inline void PLMLineCollection::CopyItems(IUnknown* piPlmLinesFrom)
+inline void PLMLineCollection::CopyItems(IUnknown *piPlmLinesFrom)
 {
-    void *_a[] = {0, (void*)&piPlmLinesFrom};
+    void *_a[] = {0, (void *) &piPlmLinesFrom};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
 }
 
 inline QString PLMLineCollection::Item(int pos)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
 
-inline void PLMLineCollection::ProcessHyphenWords(IUnknown* piGraphan)
+inline void PLMLineCollection::ProcessHyphenWords(IUnknown *piGraphan)
 {
-    void *_a[] = {0, (void*)&piGraphan};
+    void *_a[] = {0, (void *) &piGraphan};
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
 }
 
-inline void PLMLineCollection::ProcessPlmLines(IUnknown* piGraphmatFile)
+inline void PLMLineCollection::ProcessPlmLines(IUnknown *piGraphmatFile)
 {
-    void *_a[] = {0, (void*)&piGraphmatFile};
+    void *_a[] = {0, (void *) &piGraphmatFile};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
 }
 
 inline void PLMLineCollection::Remove(int pos)
 {
-    void *_a[] = {0, (void*)&pos};
+    void *_a[] = {0, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 14, _a);
 }
 
-inline void PLMLineCollection::SaveToFile(const QString& filename)
+inline void PLMLineCollection::SaveToFile(const QString &filename)
 {
-    void *_a[] = {0, (void*)&filename};
+    void *_a[] = {0, (void *) &filename};
     qt_metacall(QMetaObject::InvokeMetaMethod, 15, _a);
 }
 
-inline void PLMLineCollection::SetItem(int pos, const QString& rhs)
+inline void PLMLineCollection::SetItem(int pos, const QString &rhs)
 {
-    void *_a[] = {0, (void*)&pos, (void*)&rhs};
+    void *_a[] = {0, (void *) &pos, (void *) &rhs};
     qt_metacall(QMetaObject::InvokeMetaMethod, 16, _a);
 }
-
 
 inline int IPLMLineCollection::Count() const
 {
     QVariant qax_result = property("Count");
     Q_ASSERT(qax_result.isValid());
-    return *(int*)qax_result.constData();
+    return *(int *) qax_result.constData();
 }
 
-inline void IPLMLineCollection::AttachLemmatizer(LEMMATIZERLib::ILemmatizer* pVal)
+inline void IPLMLineCollection::AttachLemmatizer(LEMMATIZERLib::ILemmatizer *pVal)
 {
-    void *_a[] = {0, (void*)&pVal};
+    void *_a[] = {0, (void *) &pVal};
     qt_metacall(QMetaObject::InvokeMetaMethod, 8, _a);
 }
 
@@ -1540,65 +1578,64 @@ inline void IPLMLineCollection::Clear()
     qt_metacall(QMetaObject::InvokeMetaMethod, 9, _a);
 }
 
-inline void IPLMLineCollection::CopyItems(IUnknown* piPlmLinesFrom)
+inline void IPLMLineCollection::CopyItems(IUnknown *piPlmLinesFrom)
 {
-    void *_a[] = {0, (void*)&piPlmLinesFrom};
+    void *_a[] = {0, (void *) &piPlmLinesFrom};
     qt_metacall(QMetaObject::InvokeMetaMethod, 10, _a);
 }
 
 inline QString IPLMLineCollection::Item(int pos)
 {
     QString qax_result;
-    void *_a[] = {(void*)&qax_result, (void*)&pos};
+    void *_a[] = {(void *) &qax_result, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 11, _a);
     return qax_result;
 }
 
-inline void IPLMLineCollection::ProcessHyphenWords(IUnknown* piGraphan)
+inline void IPLMLineCollection::ProcessHyphenWords(IUnknown *piGraphan)
 {
-    void *_a[] = {0, (void*)&piGraphan};
+    void *_a[] = {0, (void *) &piGraphan};
     qt_metacall(QMetaObject::InvokeMetaMethod, 12, _a);
 }
 
-inline void IPLMLineCollection::ProcessPlmLines(IUnknown* piGraphmatFile)
+inline void IPLMLineCollection::ProcessPlmLines(IUnknown *piGraphmatFile)
 {
-    void *_a[] = {0, (void*)&piGraphmatFile};
+    void *_a[] = {0, (void *) &piGraphmatFile};
     qt_metacall(QMetaObject::InvokeMetaMethod, 13, _a);
 }
 
 inline void IPLMLineCollection::Remove(int pos)
 {
-    void *_a[] = {0, (void*)&pos};
+    void *_a[] = {0, (void *) &pos};
     qt_metacall(QMetaObject::InvokeMetaMethod, 14, _a);
 }
 
-inline void IPLMLineCollection::SaveToFile(const QString& filename)
+inline void IPLMLineCollection::SaveToFile(const QString &filename)
 {
-    void *_a[] = {0, (void*)&filename};
+    void *_a[] = {0, (void *) &filename};
     qt_metacall(QMetaObject::InvokeMetaMethod, 15, _a);
 }
 
-inline void IPLMLineCollection::SetItem(int pos, const QString& rhs)
+inline void IPLMLineCollection::SetItem(int pos, const QString &rhs)
 {
-    void *_a[] = {0, (void*)&pos, (void*)&rhs};
+    void *_a[] = {0, (void *) &pos, (void *) &rhs};
     qt_metacall(QMetaObject::InvokeMetaMethod, 16, _a);
 }
 
-
-
 #endif
 
-}
+} // namespace LEMMATIZERLib
 
 QT_BEGIN_NAMESPACE
 
 namespace QtMetaTypePrivate {
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::Paradigm, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::Paradigm, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::Paradigm*>(t)->LEMMATIZERLib::Paradigm::~Paradigm();
+        static_cast<LEMMATIZERLib::Paradigm *>(t)->LEMMATIZERLib::Paradigm::~Paradigm();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1607,17 +1644,24 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::Paradigm, /* Accepted */ true> {
         return new (where) LEMMATIZERLib::Paradigm;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::Paradigm*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::Paradigm*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::Paradigm *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::Paradigm *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::IParadigm, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::IParadigm, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::IParadigm*>(t)->LEMMATIZERLib::IParadigm::~IParadigm();
+        static_cast<LEMMATIZERLib::IParadigm *>(t)->LEMMATIZERLib::IParadigm::~IParadigm();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1626,17 +1670,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::IParadigm, /* Accepted */ true> {
         return new (where) LEMMATIZERLib::IParadigm;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::IParadigm*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::IParadigm*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::IParadigm *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::IParadigm *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::ParadigmCollection, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::ParadigmCollection, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::ParadigmCollection*>(t)->LEMMATIZERLib::ParadigmCollection::~ParadigmCollection();
+        static_cast<LEMMATIZERLib::ParadigmCollection *>(t)
+            ->LEMMATIZERLib::ParadigmCollection::~ParadigmCollection();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1645,17 +1697,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::ParadigmCollection, /* Accepted */
         return new (where) LEMMATIZERLib::ParadigmCollection;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::ParadigmCollection*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::ParadigmCollection*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::ParadigmCollection *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::ParadigmCollection *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::IParadigmCollection, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::IParadigmCollection, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::IParadigmCollection*>(t)->LEMMATIZERLib::IParadigmCollection::~IParadigmCollection();
+        static_cast<LEMMATIZERLib::IParadigmCollection *>(t)
+            ->LEMMATIZERLib::IParadigmCollection::~IParadigmCollection();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1664,17 +1724,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::IParadigmCollection, /* Accepted *
         return new (where) LEMMATIZERLib::IParadigmCollection;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::IParadigmCollection*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::IParadigmCollection*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::IParadigmCollection *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::IParadigmCollection *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerRussian, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerRussian, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::LemmatizerRussian*>(t)->LEMMATIZERLib::LemmatizerRussian::~LemmatizerRussian();
+        static_cast<LEMMATIZERLib::LemmatizerRussian *>(t)
+            ->LEMMATIZERLib::LemmatizerRussian::~LemmatizerRussian();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1683,17 +1751,24 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerRussian, /* Accepted */ 
         return new (where) LEMMATIZERLib::LemmatizerRussian;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::LemmatizerRussian*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::LemmatizerRussian*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::LemmatizerRussian *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::LemmatizerRussian *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::ILemmatizer, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::ILemmatizer, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::ILemmatizer*>(t)->LEMMATIZERLib::ILemmatizer::~ILemmatizer();
+        static_cast<LEMMATIZERLib::ILemmatizer *>(t)->LEMMATIZERLib::ILemmatizer::~ILemmatizer();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1702,17 +1777,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::ILemmatizer, /* Accepted */ true> 
         return new (where) LEMMATIZERLib::ILemmatizer;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::ILemmatizer*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::ILemmatizer*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::ILemmatizer *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::ILemmatizer *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerEnglish, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerEnglish, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::LemmatizerEnglish*>(t)->LEMMATIZERLib::LemmatizerEnglish::~LemmatizerEnglish();
+        static_cast<LEMMATIZERLib::LemmatizerEnglish *>(t)
+            ->LEMMATIZERLib::LemmatizerEnglish::~LemmatizerEnglish();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1721,17 +1804,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerEnglish, /* Accepted */ 
         return new (where) LEMMATIZERLib::LemmatizerEnglish;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::LemmatizerEnglish*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::LemmatizerEnglish*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::LemmatizerEnglish *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::LemmatizerEnglish *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerGerman, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerGerman, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::LemmatizerGerman*>(t)->LEMMATIZERLib::LemmatizerGerman::~LemmatizerGerman();
+        static_cast<LEMMATIZERLib::LemmatizerGerman *>(t)
+            ->LEMMATIZERLib::LemmatizerGerman::~LemmatizerGerman();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1740,17 +1831,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::LemmatizerGerman, /* Accepted */ t
         return new (where) LEMMATIZERLib::LemmatizerGerman;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::LemmatizerGerman*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::LemmatizerGerman*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::LemmatizerGerman *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::LemmatizerGerman *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::PLMLineCollection, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::PLMLineCollection, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::PLMLineCollection*>(t)->LEMMATIZERLib::PLMLineCollection::~PLMLineCollection();
+        static_cast<LEMMATIZERLib::PLMLineCollection *>(t)
+            ->LEMMATIZERLib::PLMLineCollection::~PLMLineCollection();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1759,17 +1858,25 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::PLMLineCollection, /* Accepted */ 
         return new (where) LEMMATIZERLib::PLMLineCollection;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::PLMLineCollection*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::PLMLineCollection*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::PLMLineCollection *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::PLMLineCollection *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
 template<>
-struct QMetaTypeFunctionHelper<LEMMATIZERLib::IPLMLineCollection, /* Accepted */ true> {
+struct QMetaTypeFunctionHelper<LEMMATIZERLib::IPLMLineCollection, /* Accepted */ true>
+{
     static void Destruct(void *t)
     {
         Q_UNUSED(t)
-        static_cast<LEMMATIZERLib::IPLMLineCollection*>(t)->LEMMATIZERLib::IPLMLineCollection::~IPLMLineCollection();
+        static_cast<LEMMATIZERLib::IPLMLineCollection *>(t)
+            ->LEMMATIZERLib::IPLMLineCollection::~IPLMLineCollection();
     }
     static void *Construct(void *where, const void *t)
     {
@@ -1778,8 +1885,14 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::IPLMLineCollection, /* Accepted */
         return new (where) LEMMATIZERLib::IPLMLineCollection;
     }
 #ifndef QT_NO_DATASTREAM
-    static void Save(QDataStream &stream, const void *t) { stream << *static_cast<const LEMMATIZERLib::IPLMLineCollection*>(t); }
-    static void Load(QDataStream &stream, void *t) { stream >> *static_cast<LEMMATIZERLib::IPLMLineCollection*>(t); }
+    static void Save(QDataStream &stream, const void *t)
+    {
+        stream << *static_cast<const LEMMATIZERLib::IPLMLineCollection *>(t);
+    }
+    static void Load(QDataStream &stream, void *t)
+    {
+        stream >> *static_cast<LEMMATIZERLib::IPLMLineCollection *>(t);
+    }
 #endif // QT_NO_DATASTREAM
 };
 
@@ -1787,4 +1900,3 @@ struct QMetaTypeFunctionHelper<LEMMATIZERLib::IPLMLineCollection, /* Accepted */
 QT_END_NAMESPACE
 
 #endif
-

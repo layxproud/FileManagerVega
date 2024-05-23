@@ -1,9 +1,11 @@
 #include "mainwindow.h"
+#include "trmlshell.h"
 #include <QApplication>
-#include <QFile>
 #include <QDebug>
+#include <QFile>
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
     Q_UNUSED(context);
     QString txt;
     switch (type) {
@@ -33,13 +35,22 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 int main(int argc, char *argv[])
 {
+    // Очистка файла
+    QFile outputFile("debug.log");
+    if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        outputFile.close();
+    } else {
+        qDebug() << "Failed to open log file for clearing";
+    }
     // qputenv("QT_DEBUG_PLUGINS", QByteArray("1"));
     qInstallMessageHandler(customMessageHandler);
 
     QApplication a(argc, argv);
     setlocale(LC_ALL, "Russian");
-    QTextCodec* codec = QTextCodec::codecForName("Windows-1251");
+    QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
     QTextCodec::setCodecForLocale(codec);
+
+    qRegisterMetaType<QMap<QString, DocumentData>>("QMap<QString,DocumentData>");
 
     MainWindow w;
     w.show();

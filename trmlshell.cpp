@@ -1,8 +1,8 @@
 #include "trmlshell.h"
-#include <qaxobject.h>
 #include <QFile>
 #include <QMessageBox>
 #include <QRegExp>
+#include <qaxobject.h>
 
 TRMLShell *lemmatizer = NULL;
 
@@ -10,29 +10,26 @@ TRMLShell::TRMLShell()
 {
     RusLemmatizer.LoadDictionariesRegistry();
     RusGramTab.Load();
-
-//    RusLemmatizer = new QAxObject("{6b23250f-1816-11d3-9cc6-00105a68baf2}");
-//    RusLemmatizer->dynamicCall("LoadDictionariesRegistry()");
-//    RusGramTab = new QAxObject("{ecd62f7e-19b6-11d3-a77a-2679a7000000}");
-//    RusGramTab->dynamicCall("Load()");
+    //    RusLemmatizer = new QAxObject("{6b23250f-1816-11d3-9cc6-00105a68baf2}");
+    //    RusLemmatizer->dynamicCall("LoadDictionariesRegistry()");
+    //    RusGramTab = new QAxObject("{ecd62f7e-19b6-11d3-a77a-2679a7000000}");
+    //    RusGramTab->dynamicCall("Load()");
 
     QFile DictFile("multiform.txt");
 
-    if (DictFile.open(QIODevice::ReadOnly))
-    {
-        while(!DictFile.atEnd())
-        {
+    if (DictFile.open(QIODevice::ReadOnly)) {
+        while (!DictFile.atEnd()) {
             QStringList rec = QString(DictFile.readLine()).split(' ');
             mf[rec[0]] = rec[1];
         }
 
         DictFile.close();
-    }
-    else
+    } else
         QMessageBox::information(0, "Ошибка открытия словаря multiform", DictFile.errorString());
 }
 
-QString TRMLShell::GetNorm(QString term, QString context, int &Interrupt, float fProgress, bool bAskUser)
+QString TRMLShell::GetNorm(
+    QString term, QString context, int &Interrupt, float fProgress, bool bAskUser)
 {
     QString Lemma, SrcAncode;
     QStringList sl;
@@ -43,27 +40,24 @@ QString TRMLShell::GetNorm(QString term, QString context, int &Interrupt, float 
     if (mf.count(term))
         return mf[term];
 
-    LEMMATIZERLib::IParadigmCollection *ParadigmCollection = RusLemmatizer.CreateParadigmCollectionFromForm(term, 1, 1);
+    LEMMATIZERLib::IParadigmCollection *ParadigmCollection
+        = RusLemmatizer.CreateParadigmCollectionFromForm(term, 1, 1);
 
     if (!ParadigmCollection)
         return QString("");
 
-    for (int k=0; k<ParadigmCollection->Count(); k++)
-    {
+    for (int k = 0; k < ParadigmCollection->Count(); k++) {
         LEMMATIZERLib::IParadigm *item = ParadigmCollection->Item(k);
         pid = item->ParadigmID();
         Lemma = item->Norm();
         SrcAncode = item->SrcAncode();
         Founded = item->Founded();
 
-        try
-        {
+        try {
             partofspeech = -1;
             if (Lemma.length() > 1)
                 partofspeech = RusGramTab.GetPartOfSpeech(SrcAncode);
-        }
-        catch (...)
-        {
+        } catch (...) {
             partofspeech = -1;
         }
 
@@ -75,8 +69,8 @@ QString TRMLShell::GetNorm(QString term, QString context, int &Interrupt, float 
 
     return Lemma;
 
-    //    QAxObject *ParadigmCollection = RusLemmatizer->querySubObject("CreateParadigmCollectionFromForm(const QString&, int, int)", term, 1, 1);
-    //    int pcount = ParadigmCollection->dynamicCall("Count()").convert(QVariant::Int);
+    //    QAxObject *ParadigmCollection = RusLemmatizer->querySubObject("CreateParadigmCollectionFromForm(const QString&,
+    //    int, int)", term, 1, 1); int pcount = ParadigmCollection->dynamicCall("Count()").convert(QVariant::Int);
     //        QAxObject *item = ParadigmCollection->querySubObject("Item(int)", k);
     //        pid = item->property("ParadigmID").toInt();
     //        Lemma = item->property("Norm").toString();
@@ -96,19 +90,17 @@ unsigned char TRMLShell::GetPOfS(QString term)
     if (term.isEmpty())
         return -1;
 
-    if (mf.count(term))
-    {
+    if (mf.count(term)) {
         RightLemma = mf[term];
         if (RightLemma.isEmpty())
             RightLemma = " ";
-    }
-    else
+    } else
         RightLemma = "";
 
-    LEMMATIZERLib::IParadigmCollection *ParadigmCollection = RusLemmatizer.CreateParadigmCollectionFromForm(term, 1, 1);
+    LEMMATIZERLib::IParadigmCollection *ParadigmCollection
+        = RusLemmatizer.CreateParadigmCollectionFromForm(term, 1, 1);
 
-    for (int k = 0; k < ParadigmCollection->Count(); ++k)
-    {
+    for (int k = 0; k < ParadigmCollection->Count(); ++k) {
         Lemma = ParadigmCollection->Item(k)->Norm();
 
         if (!RightLemma.isEmpty() && RightLemma != Lemma)
@@ -118,14 +110,11 @@ unsigned char TRMLShell::GetPOfS(QString term)
         SrcAncode = ParadigmCollection->Item(k)->SrcAncode();
         Founded = ParadigmCollection->Item(k)->Founded();
 
-        try
-        {
+        try {
             partofspeech = -1;
             if (Lemma.length() > 1)
                 partofspeech = RusGramTab.GetPartOfSpeech(SrcAncode);
-        }
-        catch (...)
-        {
+        } catch (...) {
             partofspeech = -1;
         }
 
@@ -138,7 +127,13 @@ unsigned char TRMLShell::GetPOfS(QString term)
     return partofspeech;
 }
 
-QString TRMLShell::AddNorms(QStringList *list, QString term, QString context, int &Interrupt, float fProgress, bool bFindNorms)
+QString TRMLShell::AddNorms(
+    QStringList *list,
+    QString term,
+    QString context,
+    int &Interrupt,
+    float fProgress,
+    bool bFindNorms)
 {
     if (term.trimmed().isEmpty())
         return "";
@@ -163,19 +158,19 @@ bool TRMLShell::CheckAbbr(QString str)
 {
     QString uc = str.toUpper();
 
-    if (str.trimmed().isEmpty() || (str != uc)
-        || (str.trimmed().length() > 4)  || (str.trimmed().length() < 2))
+    if (str.trimmed().isEmpty() || (str != uc) || (str.trimmed().length() > 4)
+        || (str.trimmed().length() < 2))
         return false;
 
-    LEMMATIZERLib::IParadigmCollection *ParadigmCollection = RusLemmatizer.CreateParadigmCollectionFromForm(str, 1, 1);
+    LEMMATIZERLib::IParadigmCollection *ParadigmCollection
+        = RusLemmatizer.CreateParadigmCollectionFromForm(str, 1, 1);
 
     QString Lemma, SrcAncode;
     long Founded = 0;
     unsigned char partofspeech = 0;
-    unsigned long pid=0;
+    unsigned long pid = 0;
 
-    for (int k=0; k<ParadigmCollection->Count(); k++)
-    {
+    for (int k = 0; k < ParadigmCollection->Count(); k++) {
         pid = ParadigmCollection->Item(k)->ParadigmID();
         Lemma = ParadigmCollection->Item(k)->Norm();
         SrcAncode = ParadigmCollection->Item(k)->SrcAncode();
@@ -187,7 +182,6 @@ bool TRMLShell::CheckAbbr(QString str)
 
     return true;
 }
-
 
 IPPortrait::IPPortrait()
 {
@@ -204,11 +198,7 @@ IPPortrait::IPPortrait()
     eParamStruct = E_PARAMSTRUCT_MORPHOLOGY;
 }
 
-
-IPPortrait::~IPPortrait()
-{
-}
-
+IPPortrait::~IPPortrait() {}
 
 void IPPortrait::CountWord(QString word)
 {
@@ -216,8 +206,7 @@ void IPPortrait::CountWord(QString word)
         return;
 
     ulWordCounter++;
-    if (mData.count(word) == 0)
-    {
+    if (mData.count(word) == 0) {
         IPTerm term;
         term.term = word;
         term.times = 1;
@@ -226,17 +215,15 @@ void IPPortrait::CountWord(QString word)
         term.weight = 0.0;
         term.occurences = 0.0;
         mData[word] = term;
-    }
-    else
+    } else
         mData[word].times++;
 }
 
 void IPPortrait::CalcWordOccurences()
 {
-    map<QString,IPTerm>::iterator it = mData.begin();
-    for ( ; it!=mData.end(); ++it)
-    {
-        it->second.occurences = (double)it->second.times / ulWordCounter;
+    map<QString, IPTerm>::iterator it = mData.begin();
+    for (; it != mData.end(); ++it) {
+        it->second.occurences = (double) it->second.times / ulWordCounter;
     }
 }
 
@@ -246,74 +233,81 @@ double IPPortrait::GetWordOccurence(QString word)
         return 0.0;
 
     if (mData.count(word) > 0)
-        return (mData[word].occurences = ((double)mData[word].times) / ulWordCounter);
+        return (mData[word].occurences = ((double) mData[word].times) / ulWordCounter);
     else
         return 0;
 }
 
-
 QStringList *SplitToWords(QString &sWholeText)
 {
-/*	QString str = sWholeText;
-    for (int i=1; i<=str.Length(); i++)
-    {
-        if (str[i] == (char)0xAC)
-        {
-            str.Delete(i,1);
-            i--;
-            continue;
-        }
-        if (! ((str[i] >= 'a' && str[i] <= 'z') ||
-                (str[i] >= 'A' && str[i] <= 'Z') ||
-                (str[i] >= 'А' && str[i] <= 'Я') ||
-                (str[i] >= 'а' && str[i] <= 'я'))
-            )
-            str[i]='\n';
-    }
+    /*	QString str = sWholeText;
+      for (int i=1; i<=str.Length(); i++)
+      {
+          if (str[i] == (char)0xAC)
+          {
+              str.Delete(i,1);
+              i--;
+              continue;
+          }
+          if (! ((str[i] >= 'a' && str[i] <= 'z') ||
+                  (str[i] >= 'A' && str[i] <= 'Z') ||
+                  (str[i] >= 'А' && str[i] <= 'Я') ||
+                  (str[i] >= 'а' && str[i] <= 'я'))
+              )
+              str[i]='\n';
+      }
 
-    TStringList *slWords = new TStringList;
-    slWords->Text = str;*/
+      TStringList *slWords = new TStringList;
+      slWords->Text = str;*/
     QStringList *slWords = new QStringList(sWholeText.split(QRegExp("[^a-zA-Zа-яА-Я]")));
     return slWords;
 }
 
-int IPPortrait::GenerateByText(QString aText, bool bFindNorms, ulong aOccurThreshold,
-                   double aPercentThreshold, double aWeightThreshold,
-                   QStringList *slNorms)
+int IPPortrait::GenerateByText(
+    QString aText,
+    bool bFindNorms,
+    ulong aOccurThreshold,
+    double aPercentThreshold,
+    double aWeightThreshold,
+    QStringList *slNorms)
 {
     int Interrupt = 0;
     slSourceText = aText.split('\n');
     QStringList *slWords = SplitToWords(aText);
 
     QStringList *slForms = new QStringList;
-    for(int i=0; i<slWords->count(); i++)
-    {
+    for (int i = 0; i < slWords->count(); i++) {
         slForms->clear();
-        if (!((*slWords)[i].trimmed().isEmpty()) && (slAbbrs.indexOf((*slWords)[i]) >= 0))
-        {
+        if (!((*slWords)[i].trimmed().isEmpty()) && (slAbbrs.indexOf((*slWords)[i]) >= 0)) {
             slForms->append(slWords[i]);
             if (slNorms)
                 slNorms->append(slWords[i]);
-        }
-        else
-        {
+        } else {
             QString context;
             if (slNorms)
-                slNorms->append(lemmatizer->AddNorms(slForms, (*slWords)[i], context,
-                    Interrupt, ((float)i)/slWords->count(), bFindNorms));
+                slNorms->append(lemmatizer->AddNorms(
+                    slForms,
+                    (*slWords)[i],
+                    context,
+                    Interrupt,
+                    ((float) i) / slWords->count(),
+                    bFindNorms));
             else
-                lemmatizer->AddNorms(slForms, (*slWords)[i], context, Interrupt,
-                    ((float)i)/slWords->count(), bFindNorms);
+                lemmatizer->AddNorms(
+                    slForms,
+                    (*slWords)[i],
+                    context,
+                    Interrupt,
+                    ((float) i) / slWords->count(),
+                    bFindNorms);
 
-            if (Interrupt)
-            {
+            if (Interrupt) {
                 lemmatizer->Save();
                 CalcWordOccurences();
                 return -1;
             }
         }
-        for (int j=0; j<slForms->count(); j++)
-        {
+        for (int j = 0; j < slForms->count(); j++) {
             if (!(*slForms)[j].trimmed().isEmpty())
                 CountWord((*slForms)[j]);
         }

@@ -2,12 +2,12 @@
 #define TIPDBSHELL_H
 
 #include <vector>
-#include <QString>
-#include <QTime>
-#include <QModelIndex>
+#include <QDateTime>
 #include <QFileSystemModel>
 #include <QMessageBox>
-#include <QDateTime>
+#include <QModelIndex>
+#include <QString>
+#include <QTime>
 
 #include <QtSql/QtSql>
 
@@ -36,12 +36,26 @@ struct TIPFullTermInfo
     double weight;
     double occurences;
     long times;
-    long size; // только для шинглов
+    long size;  // только для шинглов
     long shows; // только для шинглов
 
     TIPFullTermInfo() {}
-    TIPFullTermInfo(long _id, QString _term, double _weight, double _occurences, long _times, long _size, long _shows):
-        id(_id), term(_term), weight(_weight), occurences(_occurences), times(_times), size(_size), shows(_shows) {}
+    TIPFullTermInfo(
+        long _id,
+        QString _term,
+        double _weight,
+        double _occurences,
+        long _times,
+        long _size,
+        long _shows)
+        : id(_id)
+        , term(_term)
+        , weight(_weight)
+        , occurences(_occurences)
+        , times(_times)
+        , size(_size)
+        , shows(_shows)
+    {}
 };
 
 struct TIPFullInfo
@@ -64,8 +78,8 @@ struct TIPFullInfo
     char *source_lo;
     char *abbr_lo;
 
-    vector<TIPFullTermInfo*> terms;
-    vector<TIPFullTermInfo*> shingles;
+    vector<TIPFullTermInfo *> terms;
+    vector<TIPFullTermInfo *> shingles;
 
     TIPFullInfo() {}
     TIPFullInfo(IPPortrait *ip);
@@ -97,10 +111,11 @@ public:
 
     folderid ChangeFolder(folderid id = 0, QString newFolder = "");
     folderinfo GetCurrentFolder();
-    bool GetFolderContents(folderid id, vector<TIPInfo*> &Items, vector<folderinfo*> &Folders);
+    bool GetFolderContents(folderid id, vector<TIPInfo *> &Items, vector<folderinfo *> &Folders);
 
     bool CopyItemWithinDatabase(TIPInfo *item, folderid source, folderid destination);
-    bool CopyItemBetweenDatabases(TIPInfo *item, QSqlDatabase *sourceDB, QSqlDatabase *destinationDB, folderid destination);
+    bool CopyItemBetweenDatabases(
+        TIPInfo *item, QSqlDatabase *sourceDB, QSqlDatabase *destinationDB, folderid destination);
     bool MoveItem(TIPInfo *item, folderid source, folderid destination);
     bool DeleteItem(TIPInfo *item, folderid source);
     folderid NewFolder(QString name, folderid parent = 0);
@@ -121,6 +136,7 @@ public:
 
 private:
     folderid GetNextSequenceValue(QSqlQuery &query, const QString &sequenceName);
+    double convertCommaSeparatedStringToDouble(const std::string &str);
 };
 
 #endif // TIPDBSHELL_H

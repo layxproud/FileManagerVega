@@ -1,11 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow{parent},
-    ui{new Ui::MainWindow},
-    fileSystem{new FileSystem(this)},
-    iniFile{new TIniFile("db.ini")}
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow{parent}
+    , ui{new Ui::MainWindow}
+    , fileSystem{new FileSystem(this)}
+    , iniFile{new TIniFile("db.ini")}
+    , serviceHandler{new ServiceHandler(this)}
 {
     ui->setupUi(this);
 
@@ -17,13 +18,28 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->rightPanel, &Panel::showPath, ui->labelRightPath, &QLabel::setText);
 
     workspace = new Workspace(ui->leftPanel, ui->rightPanel, fileSystem, this);
-    workspace->updateFolder(true, QDir::drives().at(0).path());
-    workspace->updateFolder(false, QDir::drives().at(0).path());
+    workspace->updateFolder(true, QDir::drives().at(0).path(), false);
+    workspace->updateFolder(false, QDir::drives().at(0).path(), false);
+    workspace->setServiceHandler(serviceHandler);
 
     initDrivesComboBoxes();
     initShortcuts();
     initButtons();
     initToolbar();
+
+    loginWindow = new LoginWindow(this);
+    loginWindow->setModal(true);
+    connect(
+        loginWindow,
+        &LoginWindow::loginAttempt,
+        serviceHandler,
+        &ServiceHandler::getAccessTokenSignal);
+    connect(
+        serviceHandler,
+        &ServiceHandler::tokenReceivedSignal,
+        loginWindow,
+        &LoginWindow::onTokenReceived);
+    loginWindow->show();
 }
 
 MainWindow::~MainWindow()
@@ -34,8 +50,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (workspace)
-    {
+    if (workspace) {
         workspace->killChildren();
     }
     QMainWindow::closeEvent(event);
@@ -46,14 +61,12 @@ void MainWindow::initDrivesComboBoxes()
     connect(ui->leftBox, &QComboBox::currentTextChanged, this, &MainWindow::onDriveChanged);
     connect(ui->rightBox, &QComboBox::currentTextChanged, this, &MainWindow::onDriveChanged);
 
-    foreach (const auto &drive, QDir::drives())
-    {
+    foreach (const auto &drive, QDir::drives()) {
         ui->leftBox->addItem(drive.filePath());
         ui->rightBox->addItem(drive.filePath());
     }
 
-    for (int i = 0; i < iniFile->GetSectionCount(); i++)
-    {
+    for (int i = 0; i < iniFile->GetSectionCount(); i++) {
         ui->leftBox->addItem(QString::fromStdString(iniFile->GetSections()[i]));
         ui->rightBox->addItem(QString::fromStdString(iniFile->GetSections()[i]));
     }
@@ -114,6 +127,7 @@ void MainWindow::initButtons()
 void MainWindow::initToolbar()
 {
     connect(ui->actionIPCompare, &QAction::triggered, workspace, &Workspace::comparePortraits);
+    connect(ui->actiongetXMLFile, &QAction::triggered, workspace, &Workspace::getXmlFile);
 }
 
 void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDatabase)
@@ -127,27 +141,22 @@ void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDa
 void MainWindow::onDriveChanged(const QString &arg)
 {
     bool isDriveDatabase = false;
-    for (int i = 0; i < iniFile->GetSectionCount(); i++)
-    {
-        if (arg.toStdString() == iniFile->GetSections()[i])
-        {
+    for (int i = 0; i < iniFile->GetSectionCount(); i++) {
+        if (arg.toStdString() == iniFile->GetSections()[i]) {
             isDriveDatabase = true;
             break;
         }
     }
 
-    QComboBox *comboBox = qobject_cast<QComboBox*>(sender());
+    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
 
-    if (comboBox == ui->leftBox)
-    {
+    if (comboBox == ui->leftBox) {
         ui->leftPanel->populatePanel(arg, isDriveDatabase);
         setPathLabels(ui->labelLeftPath, arg, isDriveDatabase);
-        workspace->updateFolder(true, ui->labelLeftPath->text());
-    }
-    else if (comboBox == ui->rightBox)
-    {
+        workspace->updateFolder(true, ui->labelLeftPath->text(), isDriveDatabase);
+    } else if (comboBox == ui->rightBox) {
         ui->rightPanel->populatePanel(arg, isDriveDatabase);
         setPathLabels(ui->labelRightPath, arg, isDriveDatabase);
-        workspace->updateFolder(false, ui->labelRightPath->text());
+        workspace->updateFolder(false, ui->labelRightPath->text(), isDriveDatabase);
     }
 }

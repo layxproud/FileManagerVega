@@ -1,11 +1,12 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
-#include <QString>
+
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QDir>
 #include <QFileSystemModel>
 #include <QMainWindow>
+#include <QString>
 
 class FileSystem : public QFileSystemModel
 {
@@ -13,10 +14,8 @@ public:
     FileSystem(QObject *parent = 0);
     bool copyIndex(QModelIndex index, QString destination);
     void copyFolder(QString sourceFolder, QString destFolder);
-    bool removeIndex (QModelIndex index);
-    bool removeFolder(QDir dir, const QDir& rootDir);
-    bool renameIndex(QModelIndex index, const QString &newPath);
-    long long int getFolderSize(QString path);
+    bool removeIndex(QModelIndex index);
+    bool removeFolder(QDir dir, const QDir &rootDir);
 };
 
 #endif // FILESYSTEM_H
