@@ -82,7 +82,7 @@ void Workspace::removeFilesystemEntries(Panel *panel)
 {
     QModelIndexList &selectedIndexes = panel->getList();
 
-    foreach (const QModelIndex &index, selectedIndexes) {
+    for (const auto &index : selectedIndexes) {
         fileSystem->removeIndex(index);
     }
     selectedIndexes.clear();
@@ -90,8 +90,9 @@ void Workspace::removeFilesystemEntries(Panel *panel)
 
 void Workspace::removeDatabaseEntries(Panel *panel)
 {
-    for (auto i = panel->getChosenItems().begin(); i != panel->getChosenItems().end(); i++) {
-        panel->getFunctionsDB()->DeleteItem(*i, panel->getCurrentFolder());
+    for (const auto &item : panel->getChosenItems()) {
+        serviceHandler
+            ->deleteDbEntry(item->id, panel->getFunctionsDB()->getDataBase()->databaseName());
     }
     panel->getChosenItems().clear();
 
@@ -155,7 +156,6 @@ void Workspace::copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationP
             continue;
         }
     }
-    qDebug() << filesToIndex;
 
     indexWindow = new IndexWindow();
     indexWindow->setModal(true);
@@ -553,15 +553,93 @@ void Workspace::getXmlFile()
         return;
     }
 
+    QString dbName;
+    long id;
     if (isLeftCurrent) {
-        QString dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
-        auto leftPortrait = *(leftPanel->getChosenItems().rbegin());
-        serviceHandler->getXmlFile(filePath, leftPortrait->id, dbName);
+        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
+        id = (*(leftPanel->getChosenItems().rbegin()))->id;
     } else {
-        QString dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
-        auto rightPortrait = *(rightPanel->getChosenItems().rbegin());
-        serviceHandler->getXmlFile(filePath, rightPortrait->id, dbName);
+        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
+        id = (*(rightPanel->getChosenItems().rbegin()))->id;
     }
+    serviceHandler->getXmlFile(filePath, id, dbName);
+}
+
+void Workspace::getSummary()
+{
+    if (!serviceHandler) {
+        qDebug() << "Проблема с модулем веб-сервисов";
+        return;
+    }
+
+    if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
+        qDebug() << "Хотя бы одна панель должна быть базой данных";
+        return;
+    }
+
+    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
+        qDebug() << "Не выбрано ни одного элемента";
+        return;
+    }
+
+    QString filePath = QFileDialog::getSaveFileName(
+        nullptr, tr("Сохранение реферата"), "", "TXT files(*.txt);;All Files(*)");
+
+    if (filePath.isEmpty()) {
+        qDebug() << "No file selected.";
+        return;
+    }
+
+    long id;
+    QString dbName;
+    if (isLeftCurrent) {
+        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
+        id = (*(leftPanel->getChosenItems().rbegin()))->id;
+    } else {
+        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
+        id = (*(rightPanel->getChosenItems().rbegin()))->id;
+    }
+    serviceHandler->getSummary(filePath, id, dbName);
+}
+
+void Workspace::classifyPortraits()
+{
+    if (!serviceHandler) {
+        qDebug() << "Проблема с модулем веб-сервисов";
+        return;
+    }
+
+    if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
+        qDebug() << "Хотя бы одна панель должна быть базой данных";
+        return;
+    }
+
+    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
+        qDebug() << "Не выбрано ни одного элемента";
+        return;
+    }
+
+    std::list<TIPInfo *> portraits;
+    QString dbName;
+    if (isLeftCurrent) {
+        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
+        portraits = leftPanel->getChosenItems();
+    } else {
+        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
+        portraits = rightPanel->getChosenItems();
+    }
+
+    QMap<QString, long> nameIdMap;
+    for (auto portrait : portraits) {
+        nameIdMap.insert(portrait->name, portrait->id);
+    }
+
+    classifyWindow = new ClassifyWindow();
+    connect(classifyWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+    classifyWindow->setPortraits(nameIdMap);
+    classifyWindow->setDbName(dbName);
+    classifyWindow->show();
+    widgetsList.append(classifyWindow);
 }
 
 void Workspace::killChildren()

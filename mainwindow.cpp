@@ -127,7 +127,9 @@ void MainWindow::initButtons()
 void MainWindow::initToolbar()
 {
     connect(ui->actionIPCompare, &QAction::triggered, workspace, &Workspace::comparePortraits);
-    connect(ui->actiongetXMLFile, &QAction::triggered, workspace, &Workspace::getXmlFile);
+    connect(ui->actionGetXMLFile, &QAction::triggered, workspace, &Workspace::getXmlFile);
+    connect(ui->actionSummary, &QAction::triggered, workspace, &Workspace::getSummary);
+    connect(ui->actionClassify, &QAction::triggered, workspace, &Workspace::classifyPortraits);
 }
 
 void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDatabase)

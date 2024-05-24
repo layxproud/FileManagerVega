@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Вход в систему</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(220, 250, 255);</string>

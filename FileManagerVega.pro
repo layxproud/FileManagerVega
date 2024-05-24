@@ -27,6 +27,7 @@ CONFIG += c++11
 SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
+        classifywindow.cpp \
         filesystem.cpp \
         indexwindow.cpp \
         inifile.cpp \
@@ -46,6 +47,7 @@ SOURCES += \
 HEADERS += \
         Lemmatizer.h \
         agramtab.h \
+        classifywindow.h \
         filesystem.h \
         indexwindow.h \
         inifile.h \
@@ -62,14 +64,15 @@ HEADERS += \
         xmlparser.h
 
 FORMS += \
+        classifywindow.ui \
         indexwindow.ui \
         ipcompare.ui \
         loginwindow.ui \
         mainwindow.ui \
         viewip.ui
 
-LIBCURL_DEBUG_PATH = D:/lib/install/libcurl-debug
-LIBCURL_RELEASE_PATH = D:/lib/install/libcurl-release
+LIBCURL_DEBUG_PATH = C:/lib/install/libcurl-debug
+LIBCURL_RELEASE_PATH = C:/lib/install/libcurl-release
 
 CONFIG(debug, debug|release) {
     LIBS += -L$$LIBCURL_DEBUG_PATH/lib -llibcurl_debug

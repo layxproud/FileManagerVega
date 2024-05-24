@@ -23,6 +23,8 @@ public:
 public slots:
     void getAccessToken(const QString &login, const QString &pass);
     void getXmlFile(const QString &filePath, long id, const QString &dbName);
+    void deleteDbEntry(long id, const QString &dbName);
+    void getSummary(const QString &filePath, long id, const QString &dbName);
     void indexFiles(
         const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
 
@@ -43,11 +45,12 @@ private:
         return written;
     }
 
-    static size_t handle_header(void* ptr, size_t size, size_t nmemb, void* userdata) {
-        std::string header((char*)ptr, size * nmemb);
+    static size_t handle_header(void *ptr, size_t size, size_t nmemb, void *userdata)
+    {
+        std::string header((char *) ptr, size * nmemb);
         if (header.find("HTTP/") == 0) {
             int responseCode = std::stoi(header.substr(9, 3));
-            *((int*)userdata) = responseCode;
+            *((int *) userdata) = responseCode;
         }
         return size * nmemb;
     }
@@ -86,13 +89,20 @@ signals:
         const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
     void getAccessTokenSignal(const QString &login, const QString &pass);
     void getXmlFileSignal(const QString &filePath, long id, const QString &dbName);
+    void getSummarySignal(const QString &filePath, long id, const QString &dbName);
     void tokenReceivedSignal(bool success);
+    void deleteDbEntrySignal(long id, const QString &dbName);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)
     {
         emit getXmlFileSignal(filePath, id, dbName);
     }
+    void getSummary(const QString &filePath, long id, const QString &dbName)
+    {
+        emit getSummarySignal(filePath, id, dbName);
+    }
+    void deleteDbEntry(long id, const QString &dbName) { emit deleteDbEntrySignal(id, dbName); }
     void onWorkerGotXmlFile(bool success);
 };
 

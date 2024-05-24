@@ -280,7 +280,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionIPCompare"/>
-   <addaction name="actiongetXMLFile"/>
+   <addaction name="actionGetXMLFile"/>
+   <addaction name="actionSummary"/>
+   <addaction name="actionClassify"/>
   </widget>
   <action name="actionIPCompare">
    <property name="icon">
@@ -294,7 +296,7 @@
     <string>Сравнение портретов</string>
    </property>
   </action>
-  <action name="actiongetXMLFile">
+  <action name="actionGetXMLFile">
    <property name="icon">
     <iconset resource="res.qrc">
      <normaloff>:/icons/resources/xml-file.png</normaloff>:/icons/resources/xml-file.png</iconset>
@@ -304,6 +306,30 @@
    </property>
    <property name="toolTip">
     <string>Получить XML файл</string>
+   </property>
+  </action>
+  <action name="actionSummary">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/summary.png</normaloff>:/icons/resources/summary.png</iconset>
+   </property>
+   <property name="text">
+    <string>summary</string>
+   </property>
+   <property name="toolTip">
+    <string>Получить реферат</string>
+   </property>
+  </action>
+  <action name="actionClassify">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/classify.png</normaloff>:/icons/resources/classify.png</iconset>
+   </property>
+   <property name="text">
+    <string>classify</string>
+   </property>
+   <property name="toolTip">
+    <string>Классифицировать портреты</string>
    </property>
   </action>
  </widget>

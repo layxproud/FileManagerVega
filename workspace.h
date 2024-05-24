@@ -1,6 +1,7 @@
 #ifndef WORKSPACE_H
 #define WORKSPACE_H
 
+#include "classifywindow.h"
 #include "indexwindow.h"
 #include "ipcompare.h"
 #include "servicehandler.h"
@@ -34,6 +35,7 @@ private:
     bool isLeftCurrent;
     IPCompare *ipCompare;
     IndexWindow *indexWindow;
+    ClassifyWindow *classifyWindow;
     QList<QWidget *> widgetsList;
 
 private:
@@ -78,6 +80,8 @@ public slots:
     // Семантические функции
     void comparePortraits();
     void getXmlFile();
+    void getSummary();
+    void classifyPortraits();
 
     // GUI
     void killChildren();

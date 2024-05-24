@@ -14,6 +14,8 @@ ServiceHandler::ServiceHandler(QObject *parent)
     connect(this, &ServiceHandler::indexFilesSignal, worker, &NetworkWorker::indexFiles);
     connect(this, &ServiceHandler::getAccessTokenSignal, worker, &NetworkWorker::getAccessToken);
     connect(this, &ServiceHandler::getXmlFileSignal, worker, &NetworkWorker::getXmlFile);
+    connect(this, &ServiceHandler::deleteDbEntrySignal, worker, &NetworkWorker::deleteDbEntry);
+    connect(this, &ServiceHandler::getSummarySignal, worker, &NetworkWorker::getSummary);
 
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
@@ -121,9 +123,9 @@ void ServiceHandler::calculateComparisonCircles()
 void ServiceHandler::onWorkerGotXmlFile(bool success)
 {
     if (success) {
-        std::cout << "File downloaded successfully" << std::endl;
+        qDebug() << "Файл успешно загружен";
     } else {
-        std::cerr << "Failed to download file" << std::endl;
+        qCritical() << "Не удалось загрузить файл";
     }
 }
 
@@ -138,127 +140,200 @@ void NetworkWorker::getAccessToken(const QString &login, const QString &pass)
 {
     CURL *curl;
     CURLcode res;
-    std::string readBuffer;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qCritical() << "Не удалось инициализировать cURL";
+        emit tokenReceived(false);
+        return;
+    }
 
     std::string url = "https://vega.mirea.ru/authservice.php?op=getusertoken&login="
                       + login.toStdString() + "&password=" + pass.toStdString();
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-    curl = curl_easy_init();
-    if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+    std::string readBuffer;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-            std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
-        } else {
-            QByteArray jsonData = QByteArray::fromStdString(readBuffer);
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
-            if (!jsonDoc.isNull()) {
-                if (jsonDoc.isObject()) {
-                    QJsonObject jsonObj = jsonDoc.object();
-                    if (jsonObj.contains("token")) {
-                        accessToken = jsonObj["token"].toString().toStdString();
-                        emit tokenReceived(true);
-                    } else {
-                        std::cerr << "JSON parse error: 'token' not found" << std::endl;
-                        emit tokenReceived(false);
-                    }
-                } else {
-                    std::cerr << "JSON parse error: Document is not an object" << std::endl;
-                    emit tokenReceived(false);
-                }
-            } else {
-                std::cerr << "JSON parse error" << std::endl;
-                emit tokenReceived(false);
-            }
-        }
-        curl_easy_cleanup(curl);
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] { curl_easy_cleanup(curl); });
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        emit tokenReceived(false);
+        return;
     }
+
+    QByteArray jsonData = QByteArray::fromStdString(readBuffer);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+    if (jsonDoc.isNull() || !jsonDoc.isObject()) {
+        qCritical() << "Ошибка чтения JSON ответа";
+        emit tokenReceived(false);
+        return;
+    }
+    QJsonObject jsonObj = jsonDoc.object();
+    if (!jsonObj.contains("token")) {
+        qCritical() << "Ошибка JSON: 'token' отсутствует";
+        emit tokenReceived(false);
+        return;
+    }
+    accessToken = jsonObj["token"].toString().toStdString();
+    emit tokenReceived(true);
 }
 
 void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &dbName)
 {
     CURL *curl;
-    FILE *fp;
     CURLcode res;
 
     curl = curl_easy_init();
     if (!curl) {
-        qDebug() << "Failed to initialize cURL";
+        qCritical() << "Не удалось инициализировать cURL";
         emit xmlFileDownloaded(false);
         return;
     }
 
+    FILE *fp;
     fp = fopen(filePath.toStdString().c_str(), "wb");
     if (!fp) {
-        qDebug() << "Failed to open file " << filePath;
+        qCritical() << "Не удалось открыть файл " << filePath;
         emit xmlFileDownloaded(false);
+        curl_easy_cleanup(curl);
         return;
     }
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
     std::string url = "https://vega.mirea.ru/intservice/index/xml/" + std::to_string(id);
     if (!dbName.isEmpty()) {
-        url += "&db_name=" + dbName.toStdString();
+        url += "?db_name=" + dbName.toStdString();
     }
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-    qDebug() << QString::fromStdString(url);
-
-    // Заголовок авторизации
     struct curl_slist *headers = nullptr;
     std::string authHeader = "Authorization: Bearer " + accessToken;
     headers = curl_slist_append(headers, authHeader.c_str());
     headers = curl_slist_append(headers, "accept: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteData);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-
     int httpResponseCode = 0;
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
 
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    });
+
     res = curl_easy_perform(curl);
-    if (res!= CURLE_OK) {
-        std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
         emit xmlFileDownloaded(false);
+        if (fp) {
+            fclose(fp);
+            remove(filePath.toStdString().c_str());
+        }
         return;
-    } else {
-        qDebug() << "HTTP Response Code:" << httpResponseCode;
     }
 
     fclose(fp);
-    curl_easy_cleanup(curl);
-
     emit xmlFileDownloaded(true);
-    return;
 }
 
-void NetworkWorker::indexFiles(
-    const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
+void NetworkWorker::deleteDbEntry(long id, const QString &dbName)
 {
     CURL *curl;
     CURLcode res;
 
     curl = curl_easy_init();
     if (!curl) {
-        qDebug() << "Failed to initialize cURL";
+        qCritical() << "Не удалось инициализировать cURL";
         return;
     }
+
+    std::string url = "https://vega.mirea.ru/intservice/index/delete/" + std::to_string(id);
+    if (!dbName.isEmpty()) {
+        url += "?db_name=" + dbName.toStdString();
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    std::string readBuffer;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    });
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        return;
+    }
+
+    qDebug() << "Удаление завершено";
+}
+
+void NetworkWorker::getSummary(const QString &filePath, long id, const QString &dbName)
+{
+    qDebug() << "Получение реферата";
+}
+
+void NetworkWorker::indexFiles(
+    const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
+{
+    if (documents.isEmpty()) {
+        qCritical() << "Не передано ни одного файла";
+        return;
+    }
+
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qCritical() << "Не удалось инициализировать cURL";
+        return;
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
+                      + std::string(calcWeightSim ? "true" : "false");
+    if (!dbName.isEmpty()) {
+        url += "&db_name=" + dbName.toStdString();
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     QJsonDocument jsonDoc = mapToJsonDocument(documents);
     QByteArray jsonData = jsonDoc.toJson();
 
     curl_mime *mime = curl_mime_init(curl);
-
     // JSON
     curl_mimepart *jsonPart = curl_mime_addpart(mime);
     curl_mime_name(jsonPart, "json");
     curl_mime_data(jsonPart, jsonData.constData(), jsonData.size());
     curl_mime_type(jsonPart, "application/json");
-
     // Файлы
     for (auto it = documents.begin(); it != documents.end(); ++it) {
         const QString &filePath = it.key();
@@ -275,42 +350,40 @@ void NetworkWorker::indexFiles(
         curl_mime_filename(filePart, fileInfo.fileName().toStdString().c_str());
         curl_mime_type(filePart, "text/plain");
     }
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
 
-    std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
-                      + std::string(calcWeightSim ? "true" : "false");
-    if (!dbName.isEmpty()) {
-        url += "&db_name=" + dbName.toStdString();
-    }
-
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-
-    // Заголовок авторизации
     struct curl_slist *headers = nullptr;
     std::string authHeader = "Authorization: Bearer " + accessToken;
     headers = curl_slist_append(headers, authHeader.c_str());
     headers = curl_slist_append(headers, "accept: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_mime_free(mime);
+        curl_easy_cleanup(curl);
+    });
 
     res = curl_easy_perform(curl);
-
-    if (res != CURLE_OK) {
-        qDebug() << "cURL error: " << curl_easy_strerror(res);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        return;
     }
 
-    curl_slist_free_all(headers);
-    curl_mime_free(mime);
-    curl_easy_cleanup(curl);
-
-    qDebug() << "SUCCESS";
+    qDebug() << "Индексация прошла успешно";
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "Failed to open file:" << filePath;
+        qWarning() << "Не удалось открыть файл:" << filePath;
         return QByteArray();
     }
     return file.readAll();
