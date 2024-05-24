@@ -74,11 +74,25 @@ void ClassifyWindow::onRemoveClassButtonClicked()
 void ClassifyWindow::onApplyButtonClicked()
 {
     ids.clear();
+    classes.clear();
 
     for (int i = 0; i < ui->portraitsList->count(); ++i) {
         QListWidgetItem *item = ui->portraitsList->item(i);
         QVariant idData = item->data(Qt::UserRole);
         ids.append(idData.toLongLong());
     }
-    qDebug() << ids;
+
+    for (int i = 0; i < ui->classesList->count(); ++i) {
+        QListWidgetItem *item = ui->classesList->item(i);
+        CustomItemWidget *customWidget = qobject_cast<CustomItemWidget *>(
+            ui->classesList->itemWidget(item));
+        if (!customWidget) {
+            continue;
+        }
+        QString name = customWidget->lineEdit1->text();
+        long value = customWidget->lineEdit2->text().toLong();
+        classes.insert(name, value);
+    }
+
+    emit classifyPortraits(ids, classes);
 }

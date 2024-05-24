@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
     QTextCodec::setCodecForLocale(codec);
 
     qRegisterMetaType<QMap<QString, DocumentData>>("QMap<QString,DocumentData>");
+    qRegisterMetaType<QList<long>>("QList<long>");
+    qRegisterMetaType<QMap<QString, long>>("QMap<QString, long>");
 
     MainWindow w;
     w.show();

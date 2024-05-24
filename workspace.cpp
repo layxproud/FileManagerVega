@@ -636,6 +636,11 @@ void Workspace::classifyPortraits()
 
     classifyWindow = new ClassifyWindow();
     connect(classifyWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+    connect(
+        classifyWindow,
+        &ClassifyWindow::classifyPortraits,
+        serviceHandler,
+        &ServiceHandler::classifyPortraitsSignal);
     classifyWindow->setPortraits(nameIdMap);
     classifyWindow->setDbName(dbName);
     classifyWindow->show();

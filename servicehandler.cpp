@@ -16,6 +16,7 @@ ServiceHandler::ServiceHandler(QObject *parent)
     connect(this, &ServiceHandler::getXmlFileSignal, worker, &NetworkWorker::getXmlFile);
     connect(this, &ServiceHandler::deleteDbEntrySignal, worker, &NetworkWorker::deleteDbEntry);
     connect(this, &ServiceHandler::getSummarySignal, worker, &NetworkWorker::getSummary);
+    connect(this, &ServiceHandler::classifyPortraitsSignal, worker, &NetworkWorker::classifyPortraits);
 
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
@@ -377,6 +378,11 @@ void NetworkWorker::indexFiles(
     }
 
     qDebug() << "Индексация прошла успешно";
+}
+
+void NetworkWorker::classifyPortraits(const QList<long> &ids, const QMap<QString, long> &classes)
+{
+    qDebug() << "Классифкация портретов";
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)

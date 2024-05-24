@@ -66,6 +66,9 @@ private:
 
     void populateListWidget();
 
+signals:
+    void classifyPortraits(const QList<long> &ids, const QMap<QString, long> &classes);
+
 private slots:
     void onAddClassButtonClicked();
     void onRemoveClassButtonClicked();

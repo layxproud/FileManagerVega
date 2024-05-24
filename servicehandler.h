@@ -27,6 +27,7 @@ public slots:
     void getSummary(const QString &filePath, long id, const QString &dbName);
     void indexFiles(
         const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
+    void classifyPortraits(const QList<long> &ids, const QMap<QString, long> &classes);
 
 signals:
     void tokenReceived(bool success);
@@ -92,6 +93,7 @@ signals:
     void getSummarySignal(const QString &filePath, long id, const QString &dbName);
     void tokenReceivedSignal(bool success);
     void deleteDbEntrySignal(long id, const QString &dbName);
+    void classifyPortraitsSignal(const QList<long> &ids, const QMap<QString, long> &classes);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)
