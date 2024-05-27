@@ -29,8 +29,6 @@ private:
     Ui::ClassifyWindow *ui;
     QMap<QString, long> portraits;
     QMap<QString, long> classes;
-    QList<long> portraitIDs;
-    QList<long> classesIDs;
     QString dbName;
     PortraitListWidget *portraitsWidget;
     PortraitListWidget *classesWidget;

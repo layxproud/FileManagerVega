@@ -17,6 +17,11 @@ ServiceHandler::ServiceHandler(QObject *parent)
     connect(this, &ServiceHandler::deleteDbEntrySignal, worker, &NetworkWorker::deleteDbEntry);
     connect(this, &ServiceHandler::getSummarySignal, worker, &NetworkWorker::getSummary);
     connect(this, &ServiceHandler::classifyPortraitsSignal, worker, &NetworkWorker::classifyPortraits);
+    connect(
+        this,
+        &ServiceHandler::clusterizePortraitsSignal,
+        worker,
+        &NetworkWorker::clusterizePortraits);
 
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
@@ -385,6 +390,13 @@ void NetworkWorker::classifyPortraits(const QList<long> &portraitIDs, const QLis
     qDebug() << "Классифкация портретов";
     qDebug() << portraitIDs;
     qDebug() << classesIDs;
+}
+
+void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clustersNum)
+{
+    qDebug() << "Кластеризация портретов";
+    qDebug() << portraitIDs;
+    qDebug() << clustersNum;
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)

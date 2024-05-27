@@ -13,6 +13,8 @@
         <file>resources/summary.png</file>
         <file>resources/classify.png</file>
         <file>resources/cluster.png</file>
+        <file>resources/level_match.png</file>
+        <file>resources/match.png</file>
     </qresource>
     <qresource prefix="/gifs">
         <file>resources/loading.gif</file>

@@ -28,6 +28,7 @@ SOURCES += \
         Lemmatizer.cpp \
         agramtab.cpp \
         classifywindow.cpp \
+        clusterizewindow.cpp \
         filesystem.cpp \
         indexwindow.cpp \
         inifile.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
         Lemmatizer.h \
         agramtab.h \
         classifywindow.h \
+        clusterizewindow.h \
         filesystem.h \
         indexwindow.h \
         inifile.h \
@@ -67,6 +69,7 @@ HEADERS += \
 
 FORMS += \
         classifywindow.ui \
+        clusterizewindow.ui \
         indexwindow.ui \
         ipcompare.ui \
         loginwindow.ui \

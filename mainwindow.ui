@@ -282,8 +282,12 @@
    <addaction name="actionIPCompare"/>
    <addaction name="actionGetXMLFile"/>
    <addaction name="actionSummary"/>
+   <addaction name="separator"/>
    <addaction name="actionClassify"/>
    <addaction name="actionClusterize"/>
+   <addaction name="separator"/>
+   <addaction name="actionFindMatch"/>
+   <addaction name="actionFindMatchLevel"/>
   </widget>
   <action name="actionIPCompare">
    <property name="icon">
@@ -343,6 +347,30 @@
    </property>
    <property name="toolTip">
     <string>Кластеризовать портреты</string>
+   </property>
+  </action>
+  <action name="actionFindMatch">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/match.png</normaloff>:/icons/resources/match.png</iconset>
+   </property>
+   <property name="text">
+    <string>FindMatch</string>
+   </property>
+   <property name="toolTip">
+    <string>Поиск похожих портретов</string>
+   </property>
+  </action>
+  <action name="actionFindMatchLevel">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/level_match.png</normaloff>:/icons/resources/level_match.png</iconset>
+   </property>
+   <property name="text">
+    <string>FindMatchLevel</string>
+   </property>
+   <property name="toolTip">
+    <string>Расчет процента схожести</string>
    </property>
   </action>
  </widget>

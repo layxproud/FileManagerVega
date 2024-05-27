@@ -131,6 +131,8 @@ void MainWindow::initToolbar()
     connect(ui->actionSummary, &QAction::triggered, workspace, &Workspace::getSummary);
     connect(ui->actionClassify, &QAction::triggered, workspace, &Workspace::classifyPortraits);
     connect(ui->actionClusterize, &QAction::triggered, workspace, &Workspace::clusterizePortraits);
+    connect(ui->actionFindMatch, &QAction::triggered, workspace, &Workspace::findMatch);
+    connect(ui->actionFindMatchLevel, &QAction::triggered, workspace, &Workspace::findMatchLevel);
 }
 
 void MainWindow::setPathLabels(QLabel *label, const QString &arg, bool isDriveDatabase)

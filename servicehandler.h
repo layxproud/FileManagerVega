@@ -10,6 +10,8 @@
 #include <QObject>
 #include <QThread>
 
+/* КЛАСС ОБРАБОТКИ КУРЛОВ */
+
 class NetworkWorker : public QObject
 {
     Q_OBJECT
@@ -28,6 +30,7 @@ public slots:
     void indexFiles(
         const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
     void classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs);
+    void clusterizePortraits(const QList<long> &portraitIDs, int clustersNum);
 
 signals:
     void tokenReceived(bool success);
@@ -59,6 +62,8 @@ private:
     QByteArray readFileToByteArray(const QString &filePath);
     QJsonDocument mapToJsonDocument(const QMap<QString, DocumentData> &documentMap);
 };
+
+/* ИНТЕРФЕЙС ДЛЯ СВЯЗИ WORKSPACE С КУРЛАМИ */
 
 class ServiceHandler : public QObject
 {
@@ -94,6 +99,7 @@ signals:
     void tokenReceivedSignal(bool success);
     void deleteDbEntrySignal(long id, const QString &dbName);
     void classifyPortraitsSignal(const QList<long> &portraitIDs, const QList<long> &classesIDs);
+    void clusterizePortraitsSignal(const QList<long> &portraitIDs, int clustersNum);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)

@@ -11,6 +11,7 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject 
     , serviceHandler()
     , classifyWindow(nullptr)
     , indexWindow(nullptr)
+    , clusterizeWindow(nullptr)
 {
     leftPanel->setFocus();
     leftPanel->setCurrentIndex(this->leftPanel->currentIndex());
@@ -372,6 +373,53 @@ void Workspace::createDirDatabase(Panel *panel)
     panel->getFolders()->push_back(fold);
 }
 
+bool Workspace::checkServiceHandler()
+{
+    if (!serviceHandler) {
+        qCritical() << "Проблема с модулем веб-сервисов";
+        return false;
+    }
+    return true;
+}
+
+bool Workspace::checkPanels(bool bothPanelsNeedDB)
+{
+    if (bothPanelsNeedDB) {
+        if (!leftPanel->getIsDB() || !rightPanel->getIsDB()) {
+            qDebug() << "В обоих панелях должна быть открыта база данных";
+            return false;
+        }
+    } else {
+        if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
+            qDebug() << "Хотя бы одна панель должна быть базой данных";
+            return false;
+        }
+    }
+
+    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
+        qDebug() << "Не выбрано ни одного элемента";
+        return false;
+    }
+
+    return true;
+}
+
+std::pair<QString, std::list<TIPInfo *>> Workspace::getChosenItemsAndDbName()
+{
+    QString dbName;
+    std::list<TIPInfo *> chosenItems;
+
+    if (isLeftCurrent) {
+        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
+        chosenItems = leftPanel->getChosenItems();
+    } else {
+        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
+        chosenItems = rightPanel->getChosenItems();
+    }
+
+    return std::make_pair(dbName, chosenItems);
+}
+
 void Workspace::changeDir()
 {
     if (isLeftCurrent) {
@@ -502,20 +550,14 @@ void Workspace::changeCurrentPanel()
 
 void Workspace::comparePortraits()
 {
-    if (!serviceHandler) {
-        qDebug() << "Проблема с модулем веб-сервисов";
+    if (!checkServiceHandler() || !checkPanels(true))
         return;
-    }
 
-    if (!leftPanel->getIsDB() || !rightPanel->getIsDB()) {
-        qDebug() << "В обоих панелях должна быть открыта база данных";
-        return;
-    }
+    auto result = getChosenItemsAndDbName();
+    std::list<TIPInfo *> chosenItems = result.second;
 
-    if (leftPanel->getChosenItems().empty() || rightPanel->getChosenItems().empty()) {
-        qDebug() << "В одной из панелей не выбрано ни одного элемента";
+    if (chosenItems.empty())
         return;
-    }
 
     auto leftPortrait = *(leftPanel->getChosenItems().rbegin());
     auto rightPortrait = *(rightPanel->getChosenItems().rbegin());
@@ -532,107 +574,61 @@ void Workspace::comparePortraits()
 
 void Workspace::getXmlFile()
 {
-    if (!serviceHandler) {
-        qDebug() << "Проблема с модулем веб-сервисов";
+    if (!checkServiceHandler() || !checkPanels())
         return;
-    }
-
-    if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
-        qDebug() << "Хотя бы одна панель должна быть базой данных";
-        return;
-    }
-
-    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
-        qDebug() << "Не выбрано ни одного элемента";
-        return;
-    }
 
     QString filePath = QFileDialog::getSaveFileName(
         nullptr, tr("Сохранение XML файла"), "", "XML files(*.xml);;All Files(*)");
 
     if (filePath.isEmpty()) {
-        qDebug() << "No file selected.";
+        qDebug() << "Файл не выбран";
         return;
     }
 
-    QString dbName;
-    long id;
-    if (isLeftCurrent) {
-        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
-        id = (*(leftPanel->getChosenItems().rbegin()))->id;
-    } else {
-        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
-        id = (*(rightPanel->getChosenItems().rbegin()))->id;
-    }
+    auto result = getChosenItemsAndDbName();
+    QString dbName = result.first;
+    std::list<TIPInfo *> chosenItems = result.second;
+    if (chosenItems.empty())
+        return;
+    long id = (*(chosenItems.rbegin()))->id;
     serviceHandler->getXmlFile(filePath, id, dbName);
 }
 
 void Workspace::getSummary()
 {
-    if (!serviceHandler) {
-        qDebug() << "Проблема с модулем веб-сервисов";
+    if (!checkServiceHandler() || !checkPanels())
         return;
-    }
-
-    if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
-        qDebug() << "Хотя бы одна панель должна быть базой данных";
-        return;
-    }
-
-    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
-        qDebug() << "Не выбрано ни одного элемента";
-        return;
-    }
 
     QString filePath = QFileDialog::getSaveFileName(
         nullptr, tr("Сохранение реферата"), "", "TXT files(*.txt);;All Files(*)");
 
     if (filePath.isEmpty()) {
-        qDebug() << "No file selected.";
+        qDebug() << "Файл не выбран";
         return;
     }
 
-    long id;
-    QString dbName;
-    if (isLeftCurrent) {
-        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
-        id = (*(leftPanel->getChosenItems().rbegin()))->id;
-    } else {
-        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
-        id = (*(rightPanel->getChosenItems().rbegin()))->id;
-    }
+    auto result = getChosenItemsAndDbName();
+    QString dbName = result.first;
+    std::list<TIPInfo *> chosenItems = result.second;
+    if (chosenItems.empty())
+        return;
+    long id = (*(chosenItems.rbegin()))->id;
     serviceHandler->getSummary(filePath, id, dbName);
 }
 
 void Workspace::classifyPortraits()
 {
-    if (!serviceHandler) {
-        qDebug() << "Проблема с модулем веб-сервисов";
+    if (!checkServiceHandler() || !checkPanels())
         return;
-    }
 
-    if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
-        qDebug() << "Хотя бы одна панель должна быть базой данных";
+    auto result = getChosenItemsAndDbName();
+    QString dbName = result.first;
+    std::list<TIPInfo *> chosenItems = result.second;
+    if (chosenItems.empty())
         return;
-    }
-
-    if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
-        qDebug() << "Не выбрано ни одного элемента";
-        return;
-    }
-
-    std::list<TIPInfo *> portraits;
-    QString dbName;
-    if (isLeftCurrent) {
-        dbName = leftPanel->getFunctionsDB()->getDataBase()->databaseName();
-        portraits = leftPanel->getChosenItems();
-    } else {
-        dbName = rightPanel->getFunctionsDB()->getDataBase()->databaseName();
-        portraits = rightPanel->getChosenItems();
-    }
 
     QMap<QString, long> portraitsMap;
-    for (auto portrait : portraits) {
+    for (auto portrait : chosenItems) {
         portraitsMap.insert(portrait->name, portrait->id);
     }
 
@@ -648,28 +644,20 @@ void Workspace::classifyPortraits()
             &ServiceHandler::classifyPortraitsSignal);
 
         connect(classifyWindow, &ClassifyWindow::getClassesSignal, [this]() {
-            std::list<TIPInfo *> _portraits;
-            if (isLeftCurrent) {
-                _portraits = leftPanel->getChosenItems();
-            } else {
-                _portraits = rightPanel->getChosenItems();
-            }
+            auto result = getChosenItemsAndDbName();
+            std::list<TIPInfo *> chosenItems = result.second;
             QMap<QString, long> classesMap;
-            for (auto portrait : _portraits) {
+            for (auto portrait : chosenItems) {
                 classesMap.insert(portrait->name, portrait->id);
             }
             classifyWindow->setClasses(classesMap);
         });
 
         connect(classifyWindow, &ClassifyWindow::getPortraitsSignal, [this]() {
-            std::list<TIPInfo *> _portraits;
-            if (isLeftCurrent) {
-                _portraits = leftPanel->getChosenItems();
-            } else {
-                _portraits = rightPanel->getChosenItems();
-            }
+            auto result = getChosenItemsAndDbName();
+            std::list<TIPInfo *> chosenItems = result.second;
             QMap<QString, long> _portraitsMap;
-            for (auto portrait : _portraits) {
+            for (auto portrait : chosenItems) {
                 _portraitsMap.insert(portrait->name, portrait->id);
             }
             classifyWindow->setPortraits(_portraitsMap);
@@ -683,7 +671,54 @@ void Workspace::classifyPortraits()
     classifyWindow->activateWindow();
 }
 
-void Workspace::clusterizePortraits() {}
+void Workspace::clusterizePortraits()
+{
+    if (!checkServiceHandler() || !checkPanels())
+        return;
+
+    auto result = getChosenItemsAndDbName();
+    QString dbName = result.first;
+    std::list<TIPInfo *> chosenItems = result.second;
+    if (chosenItems.empty())
+        return;
+
+    QMap<QString, long> portraitsMap;
+    for (auto portrait : chosenItems) {
+        portraitsMap.insert(portrait->name, portrait->id);
+    }
+
+    if (!clusterizeWindow) {
+        clusterizeWindow = new ClusterizeWindow();
+        widgetsList.append(clusterizeWindow);
+        connect(clusterizeWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+
+        connect(
+            clusterizeWindow,
+            &ClusterizeWindow::clusterizePortraits,
+            serviceHandler,
+            &ServiceHandler::clusterizePortraitsSignal);
+
+        connect(clusterizeWindow, &ClusterizeWindow::addPortraitsSignal, [this]() {
+            auto result = getChosenItemsAndDbName();
+            std::list<TIPInfo *> chosenItems = result.second;
+            QMap<QString, long> _portraitsMap;
+            for (auto portrait : chosenItems) {
+                _portraitsMap.insert(portrait->name, portrait->id);
+            }
+            clusterizeWindow->setPortraits(_portraitsMap);
+        });
+
+        clusterizeWindow->setPortraits(portraitsMap);
+        clusterizeWindow->setDbName(dbName);
+    }
+    clusterizeWindow->show();
+    clusterizeWindow->raise();
+    clusterizeWindow->activateWindow();
+}
+
+void Workspace::findMatch() {}
+
+void Workspace::findMatchLevel() {}
 
 void Workspace::killChildren()
 {
@@ -698,6 +733,8 @@ void Workspace::handleWidgetDestroyed(QObject *object)
     QWidget *widget = qobject_cast<QWidget *>(object);
     if (widget == classifyWindow) {
         classifyWindow = nullptr;
+    } else if (widget == clusterizeWindow) {
+        clusterizeWindow = nullptr;
     }
     if (widget && widgetsList.contains(widget)) {
         widgetsList.removeOne(widget);

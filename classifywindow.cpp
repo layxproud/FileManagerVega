@@ -5,14 +5,13 @@
 ClassifyWindow::ClassifyWindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ClassifyWindow)
+    , portraitsWidget(new PortraitListWidget(this))
+    , classesWidget(new PortraitListWidget(this))
 {
     ui->setupUi(this);
 
-    portraitsWidget = new PortraitListWidget(this);
-    classesWidget = new PortraitListWidget(this);
-
-    ui->portraits->addWidget(portraitsWidget);
-    ui->classes->addWidget(classesWidget);
+    ui->portraitsLayout->addWidget(portraitsWidget);
+    ui->classesLayout->addWidget(classesWidget);
 
     connect(ui->cancelButton, &QPushButton::clicked, this, &ClassifyWindow::close);
     connect(ui->applyButton, &QPushButton::clicked, this, &ClassifyWindow::onApplyButtonClicked);
@@ -69,15 +68,14 @@ void ClassifyWindow::onApplyButtonClicked()
         return;
     }
 
-    portraitIDs.clear();
-    classesIDs.clear();
+    QList<long> portraitIDs;
+    QList<long> classesIDs;
 
     QMap<QString, long> portraitsMap = portraitsWidget->getItems();
     for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
         portraitIDs.append(it.value());
     }
 
-    // Get items from the classesWidget
     QMap<QString, long> classesMap = classesWidget->getItems();
     for (auto it = classesMap.begin(); it != classesMap.end(); ++it) {
         classesIDs.append(it.value());

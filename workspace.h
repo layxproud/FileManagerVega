@@ -2,6 +2,7 @@
 #define WORKSPACE_H
 
 #include "classifywindow.h"
+#include "clusterizewindow.h"
 #include "indexwindow.h"
 #include "ipcompare.h"
 #include "servicehandler.h"
@@ -36,6 +37,7 @@ private:
     IPCompare *ipCompare;
     IndexWindow *indexWindow;
     ClassifyWindow *classifyWindow;
+    ClusterizeWindow *clusterizeWindow;
     QList<QWidget *> widgetsList;
 
 private:
@@ -57,11 +59,10 @@ private:
     void createDirFileSystem(Panel *panel);
     void createDirDatabase(Panel *panel);
 
-    void clearComparisonResults();
-    void calculateComparisonParameters(
-        const std::vector<TIPFullTermInfo *> &leftTerms,
-        const std::vector<TIPFullTermInfo *> &rightTerms);
-    void calculateComparisonCircles();
+    bool checkServiceHandler();
+    bool checkPanels(bool bothPanelsNeedDB = false);
+    std::pair<QString, std::list<TIPInfo *>> getChosenItemsAndDbName();
+
     void handleWidgetDestroyed(QObject *object);
 
 public slots:
@@ -83,6 +84,8 @@ public slots:
     void getSummary();
     void classifyPortraits();
     void clusterizePortraits();
+    void findMatch();
+    void findMatchLevel();
 
     // GUI
     void killChildren();

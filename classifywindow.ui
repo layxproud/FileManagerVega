@@ -20,7 +20,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="portraitsLayout">
+    <layout class="QVBoxLayout" name="leftLayout">
      <property name="leftMargin">
       <number>0</number>
      </property>
@@ -41,12 +41,12 @@
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="portraits"/>
+      <layout class="QVBoxLayout" name="portraitsLayout"/>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="classesLayout">
+    <layout class="QVBoxLayout" name="rightLayout">
      <item>
       <layout class="QHBoxLayout" name="dbNameLayout">
        <property name="topMargin">
@@ -107,7 +107,7 @@
       </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="classes"/>
+      <layout class="QVBoxLayout" name="classesLayout"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="buttonsLayout">
