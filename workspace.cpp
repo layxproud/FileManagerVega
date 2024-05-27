@@ -683,10 +683,7 @@ void Workspace::classifyPortraits()
     classifyWindow->activateWindow();
 }
 
-void Workspace::clusterizePortraits()
-{
-
-}
+void Workspace::clusterizePortraits() {}
 
 void Workspace::killChildren()
 {

@@ -1,6 +1,7 @@
 #ifndef CLASSIFYWINDOW_H
 #define CLASSIFYWINDOW_H
 
+#include "portraitlistwidget.h"
 #include <QCloseEvent>
 #include <QDialog>
 #include <QMap>
@@ -31,20 +32,19 @@ private:
     QList<long> portraitIDs;
     QList<long> classesIDs;
     QString dbName;
+    PortraitListWidget *portraitsWidget;
+    PortraitListWidget *classesWidget;
 
     void populatePortraitsList();
     void populateClassesList();
 
 signals:
+    void getPortraitsSignal();
     void getClassesSignal();
     void classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs);
-    void getPortraitsSignal();
 
 private slots:
-    void onAddClassButtonClicked();
-    void onRemoveClassButtonClicked();
-    void onAddPortraitButtonClicked();
-    void onRemovePortraitButtonClicked();
+    void addPortraits();
     void onApplyButtonClicked();
 };
 

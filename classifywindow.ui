@@ -20,12 +20,18 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="portraitsLayout">
      <property name="leftMargin">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="portraitsLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Портреты</string>
        </property>
@@ -35,68 +41,12 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="buttonsLayout_3">
-       <item>
-        <widget class="QPushButton" name="removePortraitButton">
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">#removePortraitButton {
-background-color: rgb(255, 105, 105);
-color: white;
-}
-
-#removePortraitButton:hover {
-    background-color: rgb(191, 79, 79); 
-}</string>
-         </property>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="addPortraitButton">
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">#addPortraitButton {
-background-color: rgb(0, 186, 0);
-color: white;
-}
-
-#addPortraitButton:hover {
-    background-color:rgb(0, 140, 0) ; 
-}</string>
-         </property>
-         <property name="text">
-          <string>+</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QListWidget" name="portraitsList">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="portraits"/>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="rightLayout">
+    <layout class="QVBoxLayout" name="classesLayout">
      <item>
       <layout class="QHBoxLayout" name="dbNameLayout">
        <property name="topMargin">
@@ -104,6 +54,12 @@ color: white;
        </property>
        <item>
         <widget class="QLabel" name="dbNameLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="font">
           <font>
            <pointsize>12</pointsize>
@@ -135,7 +91,13 @@ color: white;
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="classesLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Классы</string>
        </property>
@@ -145,57 +107,7 @@ color: white;
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="buttonsLayout_2">
-       <item>
-        <widget class="QPushButton" name="removeClassButton">
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">#removeClassButton {
-background-color: rgb(255, 105, 105);
-color: white;
-}
-
-#removeClassButton:hover {
-    background-color: rgb(191, 79, 79); 
-}</string>
-         </property>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="addClassButton">
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">#addClassButton {
-background-color: rgb(0, 186, 0);
-color: white;
-}
-
-#addClassButton:hover {
-    background-color:rgb(0, 140, 0) ; 
-}</string>
-         </property>
-         <property name="text">
-          <string>+</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QListWidget" name="classesList"/>
+      <layout class="QVBoxLayout" name="classes"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="buttonsLayout">
