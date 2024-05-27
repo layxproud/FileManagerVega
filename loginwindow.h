@@ -20,6 +20,8 @@ private:
     Ui::LoginWindow *ui;
     QMovie *movie;
 
+    bool eventFilter(QObject *watched, QEvent *event);
+
 public slots:
     void onTokenReceived(bool success);
 

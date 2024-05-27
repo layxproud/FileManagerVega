@@ -36,6 +36,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         panel.cpp \
+        portraitlistwidget.cpp \
         servicehandler.cpp \
         tinyxml2.cpp \
         tipdbshell.cpp \
@@ -55,6 +56,7 @@ HEADERS += \
         loginwindow.h \
         mainwindow.h \
         panel.h \
+        portraitlistwidget.h \
         servicehandler.h \
         tinyxml2.h \
         tipdbshell.h \

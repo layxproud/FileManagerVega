@@ -82,6 +82,7 @@ public slots:
     void getXmlFile();
     void getSummary();
     void classifyPortraits();
+    void clusterizePortraits();
 
     // GUI
     void killChildren();

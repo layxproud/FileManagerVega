@@ -9,6 +9,8 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject 
     , fileSystem(filesystem)
     , isLeftCurrent(true)
     , serviceHandler()
+    , classifyWindow(nullptr)
+    , indexWindow(nullptr)
 {
     leftPanel->setFocus();
     leftPanel->setCurrentIndex(this->leftPanel->currentIndex());
@@ -629,22 +631,61 @@ void Workspace::classifyPortraits()
         portraits = rightPanel->getChosenItems();
     }
 
-    QMap<QString, long> nameIdMap;
+    QMap<QString, long> portraitsMap;
     for (auto portrait : portraits) {
-        nameIdMap.insert(portrait->name, portrait->id);
+        portraitsMap.insert(portrait->name, portrait->id);
     }
 
-    classifyWindow = new ClassifyWindow();
-    connect(classifyWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
-    connect(
-        classifyWindow,
-        &ClassifyWindow::classifyPortraits,
-        serviceHandler,
-        &ServiceHandler::classifyPortraitsSignal);
-    classifyWindow->setPortraits(nameIdMap);
-    classifyWindow->setDbName(dbName);
+    if (!classifyWindow) {
+        classifyWindow = new ClassifyWindow();
+        widgetsList.append(classifyWindow);
+        connect(classifyWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+
+        connect(
+            classifyWindow,
+            &ClassifyWindow::classifyPortraits,
+            serviceHandler,
+            &ServiceHandler::classifyPortraitsSignal);
+
+        connect(classifyWindow, &ClassifyWindow::getClassesSignal, [this]() {
+            std::list<TIPInfo *> _portraits;
+            if (isLeftCurrent) {
+                _portraits = leftPanel->getChosenItems();
+            } else {
+                _portraits = rightPanel->getChosenItems();
+            }
+            QMap<QString, long> classesMap;
+            for (auto portrait : _portraits) {
+                classesMap.insert(portrait->name, portrait->id);
+            }
+            classifyWindow->setClasses(classesMap);
+        });
+
+        connect(classifyWindow, &ClassifyWindow::getPortraitsSignal, [this]() {
+            std::list<TIPInfo *> _portraits;
+            if (isLeftCurrent) {
+                _portraits = leftPanel->getChosenItems();
+            } else {
+                _portraits = rightPanel->getChosenItems();
+            }
+            QMap<QString, long> _portraitsMap;
+            for (auto portrait : _portraits) {
+                _portraitsMap.insert(portrait->name, portrait->id);
+            }
+            classifyWindow->setPortraits(_portraitsMap);
+        });
+
+        classifyWindow->setPortraits(portraitsMap);
+        classifyWindow->setDbName(dbName);
+    }
     classifyWindow->show();
-    widgetsList.append(classifyWindow);
+    classifyWindow->raise();
+    classifyWindow->activateWindow();
+}
+
+void Workspace::clusterizePortraits()
+{
+
 }
 
 void Workspace::killChildren()
@@ -658,6 +699,9 @@ void Workspace::killChildren()
 void Workspace::handleWidgetDestroyed(QObject *object)
 {
     QWidget *widget = qobject_cast<QWidget *>(object);
+    if (widget == classifyWindow) {
+        classifyWindow = nullptr;
+    }
     if (widget && widgetsList.contains(widget)) {
         widgetsList.removeOne(widget);
     }

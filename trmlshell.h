@@ -25,7 +25,7 @@ class TRMLShell
 
 public:
     TRMLShell();
-    ~TRMLShell() {};
+    ~TRMLShell() {}
 
     QString AddNorms(
         QStringList *list,

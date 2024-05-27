@@ -1,46 +1,9 @@
 #ifndef CLASSIFYWINDOW_H
 #define CLASSIFYWINDOW_H
 
+#include <QCloseEvent>
 #include <QDialog>
-#include <QHBoxLayout>
-#include <QLineEdit>
-#include <QListWidgetItem>
-#include <QWidget>
-
-class CustomItemWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    CustomItemWidget(QWidget *parent = nullptr)
-        : QWidget(parent)
-    {
-        lineEdit1 = new QLineEdit(this);
-        lineEdit2 = new QLineEdit(this);
-        QFont font("Segoe UI", 12);
-        lineEdit1->setFont(font);
-        lineEdit2->setFont(font);
-        QHBoxLayout *layout = new QHBoxLayout;
-        layout->addWidget(lineEdit1);
-        layout->addWidget(lineEdit2);
-        setLayout(layout);
-    }
-
-    QLineEdit *lineEdit1;
-    QLineEdit *lineEdit2;
-};
-
-class CustomListItem : public QListWidgetItem
-{
-public:
-    CustomListItem(CustomItemWidget *widget)
-        : QListWidgetItem()
-        , customWidget(widget)
-    {
-        setSizeHint(customWidget->sizeHint());
-    }
-
-    CustomItemWidget *customWidget;
-};
+#include <QMap>
 
 namespace Ui {
 class ClassifyWindow;
@@ -55,23 +18,33 @@ public:
     ~ClassifyWindow();
 
     void setPortraits(const QMap<QString, long> &p);
+    void setClasses(const QMap<QString, long> &c);
     void setDbName(const QString &name);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::ClassifyWindow *ui;
     QMap<QString, long> portraits;
     QMap<QString, long> classes;
-    QList<long> ids;
+    QList<long> portraitIDs;
+    QList<long> classesIDs;
     QString dbName;
 
-    void populateListWidget();
+    void populatePortraitsList();
+    void populateClassesList();
 
 signals:
-    void classifyPortraits(const QList<long> &ids, const QMap<QString, long> &classes);
+    void getClassesSignal();
+    void classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs);
+    void getPortraitsSignal();
 
 private slots:
     void onAddClassButtonClicked();
     void onRemoveClassButtonClicked();
+    void onAddPortraitButtonClicked();
+    void onRemovePortraitButtonClicked();
     void onApplyButtonClicked();
 };
 

@@ -12,6 +12,7 @@
         <file>resources/main-icon.png</file>
         <file>resources/summary.png</file>
         <file>resources/classify.png</file>
+        <file>resources/cluster.png</file>
     </qresource>
     <qresource prefix="/gifs">
         <file>resources/loading.gif</file>

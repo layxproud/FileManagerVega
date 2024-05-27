@@ -1,6 +1,8 @@
 #include "loginwindow.h"
 #include "ui_loginwindow.h"
 #include <QDebug>
+#include <QEvent>
+#include <QKeyEvent>
 #include <QMessageBox>
 
 LoginWindow::LoginWindow(QWidget *parent)
@@ -10,11 +12,30 @@ LoginWindow::LoginWindow(QWidget *parent)
     ui->setupUi(this);
     movie = new QMovie(":/gifs/resources/loading.gif");
     connect(ui->loginButton, &QPushButton::clicked, this, &LoginWindow::onLoginButtonClicked);
+    ui->loginInput->installEventFilter(this);
+    ui->passwordInput->installEventFilter(this);
 }
 
 LoginWindow::~LoginWindow()
 {
     delete ui;
+}
+
+bool LoginWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Up) {
+            if (watched == ui->passwordInput) {
+                ui->loginInput->setFocus();
+            }
+        } else if (keyEvent->key() == Qt::Key_Down) {
+            if (watched == ui->loginInput) {
+                ui->passwordInput->setFocus();
+            }
+        }
+    }
+    return false;
 }
 
 void LoginWindow::onTokenReceived(bool success)

@@ -380,9 +380,11 @@ void NetworkWorker::indexFiles(
     qDebug() << "Индексация прошла успешно";
 }
 
-void NetworkWorker::classifyPortraits(const QList<long> &ids, const QMap<QString, long> &classes)
+void NetworkWorker::classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs)
 {
     qDebug() << "Классифкация портретов";
+    qDebug() << portraitIDs;
+    qDebug() << classesIDs;
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)

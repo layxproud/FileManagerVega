@@ -283,6 +283,7 @@
    <addaction name="actionGetXMLFile"/>
    <addaction name="actionSummary"/>
    <addaction name="actionClassify"/>
+   <addaction name="actionClusterize"/>
   </widget>
   <action name="actionIPCompare">
    <property name="icon">
@@ -330,6 +331,18 @@
    </property>
    <property name="toolTip">
     <string>Классифицировать портреты</string>
+   </property>
+  </action>
+  <action name="actionClusterize">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/icons/resources/cluster.png</normaloff>:/icons/resources/cluster.png</iconset>
+   </property>
+   <property name="text">
+    <string>clusterize</string>
+   </property>
+   <property name="toolTip">
+    <string>Кластеризовать портреты</string>
    </property>
   </action>
  </widget>

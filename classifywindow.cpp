@@ -14,6 +14,16 @@ ClassifyWindow::ClassifyWindow(QWidget *parent)
         &QPushButton::clicked,
         this,
         &ClassifyWindow::onRemoveClassButtonClicked);
+    connect(
+        ui->addPortraitButton,
+        &QPushButton::clicked,
+        this,
+        &ClassifyWindow::onAddPortraitButtonClicked);
+    connect(
+        ui->removePortraitButton,
+        &QPushButton::clicked,
+        this,
+        &ClassifyWindow::onRemovePortraitButtonClicked);
 
     connect(ui->cancelButton, &QPushButton::clicked, this, &ClassifyWindow::close);
     connect(ui->applyButton, &QPushButton::clicked, this, &ClassifyWindow::onApplyButtonClicked);
@@ -24,7 +34,7 @@ ClassifyWindow::~ClassifyWindow()
     delete ui;
 }
 
-void ClassifyWindow::populateListWidget()
+void ClassifyWindow::populatePortraitsList()
 {
     ui->portraitsList->clear();
     for (auto it = portraits.begin(); it != portraits.end(); ++it) {
@@ -40,12 +50,42 @@ void ClassifyWindow::populateListWidget()
     }
 }
 
+void ClassifyWindow::populateClassesList()
+{
+    ui->classesList->clear();
+    for (auto it = classes.begin(); it != classes.end(); ++it) {
+        const QString &name = it.key();
+        long id = it.value();
+
+        QListWidgetItem *item = new QListWidgetItem(name);
+
+        QVariant idData(id);
+        item->setData(Qt::UserRole, idData);
+
+        ui->classesList->addItem(item);
+    }
+}
+
 void ClassifyWindow::setPortraits(const QMap<QString, long> &p)
 {
-    portraits.clear();
-    portraits = p;
+    for (auto it = p.begin(); it != p.end(); ++it) {
+        if (!portraits.contains(it.key())) {
+            portraits.insert(it.key(), it.value());
+        }
+    }
 
-    populateListWidget();
+    populatePortraitsList();
+}
+
+void ClassifyWindow::setClasses(const QMap<QString, long> &c)
+{
+    for (auto it = c.begin(); it != c.end(); ++it) {
+        if (!classes.contains(it.key())) {
+            classes.insert(it.key(), it.value());
+        }
+    }
+
+    populateClassesList();
 }
 
 void ClassifyWindow::setDbName(const QString &name)
@@ -54,45 +94,75 @@ void ClassifyWindow::setDbName(const QString &name)
     ui->dbNameInput->setText(dbName);
 }
 
+void ClassifyWindow::closeEvent(QCloseEvent *event)
+{
+    deleteLater();
+    event->accept();
+}
+
 void ClassifyWindow::onAddClassButtonClicked()
 {
-    CustomItemWidget *itemWidget = new CustomItemWidget();
-    CustomListItem *item = new CustomListItem(itemWidget);
-    ui->classesList->addItem(item);
-    ui->classesList->setItemWidget(item, itemWidget);
+    emit getClassesSignal();
 }
 
 void ClassifyWindow::onRemoveClassButtonClicked()
 {
-    QListWidgetItem *selectedItem = ui->classesList->currentItem();
+    QListWidgetItem *selectedItem = ui->portraitsList->currentItem();
     if (selectedItem) {
+        QString className = selectedItem->text();
+
+        auto it = classes.find(className);
+        if (it != classes.end()) {
+            classes.erase(it);
+        }
+
         int row = ui->classesList->row(selectedItem);
         delete ui->classesList->takeItem(row);
     }
 }
 
+void ClassifyWindow::onAddPortraitButtonClicked()
+{
+    emit getPortraitsSignal();
+}
+
+void ClassifyWindow::onRemovePortraitButtonClicked()
+{
+    QListWidgetItem *selectedItem = ui->portraitsList->currentItem();
+    if (selectedItem) {
+        QString portraitName = selectedItem->text();
+
+        auto it = portraits.find(portraitName);
+        if (it != portraits.end()) {
+            portraits.erase(it);
+        }
+
+        int row = ui->portraitsList->row(selectedItem);
+        delete ui->portraitsList->takeItem(row);
+    }
+}
+
 void ClassifyWindow::onApplyButtonClicked()
 {
-    ids.clear();
-    classes.clear();
+    if (ui->classesList->count() == 0 || ui->portraitsList->count() == 0) {
+        qWarning() << "Не выбрано ни одного класса или портрета";
+        return;
+    }
+
+    portraitIDs.clear();
+    classesIDs.clear();
 
     for (int i = 0; i < ui->portraitsList->count(); ++i) {
         QListWidgetItem *item = ui->portraitsList->item(i);
         QVariant idData = item->data(Qt::UserRole);
-        ids.append(idData.toLongLong());
+        portraitIDs.append(idData.toLongLong());
     }
 
     for (int i = 0; i < ui->classesList->count(); ++i) {
         QListWidgetItem *item = ui->classesList->item(i);
-        CustomItemWidget *customWidget = qobject_cast<CustomItemWidget *>(
-            ui->classesList->itemWidget(item));
-        if (!customWidget) {
-            continue;
-        }
-        QString name = customWidget->lineEdit1->text();
-        long value = customWidget->lineEdit2->text().toLong();
-        classes.insert(name, value);
+        QVariant idData = item->data(Qt::UserRole);
+        classesIDs.append(idData.toLongLong());
     }
 
-    emit classifyPortraits(ids, classes);
+    emit classifyPortraits(portraitIDs, classesIDs);
 }
