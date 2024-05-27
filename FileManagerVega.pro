@@ -36,6 +36,7 @@ SOURCES += \
         loginwindow.cpp \
         main.cpp \
         mainwindow.cpp \
+        matchlevelwindow.cpp \
         panel.cpp \
         portraitlistwidget.cpp \
         servicehandler.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
         ipcompare.h \
         loginwindow.h \
         mainwindow.h \
+        matchlevelwindow.h \
         panel.h \
         portraitlistwidget.h \
         servicehandler.h \
@@ -74,6 +76,7 @@ FORMS += \
         ipcompare.ui \
         loginwindow.ui \
         mainwindow.ui \
+        matchlevelwindow.ui \
         viewip.ui
 
 LIBCURL_DEBUG_PATH = C:/lib/install/libcurl-debug

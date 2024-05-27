@@ -22,6 +22,7 @@ ServiceHandler::ServiceHandler(QObject *parent)
         &ServiceHandler::clusterizePortraitsSignal,
         worker,
         &NetworkWorker::clusterizePortraits);
+    connect(this, &ServiceHandler::findMatchLevelSignal, worker, &NetworkWorker::findMatchLevel);
 
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
@@ -397,6 +398,24 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
     qDebug() << "Кластеризация портретов";
     qDebug() << portraitIDs;
     qDebug() << clustersNum;
+}
+
+void NetworkWorker::findMatchLevel(
+    const QString &dbName, long inputID, const QString &type, const QString &request)
+{
+    qDebug() << "Поиск уровня схожести";
+    qDebug() << type;
+    if (type == "portrait") {
+        bool ok;
+        long requestId = request.toLongLong(&ok);
+        if (ok) {
+            qDebug() << requestId;
+        } else {
+            qDebug() << "Не удалось конвертировать в long";
+        }
+    } else {
+        qDebug() << request;
+    }
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)
