@@ -89,26 +89,34 @@ public:
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
     {
-        if (sortColumn() == 0) {
-            QFileSystemModel *fsm = qobject_cast<QFileSystemModel *>(sourceModel());
-            bool asc = sortOrder() == Qt::AscendingOrder ? true : false;
+        QModelIndex normalizedLeft = left.sibling(left.row(), 0);
+        QModelIndex normalizedRight = right.sibling(right.row(), 0);
 
-            QFileInfo leftFileInfo = fsm->fileInfo(left);
-            QFileInfo rightFileInfo = fsm->fileInfo(right);
+        QFileSystemModel *fsm = qobject_cast<QFileSystemModel *>(sourceModel());
+        if (!fsm)
+            return QSortFilterProxyModel::lessThan(left, right);
 
-            // If DotAndDot move in the beginning
-            if (sourceModel()->data(left).toString() == "..")
-                return asc;
-            if (sourceModel()->data(right).toString() == "..")
-                return !asc;
+        if (sourceModel()->data(normalizedLeft).toString() == "..")
+            return sortOrder() == Qt::AscendingOrder;
+        if (sourceModel()->data(normalizedRight).toString() == "..")
+            return sortOrder() != Qt::AscendingOrder;
 
-            // Move dirs upper
-            if (!leftFileInfo.isDir() && rightFileInfo.isDir()) {
-                return !asc;
-            }
-            if (leftFileInfo.isDir() && !rightFileInfo.isDir()) {
-                return asc;
-            }
+        if (sortColumn() == 1) {
+            QFileInfo fileInfoLeft(fsm->filePath(left));
+            QFileInfo fileInfoRight(fsm->filePath(right));
+            auto leftSize = fileInfoLeft.size();
+            auto rightSize = fileInfoRight.size();
+
+            return leftSize < rightSize;
+        }
+
+        if (sortColumn() == 3) {
+            QFileInfo fileInfoLeft(fsm->filePath(left));
+            QFileInfo fileInfoRight(fsm->filePath(right));
+            QDateTime leftDate = fileInfoLeft.lastModified();
+            QDateTime rightDate = fileInfoRight.lastModified();
+
+            return leftDate < rightDate;
         }
 
         return QSortFilterProxyModel::lessThan(left, right);
