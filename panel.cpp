@@ -39,7 +39,9 @@ Panel::~Panel()
 
 void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
 {
-    setFileSystem(fileSystem);
+    proxyModel = new PanelSortFilterProxyModel();
+    proxyModel->setSourceModel(fileSystem);
+    setFileSystem(proxyModel);
     this->isDB = isDB;
     this->isLeft = isLeft;
 
@@ -53,8 +55,8 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
 
     // Сортировка
-    sortByColumn(0, Qt::AscendingOrder);
     setSortingEnabled(true);
+    sortByColumn(0, Qt::AscendingOrder);
 
     // Редактирование элементов
     setEditTriggers(QAbstractItemView::SelectedClicked);
@@ -72,19 +74,31 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
         ChangeFolderDB(1);
     } else {
         setIsDB(false);
-        setFileSystem(fileSystem);
-        setRootIndex(fileSystem->index(arg));
+        setFileSystem(proxyModel);
+        QModelIndex sourceRootIndex = fileSystem->index(arg);
+        QModelIndex proxyRootIndex = proxyModel->mapFromSource(sourceRootIndex);
+        setRootIndex(proxyRootIndex);
     }
     header()->setSectionResizeMode(QHeaderView::Interactive);
     clearPanel();
+    proxyModel->invalidate();
 }
 
 /*** ГЕТТЕРЫ И СЕТТЕРЫ ***/
 
-void Panel::setFileSystem(FileSystem *filesystem)
+void Panel::setFileSystem(QAbstractItemModel *model)
 {
-    this->setModel(filesystem);
-    this->fileSystem = filesystem;
+    this->setModel(model);
+    qDebug() << "setting file system";
+    QAbstractProxyModel *proxyModel = qobject_cast<QAbstractProxyModel *>(model);
+    if (proxyModel) {
+        // If the cast was successful, we're dealing with a proxy model
+        // Get the source model from the proxy model
+        this->fileSystem = dynamic_cast<FileSystem *>(proxyModel->sourceModel());
+    } else {
+        // If the cast failed, we're dealing directly with a FileSystem model
+        this->fileSystem = dynamic_cast<FileSystem *>(model);
+    }
     this->update();
 }
 
@@ -179,10 +193,14 @@ void Panel::choose(const QModelIndex &originalIndex)
     if (!originalIndex.isValid()) {
         return;
     }
+    QModelIndex effectiveIndex = originalIndex;
+    if (!isDB) {
+        effectiveIndex = proxyModel->mapToSource(originalIndex);
+    }
 
     // Нормализую индекс, чтобы клик по разным столбцам одной строки
     // воспринимался как клик по одному и тому же индексу
-    QModelIndex normalizedIndex = originalIndex.sibling(originalIndex.row(), 0);
+    QModelIndex normalizedIndex = effectiveIndex.sibling(effectiveIndex.row(), 0);
 
     if (this->selectionMode() != QAbstractItemView::MultiSelection) {
         if (this->selectionMode() == QAbstractItemView::NoSelection) {
@@ -224,56 +242,56 @@ void Panel::changeDirectory(const QModelIndex &index)
         return;
     }
 
-    if (!isDB && !fileSystem->isDir(index)) {
-        openFile(index);
+    QModelIndex effectiveIndex = index;
+    if (!isDB) {
+        effectiveIndex = proxyModel->mapToSource(index);
+    }
+
+    if (!isDB && !fileSystem->isDir(effectiveIndex)) {
+        openFile(effectiveIndex);
         return;
     }
 
     clearInfo();
-    QStandardItem *mb_ps = this->getDB()->item(index.row());
 
-    if (isDB && mb_ps->text() == "..") {
-        current_folder_id = pathID.back();
-        pathID.pop_back();
-        this->setPath(cdUp(this->getPath()));
-        this->ChangeFolderDB(this->getCurrentFolder());
-        emit changeFolder(isLeft, this->getPath(), isDB);
-    } else if (isDB && this->getPath() == "/" && DBmodel->item(index.row(), 1)->text() == " ") {
-        pathID.push_back(current_folder_id);
-        this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
-        path = path + this->getDB()->item(index.row())->text();
-        this->ChangeFolderDB(this->getCurrentFolder());
-        emit changeFolder(isLeft, this->getPath(), isDB);
-    } else if (isDB && this->getPath() != "/" && DBmodel->item(index.row(), 1)->text() == " ") {
-        pathID.push_back(current_folder_id);
-        this->setCurrentFolder(this->getDB()->item(index.row(), 2)->text().toInt());
-        path = path + "/" + this->getDB()->item(index.row())->text();
-        this->ChangeFolderDB(this->getCurrentFolder());
-        emit changeFolder(isLeft, this->getPath(), isDB);
-    } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
-        // Портрет
-        this->getFunctionsDB()->OpenItem(
-            findItem(this->getDB()->item(index.row(), 2)->text().toInt()));
-    } else {
-        if (this->fileSystem->fileInfo(index).fileName() == "..") {
-            populatePanel(fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))), false);
-            emit changeFolder(
-                isLeft, fileSystem->filePath(fileSystem->index(fileSystem->filePath(index))), isDB);
+    if (!isDB) {
+        QString newPath;
+        if (fileSystem->fileInfo(effectiveIndex).fileName() == "..") {
+            newPath = fileSystem->filePath(fileSystem->index(fileSystem->filePath(effectiveIndex)));
         } else {
-            populatePanel(fileSystem->filePath(index), false);
-            emit changeFolder(isLeft, fileSystem->filePath(index), isDB);
+            newPath = fileSystem->filePath(effectiveIndex);
         }
+        populatePanel(newPath, false);
+        emit changeFolder(isLeft, newPath, isDB);
+    } else {
+        // Handle database directory change logic
+        QStandardItem *mb_ps = this->getDB()->item(effectiveIndex.row());
+        if (mb_ps->text() == "..") {
+            current_folder_id = pathID.back();
+            pathID.pop_back();
+            this->setPath(cdUp(this->getPath()));
+            this->ChangeFolderDB(this->getCurrentFolder());
+        } else if (this->getPath() == "/" && DBmodel->item(effectiveIndex.row(), 1)->text() == " ") {
+            pathID.push_back(current_folder_id);
+            this->setCurrentFolder(this->getDB()->item(effectiveIndex.row(), 2)->text().toInt());
+            path = path + this->getDB()->item(effectiveIndex.row())->text();
+            this->ChangeFolderDB(this->getCurrentFolder());
+        } else if (this->getPath() != "/" && DBmodel->item(effectiveIndex.row(), 1)->text() == " ") {
+            pathID.push_back(current_folder_id);
+            this->setCurrentFolder(this->getDB()->item(effectiveIndex.row(), 2)->text().toInt());
+            path = path + "/" + this->getDB()->item(effectiveIndex.row())->text();
+            this->ChangeFolderDB(this->getCurrentFolder());
+        } else if (DBmodel->item(effectiveIndex.row(), 1)->text() != " ") {
+            this->getFunctionsDB()->OpenItem(
+                findItem(this->getDB()->item(effectiveIndex.row(), 2)->text().toInt()));
+        }
+        emit changeFolder(isLeft, this->getPath(), isDB);
     }
 
     this->clearInfo();
     this->setFocus();
     this->setSelectionMode(QAbstractItemView::NoSelection);
     this->setCurrentIndex(model()->index(0, 0, this->rootIndex()));
-    //    if (isDB) {
-    //        changeCurrentFolderInfo(path, 0,0,0);
-    //    } else {
-    //        infoToString();
-    //    }
     this->update();
 }
 

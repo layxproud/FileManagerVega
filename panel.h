@@ -77,18 +77,39 @@ signals:
     void editingFinished(const QModelIndex &) const;
 };
 
-class MyProxyModel : public QSortFilterProxyModel
+class PanelSortFilterProxyModel : public QSortFilterProxyModel
 {
+    Q_OBJECT
+
+public:
+    PanelSortFilterProxyModel(QObject *parent = nullptr)
+        : QSortFilterProxyModel(parent)
+    {}
+
 protected:
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
     {
-        QVariant leftData = sourceModel()->data(left);
-        QVariant rightData = sourceModel()->data(right);
+        if (sortColumn() == 0) {
+            QFileSystemModel *fsm = qobject_cast<QFileSystemModel *>(sourceModel());
+            bool asc = sortOrder() == Qt::AscendingOrder ? true : false;
 
-        if (leftData.toString() == "..")
-            return true;
-        if (rightData.toString() == "..")
-            return false;
+            QFileInfo leftFileInfo = fsm->fileInfo(left);
+            QFileInfo rightFileInfo = fsm->fileInfo(right);
+
+            // If DotAndDot move in the beginning
+            if (sourceModel()->data(left).toString() == "..")
+                return asc;
+            if (sourceModel()->data(right).toString() == "..")
+                return !asc;
+
+            // Move dirs upper
+            if (!leftFileInfo.isDir() && rightFileInfo.isDir()) {
+                return !asc;
+            }
+            if (leftFileInfo.isDir() && !rightFileInfo.isDir()) {
+                return asc;
+            }
+        }
 
         return QSortFilterProxyModel::lessThan(left, right);
     }
@@ -111,7 +132,7 @@ public:
 private:
     bool isDB;
     bool isLeft;
-    MyProxyModel *proxyModel;
+    PanelSortFilterProxyModel *proxyModel;
 
     /* Файловая система */
     FileSystem *fileSystem;
@@ -161,7 +182,7 @@ public slots:
     void changeCurrentFolderInfo(
         QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount);
 
-    void setFileSystem(FileSystem *filesystem);
+    void setFileSystem(QAbstractItemModel *model);
     void ChangeFolderDB(folderid folder);
 
     TIPDBShell *getFunctionsDB();
