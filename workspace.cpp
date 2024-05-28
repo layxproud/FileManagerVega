@@ -723,6 +723,10 @@ void Workspace::findMatch()
     if (!checkServiceHandler())
         return;
 
+    if ((isLeftCurrent && !leftPanel->getIsDB()) || (!isLeftCurrent && !rightPanel->getIsDB())) {
+        return;
+    }
+
     auto result = getChosenItemsAndDbName();
     QString dbName = result.first;
     std::list<TIPInfo *> chosenItems = result.second;

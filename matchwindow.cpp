@@ -50,6 +50,10 @@ void MatchWindow::onRadioButton()
 
 void MatchWindow::onApplyButton()
 {
+    if (ui->collectionInput->text().isEmpty()) {
+        qWarning() << "Выберите коллекцию для поиска";
+        return;
+    }
     FindMatchParams params;
     params.dbName = dbName;
     params.collectionID = ui->collectionInput->text();
