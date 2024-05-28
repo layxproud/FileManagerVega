@@ -12,6 +12,9 @@ class FileSystem : public QFileSystemModel
 {
 public:
     FileSystem(QObject *parent = 0);
+
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
+
     bool copyIndex(QModelIndex index, QString destination);
     void copyFolder(QString sourceFolder, QString destFolder);
     bool removeIndex(QModelIndex index);

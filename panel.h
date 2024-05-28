@@ -38,6 +38,23 @@ public:
             return defaultFlags & ~Qt::ItemIsEditable;
         }
     }
+
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override
+    {
+        QList<QStandardItem *> backItem;
+        for (int i = 0; i < rowCount(); ++i) {
+            if (item(i, 0) && item(i, 0)->text() == "..") {
+                backItem.append(takeRow(i));
+                break;
+            }
+        }
+
+        QStandardItemModel::sort(column, order);
+
+        if (!backItem.isEmpty()) {
+            insertRow(0, backItem);
+        }
+    }
 };
 
 class MyEditingDelegate : public QStyledItemDelegate
@@ -60,23 +77,20 @@ signals:
     void editingFinished(const QModelIndex &) const;
 };
 
-class CustomSortFilterProxyModel : public QSortFilterProxyModel
+class MyProxyModel : public QSortFilterProxyModel
 {
-public:
-    CustomSortFilterProxyModel(QObject *parent = nullptr)
-        : QSortFilterProxyModel(parent)
-    {}
-
 protected:
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override
     {
-        if (sourceModel()->data(left).toString() == "..") {
+        QVariant leftData = sourceModel()->data(left);
+        QVariant rightData = sourceModel()->data(right);
+
+        if (leftData.toString() == "..")
             return true;
-        } else if (sourceModel()->data(right).toString() == "..") {
+        if (rightData.toString() == "..")
             return false;
-        } else {
-            return QSortFilterProxyModel::lessThan(left, right);
-        }
+
+        return QSortFilterProxyModel::lessThan(left, right);
     }
 };
 
@@ -97,7 +111,7 @@ public:
 private:
     bool isDB;
     bool isLeft;
-    CustomSortFilterProxyModel *proxyModel;
+    MyProxyModel *proxyModel;
 
     /* Файловая система */
     FileSystem *fileSystem;
