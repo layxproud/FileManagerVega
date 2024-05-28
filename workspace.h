@@ -6,6 +6,7 @@
 #include "indexwindow.h"
 #include "ipcompare.h"
 #include "matchlevelwindow.h"
+#include "matchwindow.h"
 #include "servicehandler.h"
 #include <filesystem.h>
 #include <iostream>
@@ -40,6 +41,7 @@ private:
     ClassifyWindow *classifyWindow;
     ClusterizeWindow *clusterizeWindow;
     MatchLevelWindow *matchLevelWindow;
+    MatchWindow *matchWindow;
     QList<QWidget *> widgetsList;
 
 private:

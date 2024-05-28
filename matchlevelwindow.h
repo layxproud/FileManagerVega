@@ -1,6 +1,7 @@
 #ifndef MATCHLEVELWINDOW_H
 #define MATCHLEVELWINDOW_H
 
+#include "trmlshell.h"
 #include <QCloseEvent>
 #include <QDialog>
 
@@ -34,8 +35,7 @@ private:
 
 signals:
     void addPortraitsSignal();
-    void findMatchLevelSignal(
-        const QString &dbName, long inputID, const QString &type, const QString &request);
+    void findMatchLevelSignal(const FindMatchLevelParams &params);
 
 private slots:
     void onRadioButton();

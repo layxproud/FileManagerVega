@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QMap<QString, DocumentData>>("QMap<QString,DocumentData>");
     qRegisterMetaType<QList<long>>("QList<long>");
     qRegisterMetaType<QMap<QString, long>>("QMap<QString, long>");
+    qRegisterMetaType<FindMatchParams>("FindMatchParams");
+    qRegisterMetaType<FindMatchLevelParams>("FindMatchLevelParams");
 
     MainWindow w;
     w.show();

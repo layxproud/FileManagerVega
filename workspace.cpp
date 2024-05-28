@@ -13,6 +13,7 @@ Workspace::Workspace(Panel *left, Panel *right, FileSystem *filesystem, QObject 
     , indexWindow(nullptr)
     , clusterizeWindow(nullptr)
     , matchLevelWindow(nullptr)
+    , matchWindow(nullptr)
 {
     leftPanel->setFocus();
     leftPanel->setCurrentIndex(this->leftPanel->currentIndex());
@@ -717,7 +718,48 @@ void Workspace::clusterizePortraits()
     clusterizeWindow->activateWindow();
 }
 
-void Workspace::findMatch() {}
+void Workspace::findMatch()
+{
+    if (!checkServiceHandler())
+        return;
+
+    auto result = getChosenItemsAndDbName();
+    QString dbName = result.first;
+    std::list<TIPInfo *> chosenItems = result.second;
+
+    QMap<QString, long> portraitsMap;
+    for (auto portrait : chosenItems) {
+        portraitsMap.insert(portrait->name, portrait->id);
+    }
+
+    if (!matchWindow) {
+        matchWindow = new MatchWindow();
+        widgetsList.append(matchWindow);
+        connect(matchWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+
+        connect(
+            matchWindow,
+            &MatchWindow::findMatchingPortraits,
+            serviceHandler,
+            &ServiceHandler::findMatchingPortraitsSignal);
+
+        connect(matchWindow, &MatchWindow::addPortraitsSignal, [this]() {
+            auto result = getChosenItemsAndDbName();
+            std::list<TIPInfo *> chosenItems = result.second;
+            QMap<QString, long> _portraitsMap;
+            for (auto portrait : chosenItems) {
+                _portraitsMap.insert(portrait->name, portrait->id);
+            }
+            matchWindow->setPortraits(_portraitsMap);
+        });
+
+        matchWindow->setPortraits(portraitsMap);
+        matchWindow->setDbName(dbName);
+    }
+    matchWindow->show();
+    matchWindow->raise();
+    matchWindow->activateWindow();
+}
 
 void Workspace::findMatchLevel()
 {
@@ -777,6 +819,8 @@ void Workspace::handleWidgetDestroyed(QObject *object)
         clusterizeWindow = nullptr;
     } else if (widget == matchLevelWindow) {
         matchLevelWindow = nullptr;
+    } else if (widget == matchWindow) {
+        matchWindow = nullptr;
     }
     if (widget && widgetsList.contains(widget)) {
         widgetsList.removeOne(widget);

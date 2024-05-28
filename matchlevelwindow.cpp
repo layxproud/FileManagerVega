@@ -7,6 +7,7 @@ MatchLevelWindow::MatchLevelWindow(QWidget *parent)
     , ui(new Ui::MatchLevelWindow)
 {
     ui->setupUi(this);
+    ui->stackedWidget->setCurrentIndex(0);
 
     connect(ui->requestDocButton, &QRadioButton::toggled, this, &MatchLevelWindow::onRadioButton);
     connect(ui->requestTextButton, &QRadioButton::toggled, this, &MatchLevelWindow::onRadioButton);
@@ -65,11 +66,17 @@ void MatchLevelWindow::onRemoveButton()
 
 void MatchLevelWindow::onApplyButton()
 {
+    FindMatchLevelParams params;
+    params.dbName = dbName;
+    params.inputDocID = inputPortraitID;
+    params.requestType = (ui->requestTextButton->isChecked()) ? "text" : "portrait";
+
     if (ui->requestTextButton->isChecked() && !ui->requestInput->text().isEmpty()) {
-        emit findMatchLevelSignal(dbName, inputPortraitID, QString("text"), ui->requestInput->text());
+        params.requestText = ui->requestInput->text();
+        emit findMatchLevelSignal(params);
     } else if (ui->requestDocButton->isChecked() && !ui->docName_2->text().isEmpty()) {
-        emit findMatchLevelSignal(
-            dbName, inputPortraitID, QString("portrait"), QString::number(matchPortraitID));
+        params.requestDocID = matchPortraitID;
+        emit findMatchLevelSignal(params);
     } else {
         qWarning() << "Заполните все поля!";
     }

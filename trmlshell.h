@@ -246,6 +246,26 @@ struct DocumentData
     }
 };
 
+struct FindMatchLevelParams
+{
+    QString dbName;
+    int inputDocID = 0;
+    QString requestType;
+    QString requestText;
+    int requestDocID = 0;
+};
+
+struct FindMatchParams
+{
+    QString dbName;
+    QString collectionID;
+    QString requestType;
+    QString searchType;
+    int docCount;
+    QString requestText;
+    QList<int> requestIDs;
+};
+
 struct IPExtendedCompareResults : IPCompareResults
 {
     ulong ulWithId;     // id С КЕМ сравнивают

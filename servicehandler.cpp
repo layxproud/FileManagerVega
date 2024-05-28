@@ -23,6 +23,11 @@ ServiceHandler::ServiceHandler(QObject *parent)
         worker,
         &NetworkWorker::clusterizePortraits);
     connect(this, &ServiceHandler::findMatchLevelSignal, worker, &NetworkWorker::findMatchLevel);
+    connect(
+        this,
+        &ServiceHandler::findMatchingPortraitsSignal,
+        worker,
+        &NetworkWorker::findMatchingPortraits);
 
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
@@ -400,22 +405,22 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
     qDebug() << clustersNum;
 }
 
-void NetworkWorker::findMatchLevel(
-    const QString &dbName, long inputID, const QString &type, const QString &request)
+void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
 {
     qDebug() << "Поиск уровня схожести";
-    qDebug() << type;
-    if (type == "portrait") {
-        bool ok;
-        long requestId = request.toLongLong(&ok);
-        if (ok) {
-            qDebug() << requestId;
-        } else {
-            qDebug() << "Не удалось конвертировать в long";
-        }
-    } else {
-        qDebug() << request;
-    }
+    qDebug() << params.requestType;
+    qDebug() << params.requestText;
+    qDebug() << params.requestDocID;
+}
+
+void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
+{
+    qDebug() << "Поиск похожих портретов";
+    qDebug() << params.collectionID;
+    qDebug() << params.searchType;
+    qDebug() << params.requestType;
+    qDebug() << params.requestText;
+    qDebug() << params.requestIDs;
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)

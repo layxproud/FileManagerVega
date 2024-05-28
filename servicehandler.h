@@ -31,8 +31,8 @@ public slots:
         const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
     void classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs);
     void clusterizePortraits(const QList<long> &portraitIDs, int clustersNum);
-    void findMatchLevel(
-        const QString &dbName, long inputID, const QString &type, const QString &request);
+    void findMatchLevel(const FindMatchLevelParams &params);
+    void findMatchingPortraits(const FindMatchParams &params);
 
 signals:
     void tokenReceived(bool success);
@@ -102,8 +102,8 @@ signals:
     void deleteDbEntrySignal(long id, const QString &dbName);
     void classifyPortraitsSignal(const QList<long> &portraitIDs, const QList<long> &classesIDs);
     void clusterizePortraitsSignal(const QList<long> &portraitIDs, int clustersNum);
-    void findMatchLevelSignal(
-        const QString &dbName, long inputID, const QString &type, const QString &request);
+    void findMatchLevelSignal(const FindMatchLevelParams &params);
+    void findMatchingPortraitsSignal(const FindMatchParams &params);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)

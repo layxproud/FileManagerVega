@@ -60,6 +60,12 @@ QMap<QString, long> PortraitListWidget::getItems() const
     return items;
 }
 
+void PortraitListWidget::clear()
+{
+    listWidget->clear();
+    portraits.clear();
+}
+
 void PortraitListWidget::onRemoveButtonClicked()
 {
     QList<QListWidgetItem *> selectedItems = listWidget->selectedItems();
