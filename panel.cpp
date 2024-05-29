@@ -12,6 +12,7 @@ Panel::Panel(QWidget *parent)
     , currentDirSize(0)
     , current_folder_id(0)
     , viewip{nullptr}
+    , proxyModel(new PanelSortFilterProxyModel())
 {
     DBmodel = new EditableNameModel(this);
     DBmodel->insertColumns(0, 8);
@@ -35,11 +36,11 @@ Panel::Panel(QWidget *parent)
 Panel::~Panel()
 {
     delete functions_of_current_BD;
+    delete proxyModel;
 }
 
 void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
 {
-    proxyModel = new PanelSortFilterProxyModel();
     proxyModel->setSourceModel(fileSystem);
     setFileSystem(proxyModel);
     this->isDB = isDB;
@@ -89,17 +90,12 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
 void Panel::setFileSystem(QAbstractItemModel *model)
 {
     this->setModel(model);
-    qDebug() << "setting file system";
     QAbstractProxyModel *proxyModel = qobject_cast<QAbstractProxyModel *>(model);
     if (proxyModel) {
-        // If the cast was successful, we're dealing with a proxy model
-        // Get the source model from the proxy model
         this->fileSystem = dynamic_cast<FileSystem *>(proxyModel->sourceModel());
     } else {
-        // If the cast failed, we're dealing directly with a FileSystem model
         this->fileSystem = dynamic_cast<FileSystem *>(model);
     }
-    this->update();
 }
 
 void Panel::setPath(QString path)
@@ -205,7 +201,7 @@ void Panel::choose(const QModelIndex &originalIndex)
     if (this->selectionMode() != QAbstractItemView::MultiSelection) {
         if (this->selectionMode() == QAbstractItemView::NoSelection) {
             this->setSelectionMode(QAbstractItemView::SingleSelection);
-            this->setCurrentIndex(normalizedIndex);
+            this->setCurrentIndex(this->currentIndex());
         }
         list.clear();
         chosenItems.clear();
