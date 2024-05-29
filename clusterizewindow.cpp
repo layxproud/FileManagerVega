@@ -10,6 +10,8 @@ ClusterizeWindow::ClusterizeWindow(QWidget *parent)
     ui->setupUi(this);
     ui->portraitsLayout->addWidget(portraitsWidget);
 
+    movie = new QMovie(":/gifs/resources/loading.gif");
+
     connect(ui->cancelButton, &QPushButton::clicked, this, &ClusterizeWindow::close);
     connect(ui->applyButton, &QPushButton::clicked, this, &ClusterizeWindow::onApplyButtonClicked);
     connect(
@@ -42,6 +44,22 @@ void ClusterizeWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void ClusterizeWindow::onClusterizationComplete(bool success, const QString &res)
+{
+    ui->loadingLabel->movie()->stop();
+    ui->loadingLabel->clear();
+
+    if (!success) {
+        ui->loadingLabel->setText("ОШИБКА");
+        ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+    } else {
+        ui->loadingLabel->setText("");
+        browser = new QTextBrowser(this);
+        ui->rightLayout->addWidget(browser);
+        browser->setText(res);
+    }
+}
+
 void ClusterizeWindow::onApplyButtonClicked()
 {
     if (portraitsWidget->getItems().isEmpty()) {
@@ -56,4 +74,6 @@ void ClusterizeWindow::onApplyButtonClicked()
     }
 
     emit clusterizePortraits(portraitIDs, ui->clustersNumInput->value());
+    ui->loadingLabel->setMovie(movie);
+    ui->loadingLabel->movie()->start();
 }

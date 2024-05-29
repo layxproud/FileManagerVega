@@ -4,6 +4,8 @@
 #include "portraitlistwidget.h"
 #include <QCloseEvent>
 #include <QDialog>
+#include <QMovie>
+#include <QTextBrowser>
 
 namespace Ui {
 class ClusterizeWindow;
@@ -23,10 +25,15 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+public slots:
+    void onClusterizationComplete(bool success, const QString &res);
+
 private:
     Ui::ClusterizeWindow *ui;
     PortraitListWidget *portraitsWidget;
     QString dbName;
+    QMovie *movie;
+    QTextBrowser *browser;
 
 signals:
     void addPortraitsSignal();

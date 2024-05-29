@@ -31,6 +31,11 @@ ServiceHandler::ServiceHandler(QObject *parent)
 
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
     connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
+    connect(
+        worker,
+        &NetworkWorker::clusterizationComplete,
+        this,
+        &ServiceHandler::clusterizationCompleteSignal);
     workerThread->start();
 }
 
@@ -224,9 +229,9 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
     std::string url = "https://vega.mirea.ru/intservice/index/xml/" + std::to_string(id);
-    if (!dbName.isEmpty()) {
-        url += "?db_name=" + dbName.toStdString();
-    }
+    //    if (!dbName.isEmpty()) {
+    //        url += "?db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     struct curl_slist *headers = nullptr;
@@ -316,6 +321,7 @@ void NetworkWorker::getSummary(const QString &filePath, long id, const QString &
 void NetworkWorker::indexFiles(
     const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
 {
+    // TODO: NEEDS FIXING
     if (documents.isEmpty()) {
         qCritical() << "Не передано ни одного файла";
         return;
@@ -332,21 +338,23 @@ void NetworkWorker::indexFiles(
 
     std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
                       + std::string(calcWeightSim ? "true" : "false");
-    if (!dbName.isEmpty()) {
-        url += "&db_name=" + dbName.toStdString();
-    }
+    qDebug() << QString::fromStdString(url);
+    //    if (!dbName.isEmpty()) {
+    //        url += "&db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
     QJsonDocument jsonDoc = mapToJsonDocument(documents);
     QByteArray jsonData = jsonDoc.toJson();
 
     curl_mime *mime = curl_mime_init(curl);
-    // JSON
     curl_mimepart *jsonPart = curl_mime_addpart(mime);
-    curl_mime_name(jsonPart, "json");
+    curl_mime_name(jsonPart, "json.json");
     curl_mime_data(jsonPart, jsonData.constData(), jsonData.size());
     curl_mime_type(jsonPart, "application/json");
-    // Файлы
+
     for (auto it = documents.begin(); it != documents.end(); ++it) {
         const QString &filePath = it.key();
         QByteArray fileData = readFileToByteArray(filePath);
@@ -360,7 +368,8 @@ void NetworkWorker::indexFiles(
         curl_mime_data(filePart, fileData.constData(), fileData.size());
         QFileInfo fileInfo(filePath);
         curl_mime_filename(filePart, fileInfo.fileName().toStdString().c_str());
-        curl_mime_type(filePart, "text/plain");
+        QString mimeType = getMimeType(filePath);
+        curl_mime_type(filePart, mimeType.toStdString().c_str());
     }
     curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
 
@@ -400,9 +409,61 @@ void NetworkWorker::classifyPortraits(const QList<long> &portraitIDs, const QLis
 
 void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clustersNum)
 {
-    qDebug() << "Кластеризация портретов";
-    qDebug() << portraitIDs;
-    qDebug() << clustersNum;
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qCritical() << "Не удалось инициализировать cURL";
+        return;
+    }
+
+    QString idsStr;
+    foreach (long id, portraitIDs) {
+        idsStr.append(QString::number(id)).append(",");
+    }
+    idsStr.chop(1);
+
+    std::string url = "https://vega.mirea.ru/intservice/class_cluster/clustering?input_doc_ids="
+                      + idsStr.toStdString() + "&cluster_count=" + std::to_string(clustersNum);
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    std::string readBuffer;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    });
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        emit clusterizationComplete(false, "");
+        return;
+    }
+
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(
+        QString::fromStdString(readBuffer).toUtf8());
+    if (!jsonResponse.isNull()) {
+        emit clusterizationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
+    } else {
+        qCritical() << "Ошибка при разборе JSON ответа";
+        emit clusterizationComplete(false, "");
+    }
 }
 
 void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
@@ -411,6 +472,65 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
     qDebug() << params.requestType;
     qDebug() << params.requestText;
     qDebug() << params.requestDocID;
+
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qCritical() << "Не удалось инициализировать cURL";
+        return;
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/search/level_match?input_doc_id="
+                      + std::to_string(params.inputDocID)
+                      + "&request_type=" + params.requestType.toStdString();
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    std::string readBuffer;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+    // Create JSON payload
+    QJsonObject jsonPayload;
+    if (params.requestType == "text") {
+        jsonPayload["request_text"] = params.requestText;
+    } else if (params.requestType == "portrait") {
+        jsonPayload["request_doc_id"] = params.requestDocID;
+    }
+    QJsonDocument doc(jsonPayload);
+    std::string jsonString = doc.toJson(QJsonDocument::Compact).toStdString();
+
+    // Set HTTP headers
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    // Set the request to POST and provide the JSON payload
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
+
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    });
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        return;
+    }
+
+    qDebug() << "Процент схожести " << QString::fromStdString(readBuffer);
 }
 
 void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
@@ -436,12 +556,15 @@ QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)
 QJsonDocument NetworkWorker::mapToJsonDocument(const QMap<QString, DocumentData> &documentMap)
 {
     QJsonArray jsonArray;
-    for (const auto &docData : documentMap) {
-        jsonArray.append(docData.toJson());
-    }
-
     QJsonObject mainObj;
-    mainObj["documents"] = jsonArray;
-
-    return QJsonDocument(mainObj);
+    if (documentMap.size() == 1) {
+        const auto &docData = documentMap.first();
+        return QJsonDocument(docData.toJson());
+    } else {
+        for (const auto &docData : documentMap) {
+            jsonArray.append(docData.toJson());
+        }
+        mainObj["documents"] = jsonArray;
+        return QJsonDocument(mainObj);
+    }
 }

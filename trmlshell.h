@@ -230,6 +230,7 @@ struct DocumentData
         jsonObj["url"] = url;
         jsonObj["publish_year"] = publishYear;
         jsonObj["publisher"] = publisher;
+        jsonObj["collection-id"] = collection_id;
 
         QJsonObject indexParam;
         QJsonArray partsArray;
@@ -238,8 +239,6 @@ struct DocumentData
         }
         indexParam["parts"] = partsArray;
         indexParam["shingle_length"] = shingle_length;
-        indexParam["collection-id"] = collection_id;
-
         jsonObj["index_param"] = indexParam;
 
         return jsonObj;

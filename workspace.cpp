@@ -710,6 +710,12 @@ void Workspace::clusterizePortraits()
             clusterizeWindow->setPortraits(_portraitsMap);
         });
 
+        connect(
+            serviceHandler,
+            &ServiceHandler::clusterizationCompleteSignal,
+            clusterizeWindow,
+            &ClusterizeWindow::onClusterizationComplete);
+
         clusterizeWindow->setPortraits(portraitsMap);
         clusterizeWindow->setDbName(dbName);
     }

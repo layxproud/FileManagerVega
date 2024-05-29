@@ -37,6 +37,7 @@ public slots:
 signals:
     void tokenReceived(bool success);
     void xmlFileDownloaded(bool success);
+    void clusterizationComplete(bool success, const QString &res);
 
 private:
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -59,6 +60,22 @@ private:
             *((int *) userdata) = responseCode;
         }
         return size * nmemb;
+    }
+
+    static QString getMimeType(const QString &filePath)
+    {
+        QFileInfo fileInfo(filePath);
+        QString extension = fileInfo.suffix().toLower();
+
+        static QMap<QString, QString> mimeTypes = {
+            {"txt", "text/plain"},
+            {"pdf", "application/pdf"},
+            {"docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+            // Add more file types as needed
+        };
+
+        return mimeTypes.value(
+            extension, "application/octet-stream"); // Default to binary stream if type is unknown
     }
 
     QByteArray readFileToByteArray(const QString &filePath);
@@ -104,6 +121,7 @@ signals:
     void clusterizePortraitsSignal(const QList<long> &portraitIDs, int clustersNum);
     void findMatchLevelSignal(const FindMatchLevelParams &params);
     void findMatchingPortraitsSignal(const FindMatchParams &params);
+    void clusterizationCompleteSignal(bool success, const QString &res);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)
