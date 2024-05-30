@@ -85,6 +85,13 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
     proxyModel->invalidate();
 }
 
+void Panel::clearLists()
+{
+    list.clear();
+    chosenFolders.clear();
+    chosenItems.clear();
+}
+
 /*** ГЕТТЕРЫ И СЕТТЕРЫ ***/
 
 void Panel::setFileSystem(QAbstractItemModel *model)

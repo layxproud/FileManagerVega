@@ -191,7 +191,7 @@ struct IPCompareResults
 
 struct DocumentData
 {
-    int id;
+    QString id;
     QString title;
     QString disciplines;
     QString themes;

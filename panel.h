@@ -133,6 +133,7 @@ public:
 
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
+    void clearLists();
     void setIsDB(bool isDB);
     void setPath(QString path);
     bool getIsDB();

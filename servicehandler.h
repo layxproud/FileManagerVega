@@ -29,7 +29,7 @@ public slots:
     void getSummary(const QString &filePath, long id, const QString &dbName);
     void indexFiles(
         const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents);
-    void classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs);
+    void classifyPortraits(const QList<long> &portraitIDs, const QMap<QString, long> &classes);
     void clusterizePortraits(const QList<long> &portraitIDs, int clustersNum);
     void findMatchLevel(const FindMatchLevelParams &params);
     void findMatchingPortraits(const FindMatchParams &params);
@@ -38,6 +38,7 @@ signals:
     void tokenReceived(bool success);
     void xmlFileDownloaded(bool success);
     void clusterizationComplete(bool success, const QString &res);
+    void classificationComplete(bool success, const QString &res);
 
 private:
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -117,11 +118,12 @@ signals:
     void getSummarySignal(const QString &filePath, long id, const QString &dbName);
     void tokenReceivedSignal(bool success);
     void deleteDbEntrySignal(long id, const QString &dbName);
-    void classifyPortraitsSignal(const QList<long> &portraitIDs, const QList<long> &classesIDs);
+    void classifyPortraitsSignal(const QList<long> &portraitIDs, const QMap<QString, long> &classes);
     void clusterizePortraitsSignal(const QList<long> &portraitIDs, int clustersNum);
     void findMatchLevelSignal(const FindMatchLevelParams &params);
     void findMatchingPortraitsSignal(const FindMatchParams &params);
     void clusterizationCompleteSignal(bool success, const QString &res);
+    void classificationCompleteSignal(bool success, const QString &res);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)

@@ -28,25 +28,25 @@ void IndexWindow::setFiles(const QStringList &files)
     filePaths = files;
 
     DocumentData defaultData
-        = {0,
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           0,
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           "aaa",
-           QList<int>{1, 2, 3},
-           2,
-           "aaa"};
+        = {"0",
+           "аа ",
+           "1,2,3",
+           "1,2,3",
+           "<сойдет>",
+           "4",
+           "<desc_header>",
+           "<desc_body>",
+           "Новожилов А. А.",
+           3,
+           "<не знаю>",
+           "<не знаю>",
+           "",
+           "https://link",
+           "2022",
+           "https://link",
+           QList<int>{},
+           3,
+           "12000"};
 
     for (const QString &filePath : filePaths) {
         documentsData[filePath] = defaultData;
@@ -85,7 +85,7 @@ void IndexWindow::updateDocumentData(const QString &fileName)
     }
 
     DocumentData &data = documentsData[fileName];
-    data.id = ui->idInput->text().toInt();
+    data.id = ui->idInput->text();
     data.title = ui->titleInput->text();
     data.disciplines = ui->disciplinesInput->text();
     data.themes = ui->themesInput->text();
@@ -120,7 +120,7 @@ void IndexWindow::updateDocumentData(const QString &fileName)
 
 void IndexWindow::loadFormData(const DocumentData &data)
 {
-    ui->idInput->setText(QString::number(data.id));
+    ui->idInput->setText(data.id);
     ui->titleInput->setText(data.title);
     ui->disciplinesInput->setText(data.disciplines);
     ui->themesInput->setText(data.themes);

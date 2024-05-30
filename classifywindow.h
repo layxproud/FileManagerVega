@@ -4,7 +4,12 @@
 #include "portraitlistwidget.h"
 #include <QCloseEvent>
 #include <QDialog>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QMap>
+#include <QMovie>
+#include <QStandardItemModel>
+#include <QTreeView>
 
 namespace Ui {
 class ClassifyWindow;
@@ -25,6 +30,9 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) override;
 
+public slots:
+    void onClassificationComplete(bool success, const QString &res);
+
 private:
     Ui::ClassifyWindow *ui;
     QMap<QString, long> portraits;
@@ -32,14 +40,14 @@ private:
     QString dbName;
     PortraitListWidget *portraitsWidget;
     PortraitListWidget *classesWidget;
+    QMovie *movie;
 
-    void populatePortraitsList();
-    void populateClassesList();
+    void populateModel(QStandardItemModel *model, const QJsonObject &jsonObject);
 
 signals:
     void getPortraitsSignal();
     void getClassesSignal();
-    void classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs);
+    void classifyPortraits(const QList<long> &portraitIDs, const QMap<QString, long> &classes);
 
 private slots:
     void addPortraits();

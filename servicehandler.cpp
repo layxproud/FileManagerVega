@@ -36,6 +36,12 @@ ServiceHandler::ServiceHandler(QObject *parent)
         &NetworkWorker::clusterizationComplete,
         this,
         &ServiceHandler::clusterizationCompleteSignal);
+    connect(
+        worker,
+        &NetworkWorker::classificationComplete,
+        this,
+        &ServiceHandler::classificationCompleteSignal);
+
     workerThread->start();
 }
 
@@ -205,6 +211,87 @@ void NetworkWorker::getAccessToken(const QString &login, const QString &pass)
     emit tokenReceived(true);
 }
 
+void NetworkWorker::indexFiles(
+    const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
+{
+    // TODO: NEEDS FIXING
+    if (documents.isEmpty()) {
+        qCritical() << "Не передано ни одного файла";
+        return;
+    }
+
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qCritical() << "Не удалось инициализировать cURL";
+        return;
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
+                      + std::string(calcWeightSim ? "true" : "false");
+    qDebug() << QString::fromStdString(url);
+    //    if (!dbName.isEmpty()) {
+    //        url += "&db_name=" + dbName.toStdString();
+    //    }
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    QJsonDocument jsonDoc = mapToJsonDocument(documents);
+    QByteArray jsonData = jsonDoc.toJson();
+
+    curl_mime *mime = curl_mime_init(curl);
+    curl_mimepart *jsonPart = curl_mime_addpart(mime);
+    curl_mime_name(jsonPart, "json");
+    curl_mime_filename(jsonPart, "file.json");
+    curl_mime_data(jsonPart, jsonData.constData(), jsonData.size());
+    curl_mime_type(jsonPart, "application/json");
+
+    for (auto it = documents.begin(); it != documents.end(); ++it) {
+        const QString &filePath = it.key();
+        QByteArray fileData = readFileToByteArray(filePath);
+
+        if (fileData.isEmpty()) {
+            continue;
+        }
+
+        curl_mimepart *filePart = curl_mime_addpart(mime);
+        curl_mime_name(filePart, "files");
+        curl_mime_data(filePart, fileData.constData(), fileData.size());
+        QFileInfo fileInfo(filePath);
+        curl_mime_filename(filePart, fileInfo.fileName().toStdString().c_str());
+        QString mimeType = getMimeType(filePath);
+        curl_mime_type(filePart, mimeType.toStdString().c_str());
+    }
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_mime_free(mime);
+        curl_easy_cleanup(curl);
+    });
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        return;
+    }
+
+    qDebug() << "Индексация прошла успешно";
+}
+
 void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &dbName)
 {
     CURL *curl;
@@ -318,13 +405,14 @@ void NetworkWorker::getSummary(const QString &filePath, long id, const QString &
     qDebug() << "Получение реферата";
 }
 
-void NetworkWorker::indexFiles(
-    const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
+void NetworkWorker::classifyPortraits(
+    const QList<long> &portraitIDs, const QMap<QString, long> &classes)
 {
-    // TODO: NEEDS FIXING
-    if (documents.isEmpty()) {
-        qCritical() << "Не передано ни одного файла";
-        return;
+    qDebug() << "Классифкация портретов";
+    qDebug() << portraitIDs;
+    for (auto it = classes.begin(); it != classes.end(); ++it) {
+        qDebug() << it.key();
+        qDebug() << it.value();
     }
 
     CURL *curl;
@@ -336,48 +424,42 @@ void NetworkWorker::indexFiles(
         return;
     }
 
-    std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
-                      + std::string(calcWeightSim ? "true" : "false");
-    qDebug() << QString::fromStdString(url);
-    //    if (!dbName.isEmpty()) {
-    //        url += "&db_name=" + dbName.toStdString();
-    //    }
+    std::string url = "https://vega.mirea.ru/intservice/class_cluster/classification";
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    std::string readBuffer;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
-    QJsonDocument jsonDoc = mapToJsonDocument(documents);
-    QByteArray jsonData = jsonDoc.toJson();
+    // JSON payload
+    QJsonObject jsonPayload;
 
-    curl_mime *mime = curl_mime_init(curl);
-    curl_mimepart *jsonPart = curl_mime_addpart(mime);
-    curl_mime_name(jsonPart, "json.json");
-    curl_mime_data(jsonPart, jsonData.constData(), jsonData.size());
-    curl_mime_type(jsonPart, "application/json");
-
-    for (auto it = documents.begin(); it != documents.end(); ++it) {
-        const QString &filePath = it.key();
-        QByteArray fileData = readFileToByteArray(filePath);
-
-        if (fileData.isEmpty()) {
-            continue;
-        }
-
-        curl_mimepart *filePart = curl_mime_addpart(mime);
-        curl_mime_name(filePart, "files");
-        curl_mime_data(filePart, fileData.constData(), fileData.size());
-        QFileInfo fileInfo(filePath);
-        curl_mime_filename(filePart, fileInfo.fileName().toStdString().c_str());
-        QString mimeType = getMimeType(filePath);
-        curl_mime_type(filePart, mimeType.toStdString().c_str());
+    QJsonObject classesMap;
+    for (auto it = classes.begin(); it != classes.end(); ++it) {
+        classesMap[QString::number(it.value())] = it.key();
     }
-    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
+    jsonPayload["classes_map"] = classesMap;
 
+    QJsonArray inputDocIds;
+    for (int id : portraitIDs) {
+        inputDocIds.append(id);
+    }
+    jsonPayload["input_doc_ids"] = inputDocIds;
+
+    QJsonDocument doc(jsonPayload);
+    std::string jsonString = doc.toJson(QJsonDocument::Compact).toStdString();
+
+    // Set HTTP headers
     struct curl_slist *headers = nullptr;
     std::string authHeader = "Authorization: Bearer " + accessToken;
     headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "accept: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    // Set the request to POST and provide the JSON payload
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
     int httpResponseCode = 0;
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
@@ -385,7 +467,6 @@ void NetworkWorker::indexFiles(
 
     auto cleanup = qScopeGuard([&] {
         curl_slist_free_all(headers);
-        curl_mime_free(mime);
         curl_easy_cleanup(curl);
     });
 
@@ -397,14 +478,15 @@ void NetworkWorker::indexFiles(
         return;
     }
 
-    qDebug() << "Индексация прошла успешно";
-}
-
-void NetworkWorker::classifyPortraits(const QList<long> &portraitIDs, const QList<long> &classesIDs)
-{
-    qDebug() << "Классифкация портретов";
-    qDebug() << portraitIDs;
-    qDebug() << classesIDs;
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(
+        QString::fromStdString(readBuffer).toUtf8());
+    if (!jsonResponse.isNull()) {
+        qDebug() << jsonResponse.toJson(QJsonDocument::Indented);
+        emit classificationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
+    } else {
+        qCritical() << "Ошибка при разборе JSON ответа";
+        emit classificationComplete(false, "");
+    }
 }
 
 void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clustersNum)

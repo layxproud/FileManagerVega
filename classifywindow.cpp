@@ -13,6 +13,8 @@ ClassifyWindow::ClassifyWindow(QWidget *parent)
     ui->portraitsLayout->addWidget(portraitsWidget);
     ui->classesLayout->addWidget(classesWidget);
 
+    movie = new QMovie(":/gifs/resources/loading.gif");
+
     connect(ui->cancelButton, &QPushButton::clicked, this, &ClassifyWindow::close);
     connect(ui->applyButton, &QPushButton::clicked, this, &ClassifyWindow::onApplyButtonClicked);
     connect(
@@ -51,6 +53,53 @@ void ClassifyWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void ClassifyWindow::onClassificationComplete(bool success, const QString &res)
+{
+    ui->loadingLabel->movie()->stop();
+    ui->loadingLabel->clear();
+
+    if (!success) {
+        ui->loadingLabel->setText("ОШИБКА");
+        ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+    } else {
+        ui->loadingLabel->setText("");
+
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(res.toUtf8());
+        if (jsonResponse.isNull() || !jsonResponse.isObject()) {
+            qCritical() << "Ошибка при разборе JSON ответа";
+            ui->loadingLabel->setText("ОШИБКА");
+            ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+            return;
+        }
+
+        QJsonObject jsonObject = jsonResponse.object();
+
+        QStandardItemModel *model = new QStandardItemModel(this);
+        model->setHorizontalHeaderLabels({"Классификация"});
+
+        populateModel(model, jsonObject);
+
+        QTreeView *treeView = new QTreeView(this);
+        treeView->setModel(model);
+        treeView->expandAll();
+
+        ui->resultLayout->addWidget(treeView);
+    }
+}
+
+void ClassifyWindow::populateModel(QStandardItemModel *model, const QJsonObject &jsonObject)
+{
+    for (auto it = jsonObject.begin(); it != jsonObject.end(); ++it) {
+        QStandardItem *parentItem = new QStandardItem(it.key());
+        QJsonArray jsonArray = it.value().toArray();
+        for (const QJsonValue &value : jsonArray) {
+            QStandardItem *childItem = new QStandardItem(QString::number(value.toInt()));
+            parentItem->appendRow(childItem);
+        }
+        model->appendRow(parentItem);
+    }
+}
+
 void ClassifyWindow::addPortraits()
 {
     PortraitListWidget *senderWidget = qobject_cast<PortraitListWidget *>(sender());
@@ -69,7 +118,6 @@ void ClassifyWindow::onApplyButtonClicked()
     }
 
     QList<long> portraitIDs;
-    QList<long> classesIDs;
 
     QMap<QString, long> portraitsMap = portraitsWidget->getItems();
     for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
@@ -77,9 +125,8 @@ void ClassifyWindow::onApplyButtonClicked()
     }
 
     QMap<QString, long> classesMap = classesWidget->getItems();
-    for (auto it = classesMap.begin(); it != classesMap.end(); ++it) {
-        classesIDs.append(it.value());
-    }
 
-    emit classifyPortraits(portraitIDs, classesIDs);
+    emit classifyPortraits(portraitIDs, classesMap);
+    ui->loadingLabel->setMovie(movie);
+    ui->loadingLabel->movie()->start();
 }

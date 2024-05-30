@@ -526,9 +526,11 @@ void Workspace::changeSelectionMode()
 {
     if (isLeftCurrent) {
         leftPanel->selectionModel()->clear();
+        leftPanel->clearLists();
         leftPanel->changeSelectionMode();
     } else {
         rightPanel->selectionModel()->clear();
+        rightPanel->clearLists();
         rightPanel->changeSelectionMode();
     }
 }
@@ -664,6 +666,12 @@ void Workspace::classifyPortraits()
             }
             classifyWindow->setPortraits(_portraitsMap);
         });
+
+        connect(
+            serviceHandler,
+            &ServiceHandler::classificationCompleteSignal,
+            classifyWindow,
+            &ClassifyWindow::onClassificationComplete);
 
         classifyWindow->setPortraits(portraitsMap);
         classifyWindow->setDbName(dbName);
