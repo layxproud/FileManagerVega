@@ -31,7 +31,7 @@ public:
     {
         Qt::ItemFlags defaultFlags = QStandardItemModel::flags(index);
 
-        // Можно редактировать только столбец с именем
+        // Allow editing only for the name column
         if (index.column() == 0) {
             return defaultFlags | Qt::ItemIsEditable;
         } else {
