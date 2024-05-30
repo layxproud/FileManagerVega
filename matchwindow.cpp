@@ -26,7 +26,7 @@ MatchWindow::~MatchWindow()
     delete ui;
 }
 
-void MatchWindow::setPortraits(const QMap<QString, long> &p)
+void MatchWindow::setPortraits(const QMap<long, QString> &p)
 {
     portraitsWidget->setItems(p);
 }
@@ -66,9 +66,9 @@ void MatchWindow::onApplyButton()
         emit findMatchingPortraits(params);
     } else if (ui->portraitsButton->isChecked() && !portraitsWidget->getItems().isEmpty()) {
         QList<int> portraitIDs;
-        QMap<QString, long> portraitsMap = portraitsWidget->getItems();
+        QMap<long, QString> portraitsMap = portraitsWidget->getItems();
         for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
-            portraitIDs.append(it.value());
+            portraitIDs.append(it.key());
         }
         params.requestIDs = portraitIDs;
         emit findMatchingPortraits(params);

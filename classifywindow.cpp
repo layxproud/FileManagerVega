@@ -1,12 +1,14 @@
 #include "classifywindow.h"
 #include "ui_classifywindow.h"
 #include <QDebug>
+#include <QHeaderView>
 
 ClassifyWindow::ClassifyWindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ClassifyWindow)
     , portraitsWidget(new PortraitListWidget(this))
     , classesWidget(new PortraitListWidget(this))
+    , resultView(new QTreeView())
 {
     ui->setupUi(this);
 
@@ -28,15 +30,16 @@ ClassifyWindow::ClassifyWindow(QWidget *parent)
 
 ClassifyWindow::~ClassifyWindow()
 {
+    delete resultView;
     delete ui;
 }
 
-void ClassifyWindow::setPortraits(const QMap<QString, long> &p)
+void ClassifyWindow::setPortraits(const QMap<long, QString> &p)
 {
     portraitsWidget->setItems(p);
 }
 
-void ClassifyWindow::setClasses(const QMap<QString, long> &c)
+void ClassifyWindow::setClasses(const QMap<long, QString> &c)
 {
     classesWidget->setItems(c);
 }
@@ -79,21 +82,41 @@ void ClassifyWindow::onClassificationComplete(bool success, const QString &res)
 
         populateModel(model, jsonObject);
 
-        QTreeView *treeView = new QTreeView(this);
-        treeView->setModel(model);
-        treeView->expandAll();
+        if (ui->resultLayout->indexOf(resultView) == -1) {
+            ui->resultLayout->addWidget(resultView);
+        } else {
+            while (QLayoutItem *item = ui->resultLayout->takeAt(0)) {
+                if (item->widget()) {
+                    item->widget()->setParent(nullptr);
+                }
+                delete item;
+            }
+            ui->resultLayout->addWidget(resultView);
+        }
 
-        ui->resultLayout->addWidget(treeView);
+        resultView->setModel(model);
+        resultView->expandAll();
+
+        resultView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        resultView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        resultView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        resultView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        resultView->resizeColumnToContents(0);
     }
 }
 
 void ClassifyWindow::populateModel(QStandardItemModel *model, const QJsonObject &jsonObject)
 {
+    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
+
     for (auto it = jsonObject.begin(); it != jsonObject.end(); ++it) {
         QStandardItem *parentItem = new QStandardItem(it.key());
         QJsonArray jsonArray = it.value().toArray();
         for (const QJsonValue &value : jsonArray) {
-            QStandardItem *childItem = new QStandardItem(QString::number(value.toInt()));
+            long id = value.toInt();
+            QString displayValue = portraitsMap.contains(id) ? portraitsMap.value(id)
+                                                             : QString::number(id);
+            QStandardItem *childItem = new QStandardItem(displayValue);
             parentItem->appendRow(childItem);
         }
         model->appendRow(parentItem);
@@ -119,12 +142,12 @@ void ClassifyWindow::onApplyButtonClicked()
 
     QList<long> portraitIDs;
 
-    QMap<QString, long> portraitsMap = portraitsWidget->getItems();
+    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
     for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
-        portraitIDs.append(it.value());
+        portraitIDs.append(it.key());
     }
 
-    QMap<QString, long> classesMap = classesWidget->getItems();
+    QMap<long, QString> classesMap = classesWidget->getItems();
 
     emit classifyPortraits(portraitIDs, classesMap);
     ui->loadingLabel->setMovie(movie);

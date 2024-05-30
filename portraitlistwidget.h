@@ -14,16 +14,15 @@ class PortraitListWidget : public QWidget
 public:
     explicit PortraitListWidget(QWidget *parent = nullptr);
 
-    void setPortraits(const QMap<QString, long> &p);
-    void setItems(const QMap<QString, long> &items);
-    QMap<QString, long> getItems() const;
+    void setItems(const QMap<long, QString> &items);
+    QMap<long, QString> getItems() const;
     void clear();
 
 private:
     QListWidget *listWidget;
     QPushButton *addButton;
     QPushButton *removeButton;
-    QMap<QString, long> portraits;
+    QMap<long, QString> portraits;
 
     void onRemoveButtonClicked();
     void populateList();

@@ -4,8 +4,11 @@
 #include "portraitlistwidget.h"
 #include <QCloseEvent>
 #include <QDialog>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QMovie>
-#include <QTextBrowser>
+#include <QStandardItemModel>
+#include <QTreeView>
 
 namespace Ui {
 class ClusterizeWindow;
@@ -19,7 +22,7 @@ public:
     explicit ClusterizeWindow(QWidget *parent = nullptr);
     ~ClusterizeWindow();
 
-    void setPortraits(const QMap<QString, long> &p);
+    void setPortraits(const QMap<long, QString> &p);
     void setDbName(const QString &name);
 
 protected:
@@ -33,7 +36,9 @@ private:
     PortraitListWidget *portraitsWidget;
     QString dbName;
     QMovie *movie;
-    QTextBrowser *browser;
+    QTreeView *resultView;
+
+    void populateModel(QStandardItemModel *model, const QJsonObject &jsonObject);
 
 signals:
     void addPortraitsSignal();

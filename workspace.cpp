@@ -631,9 +631,9 @@ void Workspace::classifyPortraits()
     if (chosenItems.empty())
         return;
 
-    QMap<QString, long> portraitsMap;
+    QMap<long, QString> portraitsMap;
     for (auto portrait : chosenItems) {
-        portraitsMap.insert(portrait->name, portrait->id);
+        portraitsMap.insert(portrait->id, portrait->name);
     }
 
     if (!classifyWindow) {
@@ -650,9 +650,9 @@ void Workspace::classifyPortraits()
         connect(classifyWindow, &ClassifyWindow::getClassesSignal, [this]() {
             auto result = getChosenItemsAndDbName();
             std::list<TIPInfo *> chosenItems = result.second;
-            QMap<QString, long> classesMap;
+            QMap<long, QString> classesMap;
             for (auto portrait : chosenItems) {
-                classesMap.insert(portrait->name, portrait->id);
+                classesMap.insert(portrait->id, portrait->name);
             }
             classifyWindow->setClasses(classesMap);
         });
@@ -660,9 +660,9 @@ void Workspace::classifyPortraits()
         connect(classifyWindow, &ClassifyWindow::getPortraitsSignal, [this]() {
             auto result = getChosenItemsAndDbName();
             std::list<TIPInfo *> chosenItems = result.second;
-            QMap<QString, long> _portraitsMap;
+            QMap<long, QString> _portraitsMap;
             for (auto portrait : chosenItems) {
-                _portraitsMap.insert(portrait->name, portrait->id);
+                _portraitsMap.insert(portrait->id, portrait->name);
             }
             classifyWindow->setPortraits(_portraitsMap);
         });
@@ -692,9 +692,9 @@ void Workspace::clusterizePortraits()
     if (chosenItems.empty())
         return;
 
-    QMap<QString, long> portraitsMap;
+    QMap<long, QString> portraitsMap;
     for (auto portrait : chosenItems) {
-        portraitsMap.insert(portrait->name, portrait->id);
+        portraitsMap.insert(portrait->id, portrait->name);
     }
 
     if (!clusterizeWindow) {
@@ -711,9 +711,9 @@ void Workspace::clusterizePortraits()
         connect(clusterizeWindow, &ClusterizeWindow::addPortraitsSignal, [this]() {
             auto result = getChosenItemsAndDbName();
             std::list<TIPInfo *> chosenItems = result.second;
-            QMap<QString, long> _portraitsMap;
+            QMap<long, QString> _portraitsMap;
             for (auto portrait : chosenItems) {
-                _portraitsMap.insert(portrait->name, portrait->id);
+                _portraitsMap.insert(portrait->id, portrait->name);
             }
             clusterizeWindow->setPortraits(_portraitsMap);
         });
@@ -745,9 +745,9 @@ void Workspace::findMatch()
     QString dbName = result.first;
     std::list<TIPInfo *> chosenItems = result.second;
 
-    QMap<QString, long> portraitsMap;
+    QMap<long, QString> portraitsMap;
     for (auto portrait : chosenItems) {
-        portraitsMap.insert(portrait->name, portrait->id);
+        portraitsMap.insert(portrait->id, portrait->name);
     }
 
     if (!matchWindow) {
@@ -764,9 +764,9 @@ void Workspace::findMatch()
         connect(matchWindow, &MatchWindow::addPortraitsSignal, [this]() {
             auto result = getChosenItemsAndDbName();
             std::list<TIPInfo *> chosenItems = result.second;
-            QMap<QString, long> _portraitsMap;
+            QMap<long, QString> _portraitsMap;
             for (auto portrait : chosenItems) {
-                _portraitsMap.insert(portrait->name, portrait->id);
+                _portraitsMap.insert(portrait->id, portrait->name);
             }
             matchWindow->setPortraits(_portraitsMap);
         });

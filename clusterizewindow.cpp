@@ -1,11 +1,13 @@
 #include "clusterizewindow.h"
 #include "ui_clusterizewindow.h"
 #include <QDebug>
+#include <QHeaderView>
 
 ClusterizeWindow::ClusterizeWindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::ClusterizeWindow)
     , portraitsWidget(new PortraitListWidget(this))
+    , resultView(new QTreeView())
 {
     ui->setupUi(this);
     ui->portraitsLayout->addWidget(portraitsWidget);
@@ -23,10 +25,11 @@ ClusterizeWindow::ClusterizeWindow(QWidget *parent)
 
 ClusterizeWindow::~ClusterizeWindow()
 {
+    delete resultView;
     delete ui;
 }
 
-void ClusterizeWindow::setPortraits(const QMap<QString, long> &p)
+void ClusterizeWindow::setPortraits(const QMap<long, QString> &p)
 {
     portraitsWidget->setItems(p);
 }
@@ -54,9 +57,77 @@ void ClusterizeWindow::onClusterizationComplete(bool success, const QString &res
         ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
     } else {
         ui->loadingLabel->setText("");
-        browser = new QTextBrowser(this);
-        ui->rightLayout->addWidget(browser);
-        browser->setText(res);
+
+        QJsonDocument jsonResponse = QJsonDocument::fromJson(res.toUtf8());
+        if (jsonResponse.isNull() || !jsonResponse.isObject()) {
+            qCritical() << "Ошибка при разборе JSON ответа";
+            ui->loadingLabel->setText("ОШИБКА");
+            ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+            return;
+        }
+
+        QJsonObject jsonObject = jsonResponse.object();
+
+        QStandardItemModel *model = new QStandardItemModel(this);
+        model->setHorizontalHeaderLabels({"Кластеризация"});
+
+        populateModel(model, jsonObject);
+
+        // Clear the layout if resultView is already added
+        if (ui->resultLayout->indexOf(resultView) == -1) {
+            ui->resultLayout->addWidget(resultView);
+        } else {
+            while (QLayoutItem *item = ui->resultLayout->takeAt(0)) {
+                if (item->widget()) {
+                    item->widget()->setParent(nullptr);
+                }
+                delete item;
+            }
+            ui->resultLayout->addWidget(resultView);
+        }
+
+        resultView->setModel(model);
+        resultView->expandAll();
+
+        resultView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        resultView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        resultView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        resultView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        resultView->resizeColumnToContents(0);
+    }
+}
+
+void ClusterizeWindow::populateModel(QStandardItemModel *model, const QJsonObject &jsonObject)
+{
+    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
+
+    for (auto clusterIt = jsonObject.begin(); clusterIt != jsonObject.end(); ++clusterIt) {
+        QStandardItem *clusterItem = new QStandardItem(clusterIt.key());
+
+        QJsonObject clusterObject = clusterIt.value().toObject();
+
+        // IDs
+        QStandardItem *idsItem = new QStandardItem("IDs");
+        QJsonArray idsArray = clusterObject["ids"].toArray();
+        for (const QJsonValue &idValue : idsArray) {
+            long id = idValue.toInt();
+            QString displayValue = portraitsMap.contains(id) ? portraitsMap.value(id)
+                                                             : QString::number(id);
+            QStandardItem *childItem = new QStandardItem(displayValue);
+            idsItem->appendRow(childItem);
+        }
+        clusterItem->appendRow(idsItem);
+
+        // ten_terms
+        QStandardItem *termsItem = new QStandardItem("Terms");
+        QJsonArray termsArray = clusterObject["ten_terms"].toArray();
+        for (const QJsonValue &termValue : termsArray) {
+            QStandardItem *childItem = new QStandardItem(termValue.toString());
+            termsItem->appendRow(childItem);
+        }
+        clusterItem->appendRow(termsItem);
+
+        model->appendRow(clusterItem);
     }
 }
 
@@ -68,9 +139,9 @@ void ClusterizeWindow::onApplyButtonClicked()
     }
 
     QList<long> portraitIDs;
-    QMap<QString, long> portraitsMap = portraitsWidget->getItems();
+    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
     for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
-        portraitIDs.append(it.value());
+        portraitIDs.append(it.key());
     }
 
     emit clusterizePortraits(portraitIDs, ui->clustersNumInput->value());

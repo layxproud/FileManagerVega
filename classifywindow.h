@@ -23,8 +23,8 @@ public:
     explicit ClassifyWindow(QWidget *parent = nullptr);
     ~ClassifyWindow();
 
-    void setPortraits(const QMap<QString, long> &p);
-    void setClasses(const QMap<QString, long> &c);
+    void setPortraits(const QMap<long, QString> &p);
+    void setClasses(const QMap<long, QString> &c);
     void setDbName(const QString &name);
 
 protected:
@@ -35,19 +35,20 @@ public slots:
 
 private:
     Ui::ClassifyWindow *ui;
-    QMap<QString, long> portraits;
-    QMap<QString, long> classes;
+    QMap<long, QString> portraits;
+    QMap<long, QString> classes;
     QString dbName;
     PortraitListWidget *portraitsWidget;
     PortraitListWidget *classesWidget;
     QMovie *movie;
+    QTreeView *resultView;
 
     void populateModel(QStandardItemModel *model, const QJsonObject &jsonObject);
 
 signals:
     void getPortraitsSignal();
     void getClassesSignal();
-    void classifyPortraits(const QList<long> &portraitIDs, const QMap<QString, long> &classes);
+    void classifyPortraits(const QList<long> &portraitIDs, const QMap<long, QString> &classes);
 
 private slots:
     void addPortraits();

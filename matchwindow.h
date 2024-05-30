@@ -19,7 +19,7 @@ public:
     ~MatchWindow();
 
     void setDbName(const QString &name) { dbName = name; }
-    void setPortraits(const QMap<QString, long> &p);
+    void setPortraits(const QMap<long, QString> &p);
 
 protected:
     virtual void closeEvent(QCloseEvent *event) override;

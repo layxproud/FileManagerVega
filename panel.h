@@ -101,7 +101,14 @@ protected:
         if (sourceModel()->data(normalizedRight).toString() == "..")
             return sortOrder() != Qt::AscendingOrder;
 
-        if (sortColumn() == 1) {
+        int col = sortColumn();
+        if (col == 0 || col == 2) {
+            QString leftData = sourceModel()->data(left).toString().toLower();
+            QString rightData = sourceModel()->data(right).toString().toLower();
+            return leftData < rightData;
+        }
+
+        if (col == 1) {
             QFileInfo fileInfoLeft(fsm->filePath(left));
             QFileInfo fileInfoRight(fsm->filePath(right));
             auto leftSize = fileInfoLeft.size();
@@ -110,7 +117,7 @@ protected:
             return leftSize < rightSize;
         }
 
-        if (sortColumn() == 3) {
+        if (col == 3) {
             QFileInfo fileInfoLeft(fsm->filePath(left));
             QFileInfo fileInfoRight(fsm->filePath(right));
             QDateTime leftDate = fileInfoLeft.lastModified();

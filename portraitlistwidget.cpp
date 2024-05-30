@@ -39,7 +39,7 @@ PortraitListWidget::PortraitListWidget(QWidget *parent)
                                 "}");
 }
 
-void PortraitListWidget::setItems(const QMap<QString, long> &items)
+void PortraitListWidget::setItems(const QMap<long, QString> &items)
 {
     for (auto it = items.begin(); it != items.end(); ++it) {
         if (!portraits.contains(it.key())) {
@@ -50,14 +50,9 @@ void PortraitListWidget::setItems(const QMap<QString, long> &items)
     populateList();
 }
 
-QMap<QString, long> PortraitListWidget::getItems() const
+QMap<long, QString> PortraitListWidget::getItems() const
 {
-    QMap<QString, long> items;
-    for (int i = 0; i < listWidget->count(); ++i) {
-        QListWidgetItem *item = listWidget->item(i);
-        items.insert(item->text(), item->data(Qt::UserRole).toLongLong());
-    }
-    return items;
+    return portraits;
 }
 
 void PortraitListWidget::clear()
@@ -70,8 +65,8 @@ void PortraitListWidget::onRemoveButtonClicked()
 {
     QList<QListWidgetItem *> selectedItems = listWidget->selectedItems();
     foreach (QListWidgetItem *item, selectedItems) {
-        QString portraitName = item->text();
-        auto it = portraits.find(portraitName);
+        long portraitID = item->data(Qt::UserRole).toLongLong();
+        auto it = portraits.find(portraitID);
         if (it != portraits.end()) {
             portraits.erase(it);
         }
@@ -83,8 +78,8 @@ void PortraitListWidget::populateList()
 {
     listWidget->clear();
     for (auto it = portraits.begin(); it != portraits.end(); ++it) {
-        const QString &name = it.key();
-        long id = it.value();
+        const QString &name = it.value();
+        long id = it.key();
 
         QListWidgetItem *item = new QListWidgetItem(name);
 

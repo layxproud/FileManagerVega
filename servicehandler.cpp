@@ -406,7 +406,7 @@ void NetworkWorker::getSummary(const QString &filePath, long id, const QString &
 }
 
 void NetworkWorker::classifyPortraits(
-    const QList<long> &portraitIDs, const QMap<QString, long> &classes)
+    const QList<long> &portraitIDs, const QMap<long, QString> &classes)
 {
     qDebug() << "Классифкация портретов";
     qDebug() << portraitIDs;
@@ -436,7 +436,7 @@ void NetworkWorker::classifyPortraits(
 
     QJsonObject classesMap;
     for (auto it = classes.begin(); it != classes.end(); ++it) {
-        classesMap[QString::number(it.value())] = it.key();
+        classesMap[QString::number(it.key())] = it.value();
     }
     jsonPayload["classes_map"] = classesMap;
 
@@ -623,6 +623,78 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
     qDebug() << params.requestType;
     qDebug() << params.requestText;
     qDebug() << params.requestIDs;
+
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    if (!curl) {
+        qCritical() << "Не удалось инициализировать cURL";
+        return;
+    }
+
+    std::string url = "https://vega.mirea.ru/intservice/search/match?collection_id="
+                      + params.collectionID.toStdString()
+                      + "&request_type=" + params.requestType.toStdString()
+                      + "&search_type=" + params.searchType.toStdString()
+                      + "&doc_count=" + std::to_string(params.docCount);
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
+    std::string readBuffer;
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+
+    // JSON payload
+    QJsonObject jsonPayload;
+    if (params.requestType == "text") {
+        jsonPayload["request_text"] = params.requestText;
+    } else if (params.requestType == "portrait") {
+        QJsonArray inputDocIds;
+        for (int id : params.requestIDs) {
+            inputDocIds.append(id);
+        }
+        jsonPayload["request_doc_ids"] = inputDocIds;
+    }
+    QJsonDocument doc(jsonPayload);
+    std::string jsonString = doc.toJson(QJsonDocument::Compact).toStdString();
+
+    // Set HTTP headers
+    struct curl_slist *headers = nullptr;
+    std::string authHeader = "Authorization: Bearer " + accessToken;
+    headers = curl_slist_append(headers, authHeader.c_str());
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    headers = curl_slist_append(headers, "accept: application/json");
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
+
+    int httpResponseCode = 0;
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &httpResponseCode);
+
+    auto cleanup = qScopeGuard([&] {
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(curl);
+    });
+
+    res = curl_easy_perform(curl);
+    if (res != CURLE_OK || httpResponseCode != 200) {
+        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
+                    << QString::fromStdString(curl_easy_strerror(res))
+                    << "Код: " << QString::number(httpResponseCode);
+        return;
+    }
+
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(
+        QString::fromStdString(readBuffer).toUtf8());
+    if (!jsonResponse.isNull()) {
+        qDebug() << jsonResponse;
+        // emit clusterizationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
+    } else {
+        qCritical() << "Ошибка при разборе JSON ответа";
+        // emit clusterizationComplete(false, "");
+    }
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)
