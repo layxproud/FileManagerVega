@@ -69,5 +69,9 @@ void LoginWindow::onMsgBoxAccepted()
 
 void LoginWindow::on_pushButton_clicked()
 {
-    this->accept();
+    ui->loadingLabel->setMovie(movie);
+    ui->loadingLabel->movie()->start();
+    ui->loginInput->setEnabled(false);
+    ui->passwordInput->setEnabled(false);
+    emit loginAttempt("dim_nov01", "CneltynVbh'f");
 }

@@ -587,7 +587,7 @@
        <item>
         <widget class="QPushButton" name="applyButton">
          <property name="text">
-          <string>Готово</string>
+          <string>Индексировать</string>
          </property>
         </widget>
        </item>

@@ -11,6 +11,7 @@ ServiceHandler::ServiceHandler(QObject *parent)
     worker->moveToThread(workerThread);
     connect(workerThread, &QThread::finished, worker, &QObject::deleteLater);
 
+    /* Перенаправление сигнала в Worker */
     connect(this, &ServiceHandler::indexFilesSignal, worker, &NetworkWorker::indexFiles);
     connect(this, &ServiceHandler::getAccessTokenSignal, worker, &NetworkWorker::getAccessToken);
     connect(this, &ServiceHandler::getXmlFileSignal, worker, &NetworkWorker::getXmlFile);
@@ -29,8 +30,8 @@ ServiceHandler::ServiceHandler(QObject *parent)
         worker,
         &NetworkWorker::findMatchingPortraits);
 
+    /* Возврат результата */
     connect(worker, &NetworkWorker::tokenReceived, this, &ServiceHandler::tokenReceivedSignal);
-    connect(worker, &NetworkWorker::xmlFileDownloaded, this, &ServiceHandler::onWorkerGotXmlFile);
     connect(
         worker,
         &NetworkWorker::clusterizationComplete,
@@ -41,6 +42,13 @@ ServiceHandler::ServiceHandler(QObject *parent)
         &NetworkWorker::classificationComplete,
         this,
         &ServiceHandler::classificationCompleteSignal);
+    connect(
+        worker, &NetworkWorker::matchLevelComplete, this, &ServiceHandler::matchLevelCompleteSignal);
+    connect(
+        worker,
+        &NetworkWorker::findMatchingComplete,
+        this,
+        &ServiceHandler::findMatchingCompleteSignal);
 
     workerThread->start();
 }
@@ -143,15 +151,6 @@ void ServiceHandler::calculateComparisonCircles()
     comparisonResults.d = d;
 }
 
-void ServiceHandler::onWorkerGotXmlFile(bool success)
-{
-    if (success) {
-        qDebug() << "Файл успешно загружен";
-    } else {
-        qCritical() << "Не удалось загрузить файл";
-    }
-}
-
 NetworkWorker::NetworkWorker(QObject *parent)
     : QObject{parent}
     , accessToken("")
@@ -214,7 +213,6 @@ void NetworkWorker::getAccessToken(const QString &login, const QString &pass)
 void NetworkWorker::indexFiles(
     const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
 {
-    // TODO: NEEDS FIXING
     if (documents.isEmpty()) {
         qCritical() << "Не передано ни одного файла";
         return;
@@ -300,7 +298,6 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
     curl = curl_easy_init();
     if (!curl) {
         qCritical() << "Не удалось инициализировать cURL";
-        emit xmlFileDownloaded(false);
         return;
     }
 
@@ -308,7 +305,6 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
     fp = fopen(filePath.toStdString().c_str(), "wb");
     if (!fp) {
         qCritical() << "Не удалось открыть файл " << filePath;
-        emit xmlFileDownloaded(false);
         curl_easy_cleanup(curl);
         return;
     }
@@ -341,7 +337,6 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
         qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
                     << QString::fromStdString(curl_easy_strerror(res))
                     << "Код: " << QString::number(httpResponseCode);
-        emit xmlFileDownloaded(false);
         if (fp) {
             fclose(fp);
             remove(filePath.toStdString().c_str());
@@ -350,7 +345,6 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
     }
 
     fclose(fp);
-    emit xmlFileDownloaded(true);
 }
 
 void NetworkWorker::deleteDbEntry(long id, const QString &dbName)
@@ -408,12 +402,7 @@ void NetworkWorker::getSummary(const QString &filePath, long id, const QString &
 void NetworkWorker::classifyPortraits(
     const QList<long> &portraitIDs, const QMap<long, QString> &classes)
 {
-    qDebug() << "Классифкация портретов";
-    qDebug() << portraitIDs;
-    for (auto it = classes.begin(); it != classes.end(); ++it) {
-        qDebug() << it.key();
-        qDebug() << it.value();
-    }
+    qDebug() << "Классификация портретов";
 
     CURL *curl;
     CURLcode res;
@@ -421,6 +410,7 @@ void NetworkWorker::classifyPortraits(
     curl = curl_easy_init();
     if (!curl) {
         qCritical() << "Не удалось инициализировать cURL";
+        emit classificationComplete(false, "");
         return;
     }
 
@@ -431,35 +421,28 @@ void NetworkWorker::classifyPortraits(
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
-    // JSON payload
     QJsonObject jsonPayload;
-
     QJsonObject classesMap;
     for (auto it = classes.begin(); it != classes.end(); ++it) {
         classesMap[QString::number(it.key())] = it.value();
     }
     jsonPayload["classes_map"] = classesMap;
-
     QJsonArray inputDocIds;
     for (int id : portraitIDs) {
         inputDocIds.append(id);
     }
     jsonPayload["input_doc_ids"] = inputDocIds;
-
     QJsonDocument doc(jsonPayload);
     std::string jsonString = doc.toJson(QJsonDocument::Compact).toStdString();
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
-    // Set HTTP headers
     struct curl_slist *headers = nullptr;
     std::string authHeader = "Authorization: Bearer " + accessToken;
     headers = curl_slist_append(headers, authHeader.c_str());
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "accept: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-    // Set the request to POST and provide the JSON payload
-    curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
     int httpResponseCode = 0;
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
@@ -475,6 +458,7 @@ void NetworkWorker::classifyPortraits(
         qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
                     << QString::fromStdString(curl_easy_strerror(res))
                     << "Код: " << QString::number(httpResponseCode);
+        emit classificationComplete(false, "");
         return;
     }
 
@@ -497,6 +481,7 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
     curl = curl_easy_init();
     if (!curl) {
         qCritical() << "Не удалось инициализировать cURL";
+        emit clusterizationComplete(false, "");
         return;
     }
 
@@ -551,9 +536,6 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
 void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
 {
     qDebug() << "Поиск уровня схожести";
-    qDebug() << params.requestType;
-    qDebug() << params.requestText;
-    qDebug() << params.requestDocID;
 
     CURL *curl;
     CURLcode res;
@@ -561,6 +543,7 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
     curl = curl_easy_init();
     if (!curl) {
         qCritical() << "Не удалось инициализировать cURL";
+        emit matchLevelComplete(false, "Не удалось инициализировать cURL");
         return;
     }
 
@@ -573,7 +556,6 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
-    // Create JSON payload
     QJsonObject jsonPayload;
     if (params.requestType == "text") {
         jsonPayload["request_text"] = params.requestText;
@@ -582,18 +564,15 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
     }
     QJsonDocument doc(jsonPayload);
     std::string jsonString = doc.toJson(QJsonDocument::Compact).toStdString();
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
-    // Set HTTP headers
     struct curl_slist *headers = nullptr;
     std::string authHeader = "Authorization: Bearer " + accessToken;
     headers = curl_slist_append(headers, authHeader.c_str());
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "accept: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-    // Set the request to POST and provide the JSON payload
-    curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
     int httpResponseCode = 0;
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
@@ -609,20 +588,16 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
         qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
                     << QString::fromStdString(curl_easy_strerror(res))
                     << "Код: " << QString::number(httpResponseCode);
+        emit matchLevelComplete(false, QString("Ошибка %1").arg(QString::number(httpResponseCode)));
         return;
     }
 
-    qDebug() << "Процент схожести " << QString::fromStdString(readBuffer);
+    emit matchLevelComplete(true, QString::fromStdString(readBuffer));
 }
 
 void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
 {
     qDebug() << "Поиск похожих портретов";
-    qDebug() << params.collectionID;
-    qDebug() << params.searchType;
-    qDebug() << params.requestType;
-    qDebug() << params.requestText;
-    qDebug() << params.requestIDs;
 
     CURL *curl;
     CURLcode res;
@@ -630,6 +605,7 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
     curl = curl_easy_init();
     if (!curl) {
         qCritical() << "Не удалось инициализировать cURL";
+        emit findMatchingComplete(false, "Не удалось инициализировать cURL");
         return;
     }
 
@@ -644,7 +620,6 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
 
-    // JSON payload
     QJsonObject jsonPayload;
     if (params.requestType == "text") {
         jsonPayload["request_text"] = params.requestText;
@@ -657,6 +632,8 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
     }
     QJsonDocument doc(jsonPayload);
     std::string jsonString = doc.toJson(QJsonDocument::Compact).toStdString();
+    curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
     // Set HTTP headers
     struct curl_slist *headers = nullptr;
@@ -665,9 +642,6 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
     headers = curl_slist_append(headers, "Content-Type: application/json");
     headers = curl_slist_append(headers, "accept: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-    curl_easy_setopt(curl, CURLOPT_POST, 1L);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonString.c_str());
 
     int httpResponseCode = 0;
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, handle_header);
@@ -683,6 +657,7 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
         qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
                     << QString::fromStdString(curl_easy_strerror(res))
                     << "Код: " << QString::number(httpResponseCode);
+        emit findMatchingComplete(false, QString("Ошибка %1").arg(QString::number(httpResponseCode)));
         return;
     }
 
@@ -690,10 +665,10 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
         QString::fromStdString(readBuffer).toUtf8());
     if (!jsonResponse.isNull()) {
         qDebug() << jsonResponse;
-        // emit clusterizationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
+        emit findMatchingComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
     } else {
         qCritical() << "Ошибка при разборе JSON ответа";
-        // emit clusterizationComplete(false, "");
+        emit findMatchingComplete(false, "Ошибка при разборе JSON ответа");
     }
 }
 

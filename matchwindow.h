@@ -5,6 +5,11 @@
 #include "trmlshell.h"
 #include <QCloseEvent>
 #include <QDialog>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QMovie>
+#include <QStandardItemModel>
+#include <QTreeView>
 
 namespace Ui {
 class MatchWindow;
@@ -21,13 +26,21 @@ public:
     void setDbName(const QString &name) { dbName = name; }
     void setPortraits(const QMap<long, QString> &p);
 
+public slots:
+    void onFindMatchingComplete(bool success, const QString &res);
+
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::MatchWindow *ui;
+    QMovie *movie;
+    QTreeView *resultView;
     PortraitListWidget *portraitsWidget;
+    QStandardItemModel *model;
     QString dbName;
+
+    void populateModel(const QJsonArray &jsonArray);
 
 signals:
     void addPortraitsSignal();

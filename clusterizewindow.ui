@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Кластеризация портретов</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -195,7 +195,7 @@
          <item>
           <widget class="QPushButton" name="applyButton">
            <property name="text">
-            <string>Готово</string>
+            <string>Кластеризация</string>
            </property>
           </widget>
          </item>

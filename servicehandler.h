@@ -36,9 +36,10 @@ public slots:
 
 signals:
     void tokenReceived(bool success);
-    void xmlFileDownloaded(bool success);
     void clusterizationComplete(bool success, const QString &res);
     void classificationComplete(bool success, const QString &res);
+    void matchLevelComplete(bool success, const QString &res);
+    void findMatchingComplete(bool success, const QString &res);
 
 private:
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -83,7 +84,7 @@ private:
     QJsonDocument mapToJsonDocument(const QMap<QString, DocumentData> &documentMap);
 };
 
-/* ИНТЕРФЕЙС ДЛЯ СВЯЗИ WORKSPACE С КУРЛАМИ */
+/* ИНТЕРФЕЙС ДЛЯ СВЯЗИ C WORKSPACE */
 
 class ServiceHandler : public QObject
 {
@@ -116,14 +117,17 @@ signals:
     void getAccessTokenSignal(const QString &login, const QString &pass);
     void getXmlFileSignal(const QString &filePath, long id, const QString &dbName);
     void getSummarySignal(const QString &filePath, long id, const QString &dbName);
-    void tokenReceivedSignal(bool success);
     void deleteDbEntrySignal(long id, const QString &dbName);
     void classifyPortraitsSignal(const QList<long> &portraitIDs, const QMap<long, QString> &classes);
     void clusterizePortraitsSignal(const QList<long> &portraitIDs, int clustersNum);
     void findMatchLevelSignal(const FindMatchLevelParams &params);
     void findMatchingPortraitsSignal(const FindMatchParams &params);
+
+    void tokenReceivedSignal(bool success);
     void clusterizationCompleteSignal(bool success, const QString &res);
     void classificationCompleteSignal(bool success, const QString &res);
+    void matchLevelCompleteSignal(bool success, const QString &res);
+    void findMatchingCompleteSignal(bool success, const QString &res);
 
 public slots:
     void getXmlFile(const QString &filePath, long id, const QString &dbName)
@@ -135,7 +139,6 @@ public slots:
         emit getSummarySignal(filePath, id, dbName);
     }
     void deleteDbEntry(long id, const QString &dbName) { emit deleteDbEntrySignal(id, dbName); }
-    void onWorkerGotXmlFile(bool success);
 };
 
 #endif // SERVICEHANDLER_H
