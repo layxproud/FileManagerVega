@@ -49,11 +49,13 @@ bool TIPDBShell::Init(QString instance)
     if (!ok) {
         QSqlError res = db->lastError();
         db = NULL;
-        qDebug() << QString("? ***ERROR: initDb(): Can`t connect to PZ database: %1@%2:%3/%4")
+        qCritical() << QString("? ***ERROR: initDb(): Can`t connect to PZ database: %1@%2:%3/%4")
                         .arg(user)
                         .arg(host)
                         .arg(port)
                         .arg(dbname);
+        qCritical() << QString("? ***ERROR: initDb(): %1")
+                        .arg(res.text());
         // LogPrintf("? ***ERROR: initDb(): %s", res.text().toStdString().c_str());
         free(host);
         free(dbname);
@@ -61,6 +63,7 @@ bool TIPDBShell::Init(QString instance)
         free(pass);
         return false;
     }
+    qDebug() << QString("initDb(): Connected to PZ database: %1@%2/%3").arg(user, host, dbname);
     // LogPrintf("initDb(): Connect to PZ database: %s@%s/%s", user, host, dbname);
 
     free(host);
