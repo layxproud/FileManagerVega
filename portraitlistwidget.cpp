@@ -22,20 +22,24 @@ PortraitListWidget::PortraitListWidget(QWidget *parent)
 
     addButton->setObjectName("addButton");
     addButton->setStyleSheet("#addButton {"
-                             "background-color: rgb(0, 186, 0);"
-                             "color: white;"
+                             "background-color: rgb(220, 255, 254);"
+                             "color: black;"
+                             "font-size: 12;"
+                             "font-style: bold;"
                              "}"
                              "#addButton:hover {"
-                             "background-color: rgb(0, 140, 0);"
+                             "background-color: rgb(173, 200, 203);"
                              "}");
 
     removeButton->setObjectName("removeButton");
     removeButton->setStyleSheet("#removeButton {"
-                                "background-color: rgb(255, 105, 105);"
-                                "color: white;"
+                                "background-color: rgb(220, 255, 254);"
+                                "color: black;"
+                                "font-size: 12;"
+                                "font-style: bold;"
                                 "}"
                                 "#removeButton:hover {"
-                                "background-color: rgb(191, 79, 79);"
+                                "background-color: rgb(173, 200, 203);"
                                 "}");
 }
 

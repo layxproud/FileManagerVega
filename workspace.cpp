@@ -771,8 +771,14 @@ void Workspace::findMatch()
             matchWindow->setPortraits(_portraitsMap);
         });
 
-        matchWindow->setPortraits(portraitsMap);
+        connect(
+            serviceHandler,
+            &ServiceHandler::findMatchingCompleteSignal,
+            matchWindow,
+            &MatchWindow::onFindMatchingComplete);
+
         matchWindow->setDbName(dbName);
+        matchWindow->setPortraits(portraitsMap);
     }
     matchWindow->show();
     matchWindow->raise();
@@ -810,6 +816,12 @@ void Workspace::findMatchLevel()
             &MatchLevelWindow::findMatchLevelSignal,
             serviceHandler,
             &ServiceHandler::findMatchLevelSignal);
+
+        connect(
+            serviceHandler,
+            &ServiceHandler::matchLevelCompleteSignal,
+            matchLevelWindow,
+            &MatchLevelWindow::onMatchLevelComplete);
 
         matchLevelWindow->setDbName(dbName);
         matchLevelWindow->setPortrait(portrait->name, portrait->id);

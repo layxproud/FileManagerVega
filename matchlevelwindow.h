@@ -4,6 +4,8 @@
 #include "trmlshell.h"
 #include <QCloseEvent>
 #include <QDialog>
+#include <QLabel>
+#include <QMovie>
 
 namespace Ui {
 class MatchLevelWindow;
@@ -21,11 +23,17 @@ public:
     void setPortrait(const QString &name, long id);
     void setMatchPortrait(const QString &name, long id);
 
+public slots:
+    void onMatchLevelComplete(bool success, const QString &res);
+
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::MatchLevelWindow *ui;
+    QLabel *resultLabel;
+    QMovie *movie;
+
     QString dbName;
     QString inputPortraitName;
     long inputPortraitID;
