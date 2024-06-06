@@ -34,31 +34,23 @@
      <property name="verticalSpacing">
       <number>0</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="lbl_id">
-       <property name="text">
-        <string>ID портрета</string>
+     <item row="1" column="3">
+      <widget class="QLineEdit" name="edit_user">
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>16777215</height>
+        </size>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="lbl_date">
-       <property name="text">
-        <string>Дата</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="lbl_user">
-       <property name="text">
-        <string>Пользователь</string>
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item row="0" column="3">
-      <widget class="QLabel" name="lbl_com">
+      <widget class="QLabel" name="lbl_user">
        <property name="text">
-        <string>Комментарий</string>
+        <string>Пользователь</string>
        </property>
       </widget>
      </item>
@@ -76,15 +68,29 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lbl_id">
+       <property name="text">
+        <string>ID портрета</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="lbl_com">
+       <property name="text">
+        <string>Комментарий</string>
+       </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="edit_user">
-       <property name="maximumSize">
-        <size>
-         <width>150</width>
-         <height>16777215</height>
-        </size>
+      <widget class="QLineEdit" name="edit_com">
+       <property name="readOnly">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -96,10 +102,17 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
-     <item row="1" column="3">
-      <widget class="QLineEdit" name="edit_com"/>
+     <item row="0" column="2">
+      <widget class="QLabel" name="lbl_date">
+       <property name="text">
+        <string>Дата</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
