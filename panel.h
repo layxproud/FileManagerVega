@@ -174,6 +174,7 @@ private:
     // Окно для отображения XML файлов
     ViewIP *viewip;
 
+    void setItemData(QStandardItemModel *model, int row, int column, const QVariant &data);
 signals:
     /* Обновление GUI */
     void showInfo(const QString &);
