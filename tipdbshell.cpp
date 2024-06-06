@@ -15,7 +15,7 @@ bool TIPDBShell::Init(QString instance)
     TIniFile *ini = new TIniFile("db.ini");
     if (!ini->IsExist()) {
         // Unable to open ini-file
-        qDebug()
+        qCritical()
             << "? ***ERROR: initDb(): Can`t open ini-file for PZ database connection parameters!";
         return false;
     }
@@ -31,7 +31,7 @@ bool TIPDBShell::Init(QString instance)
         db = new QSqlDatabase(QSqlDatabase::addDatabase("QPSQL", instance));
     if (!db->isValid()) {
         // Unable to connect DB
-        qDebug() << "? ***ERROR: initDb(): Can`t use or create connection";
+        qCritical() << "? ***ERROR: initDb(): Can`t use or create connection";
         free(host);
         free(dbname);
         free(user);
@@ -49,11 +49,11 @@ bool TIPDBShell::Init(QString instance)
     if (!ok) {
         QSqlError res = db->lastError();
         db = NULL;
-        qDebug() << QString("? ***ERROR: initDb(): Can`t connect to PZ database: %1@%2:%3/%4")
-                        .arg(user)
-                        .arg(host)
-                        .arg(port)
-                        .arg(dbname);
+        qCritical() << QString("? ***ERROR: initDb(): Can`t connect to PZ database: %1@%2:%3/%4")
+                           .arg(user)
+                           .arg(host)
+                           .arg(port)
+                           .arg(dbname);
         // LogPrintf("? ***ERROR: initDb(): %s", res.text().toStdString().c_str());
         free(host);
         free(dbname);
@@ -478,7 +478,7 @@ bool TIPDBShell::CopyItemBetweenDatabases(
         sourceDB->rollback();
         destinationDB->rollback();
 
-        qDebug() << "Error: " << e.what();
+        qCritical() << "Error: " << e.what();
         return false;
     }
 

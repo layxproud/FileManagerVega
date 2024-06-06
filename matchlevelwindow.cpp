@@ -26,8 +26,6 @@ MatchLevelWindow::MatchLevelWindow(QWidget *parent)
 
 MatchLevelWindow::~MatchLevelWindow()
 {
-    delete resultLabel;
-    delete movie;
     delete ui;
 }
 
@@ -58,7 +56,7 @@ void MatchLevelWindow::onMatchLevelComplete(bool success, const QString &res)
     }
 
     bool ok;
-    double numValue = res.toDouble(&ok);
+    double numValue = modifiedRes.toDouble(&ok);
     if (!ok) {
         resultLabel->setStyleSheet("QLabel { font-size: 14px; color : red; }");
         modifiedRes = "Не удалось конвертировать результат в double";

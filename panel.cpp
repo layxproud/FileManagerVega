@@ -45,9 +45,8 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
     setRootIsDecorated(false);
     setAllColumnsShowFocus(true);
     setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(this, &QTreeView::clicked, this, &Panel::choose);
+    connect(this, &QTreeView::clicked, this, &Panel::handleSingleClick);
     connect(this, &QTreeView::doubleClicked, this, &Panel::changeDirectory);
 
     // Сортировка
@@ -63,6 +62,10 @@ void Panel::initPanel(FileSystem *fileSystem, bool isLeft, bool isDB)
 
 void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
 {
+    if (selectionModel()) {
+        disconnect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &Panel::choose);
+    }
+
     if (isDriveDatabase) {
         getFunctionsDB()->Init(arg);
         setPath("/");
@@ -79,6 +82,11 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
     clearPanel();
     proxyModel->invalidate();
     this->setColumnWidth(0, 200);
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    if (selectionModel()) {
+        connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &Panel::choose);
+    }
 }
 
 void Panel::clearLists()
@@ -113,22 +121,22 @@ void Panel::setIsDB(bool isDB)
 
 FileSystem *Panel::getFilesystem()
 {
-    return this->fileSystem;
+    return fileSystem;
+}
+
+QStandardItemModel *Panel::getDB()
+{
+    return DBmodel;
 }
 
 QString Panel::getPath()
 {
-    return this->path;
+    return path;
 }
 
 bool Panel::getIsDB()
 {
     return isDB;
-}
-
-QString Panel::getInfo()
-{
-    return this->info;
 }
 
 QModelIndexList &Panel::getList()
@@ -143,17 +151,12 @@ TIPDBShell *Panel::getFunctionsDB()
 
 std::vector<TIPInfo *> *Panel::getItems()
 {
-    return &this->items;
+    return &items;
 }
 
 std::vector<folderinfo *> *Panel::getFolders()
 {
-    return &this->folders;
-}
-
-QStandardItemModel *Panel::getDB()
-{
-    return this->DBmodel;
+    return &folders;
 }
 
 void Panel::setCurrentFolder(folderid folder)
@@ -184,10 +187,9 @@ void Panel::chooseButton()
         this->setSelectionMode(QAbstractItemView::MultiSelection);
     }
     this->setCurrentIndex(this->currentIndex());
-    this->choose(this->currentIndex());
 }
 
-void Panel::choose(const QModelIndex &originalIndex)
+void Panel::handleSingleClick(const QModelIndex &originalIndex)
 {
     if (!originalIndex.isValid()) {
         return;
@@ -197,33 +199,53 @@ void Panel::choose(const QModelIndex &originalIndex)
         effectiveIndex = proxyModel->mapToSource(originalIndex);
     }
 
-    // Нормализую индекс, чтобы клик по разным столбцам одной строки
-    // воспринимался как клик по одному и тому же индексу
     QModelIndex normalizedIndex = effectiveIndex.sibling(effectiveIndex.row(), 0);
 
-    if (this->selectionMode() != QAbstractItemView::MultiSelection) {
-        if (this->selectionMode() == QAbstractItemView::NoSelection) {
-            this->setSelectionMode(QAbstractItemView::SingleSelection);
-            this->setCurrentIndex(this->currentIndex());
-        }
-        list.clear();
-        chosenItems.clear();
-        chosenFolders.clear();
-        clearInfo();
-        list.push_back(normalizedIndex);
+    if (this->selectionMode() == QAbstractItemView::NoSelection) {
+        this->setSelectionMode(QAbstractItemView::SingleSelection);
+        this->setCurrentIndex(normalizedIndex);
+    }
+}
 
-        if (isDB) {
-            PushDB(normalizedIndex);
+// Function to handle selection changes
+void Panel::choose(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    // Handle the newly selected items
+    for (const QModelIndex &index : selected.indexes()) {
+        if (!index.isValid()) {
+            continue;
         }
-        emit updateInfo(isLeft, true, normalizedIndex);
-    } else if (this->selectionMode() == QAbstractItemView::MultiSelection) {
+
+        QModelIndex effectiveIndex = index;
+        if (!isDB) {
+            effectiveIndex = proxyModel->mapToSource(index);
+        }
+
+        QModelIndex normalizedIndex = effectiveIndex.sibling(effectiveIndex.row(), 0);
+
         if (!list.contains(normalizedIndex)) {
             list.push_back(normalizedIndex);
             if (isDB) {
                 PushDB(normalizedIndex);
             }
             emit updateInfo(isLeft, true, normalizedIndex);
-        } else {
+        }
+    }
+
+    // Handle the newly deselected items
+    for (const QModelIndex &index : deselected.indexes()) {
+        if (!index.isValid()) {
+            continue;
+        }
+
+        QModelIndex effectiveIndex = index;
+        if (!isDB) {
+            effectiveIndex = proxyModel->mapToSource(index);
+        }
+
+        QModelIndex normalizedIndex = effectiveIndex.sibling(effectiveIndex.row(), 0);
+
+        if (list.contains(normalizedIndex)) {
             list.removeOne(normalizedIndex);
             if (isDB) {
                 RemoveDB(normalizedIndex);
@@ -460,7 +482,7 @@ TIPInfo *Panel::findItem(folderid item)
             return items[i];
         }
     }
-    qDebug() << "ERROR";
+    qWarning() << "Не удалось найти портрет с ID: " << QString::number(item);
     return nullptr;
 }
 
@@ -471,7 +493,7 @@ folderinfo *Panel::findFolder(folderid folder)
             return folders[i];
         }
     }
-    qDebug() << "ERROR";
+    qWarning() << "Не удалось найти коллекцию с ID: " << QString::number(folder);
     return nullptr;
 }
 
@@ -490,10 +512,7 @@ void Panel::PushDB(QModelIndex index)
             this->numberOfSelectedFolders++;
         }
     } else if (isDB && DBmodel->item(index.row(), 2)->text() != " ") {
-        int itemId = DBmodel->item(index.row(), 1)->text().toInt();
-        qDebug() << itemId;
         chosenItems.push_back(findItem(DBmodel->item(index.row(), 1)->text().toInt()));
-        // selectedFilesSize += findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
         selectedFilesSize += findItem(DBmodel->item(index.row(), 1)->text().toInt())->sizeInTerms;
         this->numberOfSelectedFiles++;
     }
@@ -503,15 +522,12 @@ void Panel::RemoveDB(QModelIndex index)
 {
     if (isDB && DBmodel->item(index.row())->text() == "..") {
         return;
-    } else if (isDB && DBmodel->item(index.row(), 1)->text() == " ") {
-        chosenFolders.remove(findFolder(DBmodel->item(index.row(), 2)->text().toInt()));
+    } else if (isDB && DBmodel->item(index.row(), 2)->text() == " ") {
+        chosenFolders.remove(findFolder(DBmodel->item(index.row(), 1)->text().toInt()));
         this->numberOfSelectedFolders--;
-    } else if (isDB && DBmodel->item(index.row(), 1)->text() != " ") {
-        chosenItems.remove(findItem(DBmodel->item(index.row(), 2)->text().toInt()));
-        // selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInBytes/1024;
-        // Хотя верхняя строка корректная по отношению к размеру,
-        // Я пока не замечал файлов не с нулевым размером
-        selectedFilesSize -= findItem(DBmodel->item(index.row(), 2)->text().toInt())->sizeInTerms;
+    } else if (isDB && DBmodel->item(index.row(), 2)->text() != " ") {
+        chosenItems.remove(findItem(DBmodel->item(index.row(), 1)->text().toInt()));
+        selectedFilesSize -= findItem(DBmodel->item(index.row(), 1)->text().toInt())->sizeInTerms;
         this->numberOfSelectedFiles--;
     }
 }
@@ -549,83 +565,6 @@ void Panel::clearInfo()
     numberOfSelectedFiles = 0;
     numberOfSelectedFolders = 0;
     list.clear();
-}
-
-void Panel::arrowUp()
-{
-    if (!currentIndex().isValid()) {
-        setCurrentIndex(model()->index(0, 0, rootIndex()));
-    }
-
-    if (selectionMode() == QAbstractItemView::SingleSelection) {
-        selectionModel()->clearSelection();
-        clearInfo();
-        infoToString();
-        setSelectionMode(QAbstractItemView::NoSelection);
-
-        if ((currentIndex().row() - 1) >= 0) {
-            setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
-        } else {
-            int lastRow = model()->rowCount(currentIndex().parent()) - 1;
-            setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
-        }
-    } else if (selectionMode() == QAbstractItemView::NoSelection) {
-        selectionModel()->clearSelection();
-        getList().clear();
-
-        if ((currentIndex().row() - 1) >= 0) {
-            setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
-        } else {
-            int lastRow = model()->rowCount(currentIndex().parent()) - 1;
-            setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
-        }
-    } else if (selectionMode() == QAbstractItemView::MultiSelection) {
-        if (currentIndex().row() - 1 >= 0) {
-            setCurrentIndex(model()->index(currentIndex().row() - 1, 0, currentIndex().parent()));
-            setCurrentIndex(currentIndex());
-        } else {
-            int lastRow = model()->rowCount(currentIndex().parent()) - 1;
-            setCurrentIndex(model()->index(lastRow, 0, currentIndex().parent()));
-            setCurrentIndex(currentIndex());
-        }
-    }
-}
-
-void Panel::arrowDown()
-{
-    if (!currentIndex().isValid()) {
-        setCurrentIndex(model()->index(0, 0, rootIndex()));
-    }
-
-    if (selectionMode() == QAbstractItemView::SingleSelection) {
-        selectionModel()->clearSelection();
-        clearInfo();
-        infoToString();
-        setSelectionMode(QAbstractItemView::NoSelection);
-
-        if ((currentIndex().row() + 1) < model()->rowCount(currentIndex().parent())) {
-            setCurrentIndex(model()->index(currentIndex().row() + 1, 0, currentIndex().parent()));
-        } else {
-            setCurrentIndex(model()->index(0, 0, currentIndex().parent()));
-        }
-    } else if (selectionMode() == QAbstractItemView::NoSelection) {
-        selectionModel()->clearSelection();
-        getList().clear();
-
-        if ((currentIndex().row() + 1) < model()->rowCount(currentIndex().parent())) {
-            setCurrentIndex(model()->index(currentIndex().row() + 1, 0, currentIndex().parent()));
-        } else {
-            setCurrentIndex(model()->index(0, 0, currentIndex().parent()));
-        }
-    } else if (selectionMode() == QAbstractItemView::MultiSelection) {
-        if ((currentIndex().row() + 1) < model()->rowCount(currentIndex().parent())) {
-            setCurrentIndex(model()->index(currentIndex().row() + 1, 0, currentIndex().parent()));
-            setCurrentIndex(currentIndex());
-        } else {
-            setCurrentIndex(model()->index(0, 0, currentIndex().parent()));
-            setCurrentIndex(currentIndex());
-        }
-    }
 }
 
 void Panel::refreshDB()

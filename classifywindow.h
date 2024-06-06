@@ -45,6 +45,7 @@ private:
 
     void populateModel(QStandardItemModel *model, const QJsonObject &jsonObject);
 
+    void writeItem(QTextStream &out, QStandardItem *item, int level);
 signals:
     void getPortraitsSignal();
     void getClassesSignal();
@@ -52,6 +53,7 @@ signals:
 
 private slots:
     void addPortraits();
+    void exportDataToFile();
     void onApplyButtonClicked();
 };
 

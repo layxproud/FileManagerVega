@@ -97,7 +97,7 @@ bool FileSystem::removeFolder(QDir dir, const QDir &rootDir)
         QString entryAbsPath = dir.absolutePath() + "/" + entry;
         QFile::setPermissions(entryAbsPath, QFile::ReadOwner | QFile::WriteOwner);
         if (!QFile::remove(entryAbsPath)) {
-            qDebug() << "Не получилось удалить " << entryAbsPath << " из директории " << dir;
+            qCritical() << "Не получилось удалить " << entryAbsPath << " из директории " << dir;
             return false;
         }
     }
@@ -106,13 +106,13 @@ bool FileSystem::removeFolder(QDir dir, const QDir &rootDir)
         QString entryAbsPath = dir.absolutePath() + "/" + entry;
         QDir dr(entryAbsPath);
         if (!removeFolder(dr, rootDir)) {
-            qDebug() << "Не получилось удалить поддирректорию " << dir;
+            qCritical() << "Не получилось удалить поддирректорию " << dir;
             return false;
         }
     }
 
     if (!QDir().rmdir(dir.absolutePath())) {
-        qDebug() << "Не получилось удалить директорию " << dir;
+        qCritical() << "Не получилось удалить директорию " << dir;
         return false;
     }
 

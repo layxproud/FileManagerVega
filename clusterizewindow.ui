@@ -186,6 +186,13 @@
           <number>0</number>
          </property>
          <item>
+          <widget class="QPushButton" name="exportButton">
+           <property name="text">
+            <string>Экспорт</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="cancelButton">
            <property name="text">
             <string>Отмена</string>

@@ -2,6 +2,7 @@
 #define INDEXWINDOW_H
 
 #include "trmlshell.h"
+#include <QCloseEvent>
 #include <QDialog>
 #include <QListWidget>
 
@@ -25,22 +26,28 @@ public:
 
     void setFiles(const QStringList &files);
     void setDbName(const QString &name);
-    void addDocumentData(const QString &filePath, const DocumentData &data);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::IndexWindow *ui;
 
+    void addDefaultIndexParams(const QString &filePath);
     void loadFormData(const DocumentData &data);
     void populateListWidget();
     void updateDocumentData(const QString &fileName);
+    void clearScrollArea();
+
+signals:
+    void addFilesSignal();
+    void indexFiles(
+        const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documentsData);
 
 private slots:
     void onFileSelected(QListWidgetItem *item);
+    void onRemoveButtonClicked();
     void onApplyButtonClicked();
-
-signals:
-    void indexFiles(
-        const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documentsData);
 };
 
 #endif // INDEXWINDOW_H

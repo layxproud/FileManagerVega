@@ -89,16 +89,6 @@ void MainWindow::initShortcuts()
     enter = new QShortcut(this);
     enter->setKey(Qt::Key_Return);
     connect(enter, &QShortcut::activated, workspace, &Workspace::changeDir);
-
-    up = new QShortcut(this);
-    up->setKey(Qt::Key_Up);
-    connect(up, &QShortcut::activated, ui->leftPanel, &Panel::arrowUp);
-    connect(up, &QShortcut::activated, ui->rightPanel, &Panel::arrowUp);
-
-    down = new QShortcut(this);
-    down->setKey(Qt::Key_Down);
-    connect(down, &QShortcut::activated, ui->leftPanel, &Panel::arrowDown);
-    connect(down, &QShortcut::activated, ui->rightPanel, &Panel::arrowDown);
 }
 
 void MainWindow::initButtons()
