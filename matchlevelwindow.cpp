@@ -1,6 +1,7 @@
 #include "matchlevelwindow.h"
 #include "ui_matchlevelwindow.h"
 #include <QDebug>
+#include <QMessageBox>
 
 MatchLevelWindow::MatchLevelWindow(QWidget *parent)
     : QDialog(parent)
@@ -38,6 +39,13 @@ void MatchLevelWindow::setPortrait(const QString &name, long id)
 
 void MatchLevelWindow::setMatchPortrait(const QString &name, long id)
 {
+    if (name == inputPortraitName && id == inputPortraitID) {
+        QMessageBox::warning(
+            this,
+            tr("Попытка добавить дубликат"),
+            QString(tr("Нельзя сравнить один и тот же портрет")));
+        return;
+    }
     matchPortraitName = name;
     matchPortraitID = id;
     ui->docName_2->setText(matchPortraitName + " ID: " + QString::number(matchPortraitID));

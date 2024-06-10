@@ -39,12 +39,40 @@ ClassifyWindow::~ClassifyWindow()
 
 void ClassifyWindow::setPortraits(const QMap<long, QString> &p)
 {
-    portraitsWidget->setPortraits(p);
+    QMap<long, QString> currentClasses = classesWidget->getPortraits();
+    QMap<long, QString> newUniquePortraits;
+
+    for (auto it = p.begin(); it != p.end(); ++it) {
+        if (!currentClasses.contains(it.key())) {
+            newUniquePortraits.insert(it.key(), it.value());
+        } else {
+            QMessageBox::warning(
+                this,
+                tr("Попытка добавить дубликат"),
+                QString(tr("Портрет %1 уже добавлен в список классов")).arg(it.value()));
+        }
+    }
+
+    portraitsWidget->setPortraits(newUniquePortraits);
 }
 
 void ClassifyWindow::setClasses(const QMap<long, QString> &c)
 {
-    classesWidget->setPortraits(c);
+    QMap<long, QString> currentPortraits = portraitsWidget->getPortraits();
+    QMap<long, QString> newUniqueClasses;
+
+    for (auto it = c.begin(); it != c.end(); ++it) {
+        if (!currentPortraits.contains(it.key())) {
+            newUniqueClasses.insert(it.key(), it.value());
+        } else {
+            QMessageBox::warning(
+                this,
+                tr("Попытка добавить дубликат"),
+                QString(tr("Портрет %1 уже добавлен в список портретов")).arg(it.value()));
+        }
+    }
+
+    classesWidget->setPortraits(newUniqueClasses);
 }
 
 void ClassifyWindow::setDbName(const QString &name)
@@ -153,7 +181,7 @@ void ClassifyWindow::exportDataToFile()
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, tr("Error"), tr("Unable to open file for writing"));
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не удалось открыть файл"));
         return;
     }
 
@@ -161,7 +189,7 @@ void ClassifyWindow::exportDataToFile()
 
     QStandardItemModel *model = static_cast<QStandardItemModel *>(resultView->model());
     if (!model) {
-        QMessageBox::warning(this, tr("Error"), tr("No model found"));
+        QMessageBox::warning(this, tr("Ошибка"), tr("Модель не найдена"));
         return;
     }
 
