@@ -152,6 +152,8 @@ public:
     folderid getCurrentFolder();
     std::list<TIPInfo *> &getChosenItems();
     std::list<folderinfo *> &getChosenFolders();
+    void refreshFS();
+    void refreshDB();
 
 private:
     bool isDB;
@@ -214,10 +216,9 @@ public slots:
     void changeSize(bool isPlus, long long int delta);
     void changeCurrentFolderInfo(
         QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount);
-    void refreshDB();
 
 private slots:
-    void handleSingleClick(const QModelIndex &originalIndex);
+    void handleSingleClick(const QModelIndex &index);
     void choose(const QItemSelection &selected, const QItemSelection &deselected);
     void openFile(const QModelIndex &index);
     void onEditFinished(const QModelIndex &index);

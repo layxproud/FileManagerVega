@@ -82,7 +82,7 @@ void Panel::populatePanel(const QString &arg, bool isDriveDatabase)
     clearPanel();
     proxyModel->invalidate();
     this->setColumnWidth(0, 200);
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->setSelectionMode(QAbstractItemView::NoSelection);
 
     if (selectionModel()) {
         connect(selectionModel(), &QItemSelectionModel::selectionChanged, this, &Panel::choose);
@@ -189,21 +189,15 @@ void Panel::chooseButton()
     this->setCurrentIndex(this->currentIndex());
 }
 
-void Panel::handleSingleClick(const QModelIndex &originalIndex)
+void Panel::handleSingleClick(const QModelIndex &index)
 {
-    if (!originalIndex.isValid()) {
+    if (!index.isValid()) {
         return;
     }
-    QModelIndex effectiveIndex = originalIndex;
-    if (!isDB) {
-        effectiveIndex = proxyModel->mapToSource(originalIndex);
-    }
-
-    QModelIndex normalizedIndex = effectiveIndex.sibling(effectiveIndex.row(), 0);
 
     if (this->selectionMode() == QAbstractItemView::NoSelection) {
         this->setSelectionMode(QAbstractItemView::SingleSelection);
-        this->setCurrentIndex(normalizedIndex);
+        this->setCurrentIndex(this->currentIndex());
     }
 }
 
@@ -305,24 +299,24 @@ void Panel::changeDirectory(const QModelIndex &index)
         emit changeFolder(isLeft, this->getPath(), isDB);
     }
 
-    this->clearInfo();
-    this->setFocus();
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
-    this->setCurrentIndex(model()->index(0, 0, this->rootIndex()));
-    this->update();
+    clearInfo();
+    setFocus();
+    setSelectionMode(QAbstractItemView::NoSelection);
+    setCurrentIndex(model()->index(0, 0, this->rootIndex()));
+    update();
 }
 
 void Panel::changeSelectionMode()
 {
-    if (this->selectionMode() == QAbstractItemView::NoSelection) {
-        this->setSelectionMode(QAbstractItemView::MultiSelection);
-    } else if (this->selectionMode() == QAbstractItemView::MultiSelection) {
-        this->setSelectionMode(QAbstractItemView::SingleSelection);
-    } else if (this->selectionMode() == QAbstractItemView::SingleSelection) {
-        this->setSelectionMode(QAbstractItemView::MultiSelection);
+    if (selectionMode() == QAbstractItemView::NoSelection) {
+        setSelectionMode(QAbstractItemView::MultiSelection);
+    } else if (selectionMode() == QAbstractItemView::MultiSelection) {
+        setSelectionMode(QAbstractItemView::SingleSelection);
+    } else if (selectionMode() == QAbstractItemView::SingleSelection) {
+        setSelectionMode(QAbstractItemView::MultiSelection);
     }
-    this->clearInfo();
-    this->infoToString();
+    clearInfo();
+    infoToString();
 }
 
 void Panel::changeCountChosenFiles(bool isPlus)
@@ -442,7 +436,7 @@ void Panel::ChangeFolderDB(folderid folder)
 void Panel::clearPanel()
 {
     list.clear();
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->setSelectionMode(QAbstractItemView::NoSelection);
     this->selectedFilesSize = 0;
     this->numberOfSelectedFiles = 0;
     this->numberOfSelectedFolders = 0;
@@ -563,14 +557,23 @@ void Panel::clearInfo()
     list.clear();
 }
 
+void Panel::refreshFS()
+{
+    clearInfo();
+    infoToString();
+    setSelectionMode(QAbstractItemView::NoSelection);
+    selectionModel()->clear();
+    update();
+}
+
 void Panel::refreshDB()
 {
-    this->ChangeFolderDB(current_folder_id);
-    this->clearInfo();
-    this->infoToString();
-    this->update();
-    this->setSelectionMode(QAbstractItemView::SingleSelection);
-    this->selectionModel()->clear();
+    ChangeFolderDB(current_folder_id);
+    clearInfo();
+    infoToString();
+    setSelectionMode(QAbstractItemView::NoSelection);
+    selectionModel()->clear();
+    update();
 }
 
 void Panel::openFile(const QModelIndex &index)

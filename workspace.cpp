@@ -38,15 +38,16 @@ bool Workspace::getIsLeftCurrent()
 
 void Workspace::updatePanels()
 {
-    leftPanel->update();
-    rightPanel->update();
-
     if (leftPanel->getIsDB()) {
         leftPanel->refreshDB();
+    } else {
+        leftPanel->refreshFS();
     }
 
     if (rightPanel->getIsDB()) {
         rightPanel->refreshDB();
+    } else {
+        rightPanel->refreshFS();
     }
 
     updateFolder(true, leftPanel->getPath(), leftPanel->getIsDB());
