@@ -1,4 +1,5 @@
 #include "filesystem.h"
+#include <QDebug>
 
 FileSystem::FileSystem(QObject *parent)
     : QFileSystemModel{parent}
@@ -6,30 +7,6 @@ FileSystem::FileSystem(QObject *parent)
     setFilter(QDir::NoDot | QDir::AllEntries | QDir::System);
     setRootPath("");
     setReadOnly(false);
-}
-
-void FileSystem::copyFolder(QString sourceFolder, QString destFolder)
-{
-    QDir sourceDir(sourceFolder);
-    if (!sourceDir.exists())
-        return;
-    QDir destDir(destFolder);
-    if (!destDir.exists()) {
-        destDir.mkdir(destFolder);
-    }
-    QStringList files = sourceDir.entryList(QDir::Files);
-    for (int i = 0; i < files.count(); i++) {
-        QString srcName = sourceFolder + "/" + files[i];
-        QString destName = destFolder + "/" + files[i];
-        QFile::copy(srcName, destName);
-    }
-    files.clear();
-    files = sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    for (int i = 0; i < files.count(); i++) {
-        QString srcName = sourceFolder + "/" + files[i];
-        QString destName = destFolder + "/" + files[i];
-        copyFolder(srcName, destName);
-    }
 }
 
 bool FileSystem::copyIndex(QModelIndex index, QString destinationFilePath)
@@ -64,6 +41,30 @@ bool FileSystem::copyIndex(QModelIndex index, QString destinationFilePath)
     }
 
     return true;
+}
+
+void FileSystem::copyFolder(QString sourceFolder, QString destFolder)
+{
+    QDir sourceDir(sourceFolder);
+    if (!sourceDir.exists())
+        return;
+    QDir destDir(destFolder);
+    if (!destDir.exists()) {
+        destDir.mkdir(destFolder);
+    }
+    QStringList files = sourceDir.entryList(QDir::Files);
+    for (int i = 0; i < files.count(); i++) {
+        QString srcName = sourceFolder + "/" + files[i];
+        QString destName = destFolder + "/" + files[i];
+        QFile::copy(srcName, destName);
+    }
+    files.clear();
+    files = sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    for (int i = 0; i < files.count(); i++) {
+        QString srcName = sourceFolder + "/" + files[i];
+        QString destName = destFolder + "/" + files[i];
+        copyFolder(srcName, destName);
+    }
 }
 
 bool FileSystem::removeIndex(QModelIndex index)
