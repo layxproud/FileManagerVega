@@ -1,5 +1,4 @@
 #include "filesystem.h"
-#include <QDebug>
 
 FileSystem::FileSystem(QObject *parent)
     : QFileSystemModel{parent}
@@ -73,48 +72,13 @@ bool FileSystem::removeIndex(QModelIndex index)
         this->remove(index);
         return true;
     } else {
-        QString rootPath = this->filePath(index);
-        QDir rootDir(rootPath);
-
-        QDir dir;
-        dir.setPath(this->fileInfo(index).absoluteFilePath());
-
-        removeFolder(dir, rootDir);
-        return true;
-    }
-}
-
-bool FileSystem::removeFolder(QDir dir, const QDir &rootDir)
-{
-    if (!dir.absolutePath().startsWith(rootDir.absolutePath())) {
-        return false;
-    }
-
-    QStringList lstDirs = dir.entryList(QDir::Dirs | QDir::AllDirs | QDir::NoDotAndDotDot);
-    QStringList lstFiles = dir.entryList(QDir::Files);
-
-    foreach (QString entry, lstFiles) {
-        QString entryAbsPath = dir.absolutePath() + "/" + entry;
-        QFile::setPermissions(entryAbsPath, QFile::ReadOwner | QFile::WriteOwner);
-        if (!QFile::remove(entryAbsPath)) {
-            qCritical() << "Не получилось удалить " << entryAbsPath << " из директории " << dir;
+        QString path = this->filePath(index);
+        QDir dirToRemove(path);
+        if (dirToRemove.removeRecursively()) {
+            return true;
+        } else {
+            qCritical() << "Не удалось удалить папку " << path;
             return false;
         }
     }
-
-    foreach (QString entry, lstDirs) {
-        QString entryAbsPath = dir.absolutePath() + "/" + entry;
-        QDir dr(entryAbsPath);
-        if (!removeFolder(dr, rootDir)) {
-            qCritical() << "Не получилось удалить поддирректорию " << dir;
-            return false;
-        }
-    }
-
-    if (!QDir().rmdir(dir.absolutePath())) {
-        qCritical() << "Не получилось удалить директорию " << dir;
-        return false;
-    }
-
-    return true;
 }

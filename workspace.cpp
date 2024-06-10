@@ -84,6 +84,9 @@ void Workspace::remove()
 void Workspace::removeFilesystemEntries(Panel *panel)
 {
     QModelIndexList &selectedIndexes = panel->getList();
+    if (selectedIndexes.isEmpty()) {
+        return;
+    }
 
     for (const auto &index : selectedIndexes) {
         fileSystem->removeIndex(index);
@@ -383,19 +386,50 @@ void Workspace::createDirFileSystem(Panel *panel)
 {
     QString newCatalog = QInputDialog::getText(
         0, tr("Новая папка"), tr("Введите название: "), QLineEdit::Normal, "");
-    fileSystem->mkdir(panel->rootIndex(), newCatalog);
+
+    if (newCatalog.isEmpty()) {
+        return;
+    }
+
+    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel *>(panel->model());
+    if (!proxyModel) {
+        qWarning() << "Panel model is not a QSortFilterProxyModel";
+        return;
+    }
+
+    QModelIndex proxyIndex = panel->rootIndex();
+    QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
+
+    QFileSystemModel *fileSystemModel = qobject_cast<QFileSystemModel *>(proxyModel->sourceModel());
+    if (!fileSystemModel) {
+        qWarning() << "Source model is not a QFileSystemModel";
+        return;
+    }
+
+    QModelIndex newDirIndex = fileSystemModel->mkdir(sourceIndex, newCatalog);
+
+    if (!newDirIndex.isValid()) {
+        qCritical() << "Не удалось создать директорию!";
+        return;
+    }
+
     updateFolder(isLeftCurrent, panel->getPath(), false);
 }
 
 void Workspace::createDirDatabase(Panel *panel)
 {
     QString newCatalog = QInputDialog::getText(
-        0, tr("Новая папка"), tr("Введите название: "), QLineEdit::Normal, "");
+        0, tr("Новая коллекция"), tr("Введите название: "), QLineEdit::Normal, "");
+
+    if (newCatalog.isEmpty()) {
+        return;
+    }
+
     int new_id = panel->getFunctionsDB()->NewFolder(newCatalog);
     QStandardItem *id = new QStandardItem(QString::number(new_id));
     QStandardItem *name = new QStandardItem(newCatalog);
     name->setIcon(QIcon(":/icons/resources/folder.png"));
-    panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 2, id);
+    panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 1, id);
     panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 0, name);
     folderinfo *fold = new folderinfo;
     fold->first = new_id;

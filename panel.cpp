@@ -207,10 +207,8 @@ void Panel::handleSingleClick(const QModelIndex &originalIndex)
     }
 }
 
-// Function to handle selection changes
 void Panel::choose(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    // Handle the newly selected items
     for (const QModelIndex &index : selected.indexes()) {
         if (!index.isValid()) {
             continue;
@@ -232,7 +230,6 @@ void Panel::choose(const QItemSelection &selected, const QItemSelection &deselec
         }
     }
 
-    // Handle the newly deselected items
     for (const QModelIndex &index : deselected.indexes()) {
         if (!index.isValid()) {
             continue;
@@ -285,7 +282,6 @@ void Panel::changeDirectory(const QModelIndex &index)
         populatePanel(newPath, false);
         emit changeFolder(isLeft, newPath, isDB);
     } else {
-        // Handle database directory change logic
         QStandardItem *mb_ps = this->getDB()->item(effectiveIndex.row());
         if (mb_ps->text() == "..") {
             current_folder_id = pathID.back();
@@ -311,7 +307,7 @@ void Panel::changeDirectory(const QModelIndex &index)
 
     this->clearInfo();
     this->setFocus();
-    this->setSelectionMode(QAbstractItemView::NoSelection);
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->setCurrentIndex(model()->index(0, 0, this->rootIndex()));
     this->update();
 }
@@ -446,7 +442,7 @@ void Panel::ChangeFolderDB(folderid folder)
 void Panel::clearPanel()
 {
     list.clear();
-    this->setSelectionMode(QAbstractItemView::NoSelection);
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->selectedFilesSize = 0;
     this->numberOfSelectedFiles = 0;
     this->numberOfSelectedFolders = 0;
@@ -573,7 +569,7 @@ void Panel::refreshDB()
     this->clearInfo();
     this->infoToString();
     this->update();
-    this->setSelectionMode(QAbstractItemView::NoSelection);
+    this->setSelectionMode(QAbstractItemView::SingleSelection);
     this->selectionModel()->clear();
 }
 
