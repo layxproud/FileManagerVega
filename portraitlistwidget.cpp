@@ -4,6 +4,7 @@ PortraitListWidget::PortraitListWidget(QWidget *parent)
     : QWidget{parent}
 {
     listWidget = new QListWidget(this);
+    listWidget->setSelectionMode(QAbstractItemView::MultiSelection);
     addButton = new QPushButton("+", this);
     removeButton = new QPushButton("-", this);
 
@@ -14,9 +15,18 @@ PortraitListWidget::PortraitListWidget(QWidget *parent)
     buttonsLayout->addWidget(removeButton);
     buttonsLayout->addWidget(addButton);
 
+    QHBoxLayout *infoLayout = new QHBoxLayout();
+    QLabel *portraitsNumLabel = new QLabel();
+    portraitsNumLabel->setText("Портретов: ");
+    portraitsNumValue = new QLabel();
+    portraitsNumValue->setText("0");
+    infoLayout->addWidget(portraitsNumLabel);
+    infoLayout->addWidget(portraitsNumValue);
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addWidget(listWidget);
+    mainLayout->addLayout(infoLayout);
 
     listWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -43,7 +53,7 @@ PortraitListWidget::PortraitListWidget(QWidget *parent)
                                 "}");
 }
 
-void PortraitListWidget::setItems(const QMap<long, QString> &items)
+void PortraitListWidget::setPortraits(const QMap<long, QString> &items)
 {
     for (auto it = items.begin(); it != items.end(); ++it) {
         if (!portraits.contains(it.key())) {
@@ -54,7 +64,7 @@ void PortraitListWidget::setItems(const QMap<long, QString> &items)
     populateList();
 }
 
-QMap<long, QString> PortraitListWidget::getItems() const
+QMap<long, QString> PortraitListWidget::getPortraits() const
 {
     return portraits;
 }
@@ -76,6 +86,8 @@ void PortraitListWidget::onRemoveButtonClicked()
         }
         delete listWidget->takeItem(listWidget->row(item));
     }
+
+    portraitsNumValue->setText(QString::number(portraits.size()));
 }
 
 void PortraitListWidget::populateList()
@@ -92,4 +104,6 @@ void PortraitListWidget::populateList()
 
         listWidget->addItem(item);
     }
+
+    portraitsNumValue->setText(QString::number(portraits.size()));
 }

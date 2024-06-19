@@ -38,15 +38,16 @@ bool Workspace::getIsLeftCurrent()
 
 void Workspace::updatePanels()
 {
-    leftPanel->update();
-    rightPanel->update();
-
     if (leftPanel->getIsDB()) {
         leftPanel->refreshDB();
+    } else {
+        leftPanel->refreshFS();
     }
 
     if (rightPanel->getIsDB()) {
         rightPanel->refreshDB();
+    } else {
+        rightPanel->refreshFS();
     }
 
     updateFolder(true, leftPanel->getPath(), leftPanel->getIsDB());
@@ -78,14 +79,15 @@ void Workspace::remove()
         }
     }
 
-    leftPanel->setSelectionMode(QAbstractItemView::NoSelection);
-    rightPanel->setSelectionMode(QAbstractItemView::NoSelection);
     updatePanels();
 }
 
 void Workspace::removeFilesystemEntries(Panel *panel)
 {
     QModelIndexList &selectedIndexes = panel->getList();
+    if (selectedIndexes.isEmpty()) {
+        return;
+    }
 
     for (const auto &index : selectedIndexes) {
         fileSystem->removeIndex(index);
@@ -162,14 +164,46 @@ void Workspace::copyFilesystemToDatabase(Panel *sourcePanel, Panel *destinationP
         }
     }
 
-    indexWindow = new IndexWindow();
-    indexWindow->setModal(true);
-    indexWindow->setFiles(filesToIndex);
-    indexWindow->setDbName(destinationPanel->getFunctionsDB()->getDataBase()->databaseName());
-    connect(indexWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
-    connect(indexWindow, &IndexWindow::indexFiles, serviceHandler, &ServiceHandler::indexFilesSignal);
-    indexWindow->show();
-    widgetsList.append(indexWindow);
+    if (!filesToIndex.empty()) {
+        if (indexWindow) {
+            indexWindow->setFiles(filesToIndex);
+            indexWindow->raise();
+            indexWindow->activateWindow();
+        } else {
+            indexWindow = new IndexWindow();
+            widgetsList.append(indexWindow);
+            connect(indexWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
+            connect(
+                indexWindow,
+                &IndexWindow::indexFiles,
+                serviceHandler,
+                &ServiceHandler::indexFilesSignal);
+
+            connect(indexWindow, &IndexWindow::addFilesSignal, [this]() {
+                Panel *_panel = isLeftCurrent ? leftPanel : rightPanel;
+                if (_panel->getIsDB()) {
+                    qWarning() << "Выберите файлы в панели файловой системы";
+                    return;
+                }
+                QModelIndexList &_allIndexes = _panel->getList();
+                QStringList _filesToIndex;
+                for (const auto &index : _allIndexes) {
+                    QString filePath = _panel->getFilesystem()->filePath(index);
+                    QString extension = QFileInfo(filePath).suffix().toLower();
+                    if (extension == "txt" || extension == "pdf" || extension == "html"
+                        || extension == "docx" || extension == "doc") {
+                        _filesToIndex.append(filePath);
+                    }
+                }
+                indexWindow->setFiles(_filesToIndex);
+            });
+
+            indexWindow->setFiles(filesToIndex);
+            indexWindow->setDbName(
+                destinationPanel->getFunctionsDB()->getDataBase()->databaseName());
+        }
+        indexWindow->show();
+    }
 
     for (const auto &file : xmlFiles) {
         destinationPanel->getFunctionsDB()->CopyFileToDB(
@@ -272,8 +306,6 @@ void Workspace::move()
         }
     }
 
-    leftPanel->setSelectionMode(QAbstractItemView::NoSelection);
-    rightPanel->setSelectionMode(QAbstractItemView::NoSelection);
     leftPanel->changeDirectory(leftPanel->rootIndex());
     rightPanel->changeDirectory(rightPanel->rootIndex());
 
@@ -355,19 +387,50 @@ void Workspace::createDirFileSystem(Panel *panel)
 {
     QString newCatalog = QInputDialog::getText(
         0, tr("Новая папка"), tr("Введите название: "), QLineEdit::Normal, "");
-    fileSystem->mkdir(panel->rootIndex(), newCatalog);
+
+    if (newCatalog.isEmpty()) {
+        return;
+    }
+
+    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel *>(panel->model());
+    if (!proxyModel) {
+        qWarning() << "Panel model is not a QSortFilterProxyModel";
+        return;
+    }
+
+    QModelIndex proxyIndex = panel->rootIndex();
+    QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
+
+    QFileSystemModel *fileSystemModel = qobject_cast<QFileSystemModel *>(proxyModel->sourceModel());
+    if (!fileSystemModel) {
+        qWarning() << "Source model is not a QFileSystemModel";
+        return;
+    }
+
+    QModelIndex newDirIndex = fileSystemModel->mkdir(sourceIndex, newCatalog);
+
+    if (!newDirIndex.isValid()) {
+        qCritical() << "Не удалось создать директорию!";
+        return;
+    }
+
     updateFolder(isLeftCurrent, panel->getPath(), false);
 }
 
 void Workspace::createDirDatabase(Panel *panel)
 {
     QString newCatalog = QInputDialog::getText(
-        0, tr("Новая папка"), tr("Введите название: "), QLineEdit::Normal, "");
+        0, tr("Новая коллекция"), tr("Введите название: "), QLineEdit::Normal, "");
+
+    if (newCatalog.isEmpty()) {
+        return;
+    }
+
     int new_id = panel->getFunctionsDB()->NewFolder(newCatalog);
     QStandardItem *id = new QStandardItem(QString::number(new_id));
     QStandardItem *name = new QStandardItem(newCatalog);
     name->setIcon(QIcon(":/icons/resources/folder.png"));
-    panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 2, id);
+    panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 1, id);
     panel->getDB()->setItem(panel->getFolders()->size() + panel->getItems()->size(), 0, name);
     folderinfo *fold = new folderinfo;
     fold->first = new_id;
@@ -388,18 +451,18 @@ bool Workspace::checkPanels(bool bothPanelsNeedDB)
 {
     if (bothPanelsNeedDB) {
         if (!leftPanel->getIsDB() || !rightPanel->getIsDB()) {
-            qDebug() << "В обоих панелях должна быть открыта база данных";
+            qWarning() << "В обоих панелях должна быть открыта база данных";
             return false;
         }
     } else {
         if (!leftPanel->getIsDB() && !rightPanel->getIsDB()) {
-            qDebug() << "Хотя бы одна панель должна быть базой данных";
+            qWarning() << "Хотя бы одна панель должна быть базой данных";
             return false;
         }
     }
 
     if (leftPanel->getChosenItems().empty() && rightPanel->getChosenItems().empty()) {
-        qDebug() << "Не выбрано ни одного элемента";
+        qWarning() << "Не выбрано ни одного элемента";
         return false;
     }
 
@@ -509,7 +572,6 @@ void Workspace::updateFolder(bool isLeft, QString path, bool isDB)
             for (const auto &item : items) {
                 size += item->sizeInTerms;
             }
-            qDebug() << size;
             leftPanel->changeCurrentFolderInfo(path, size, items.size(), folders.size());
         } else {
             rightPanel->getFunctionsDB()
@@ -585,7 +647,7 @@ void Workspace::getXmlFile()
         nullptr, tr("Сохранение XML файла"), "", "XML files(*.xml);;All Files(*)");
 
     if (filePath.isEmpty()) {
-        qDebug() << "Файл не выбран";
+        qWarning() << "Файл не выбран";
         return;
     }
 
@@ -607,7 +669,7 @@ void Workspace::getSummary()
         nullptr, tr("Сохранение реферата"), "", "TXT files(*.txt);;All Files(*)");
 
     if (filePath.isEmpty()) {
-        qDebug() << "Файл не выбран";
+        qWarning() << "Файл не выбран";
         return;
     }
 
@@ -636,7 +698,11 @@ void Workspace::classifyPortraits()
         portraitsMap.insert(portrait->id, portrait->name);
     }
 
-    if (!classifyWindow) {
+    if (classifyWindow) {
+        classifyWindow->setClasses(portraitsMap);
+        classifyWindow->raise();
+        classifyWindow->activateWindow();
+    } else {
         classifyWindow = new ClassifyWindow();
         widgetsList.append(classifyWindow);
         connect(classifyWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
@@ -673,12 +739,11 @@ void Workspace::classifyPortraits()
             classifyWindow,
             &ClassifyWindow::onClassificationComplete);
 
-        classifyWindow->setPortraits(portraitsMap);
+        classifyWindow->setClasses(portraitsMap);
         classifyWindow->setDbName(dbName);
     }
+
     classifyWindow->show();
-    classifyWindow->raise();
-    classifyWindow->activateWindow();
 }
 
 void Workspace::clusterizePortraits()
@@ -697,7 +762,11 @@ void Workspace::clusterizePortraits()
         portraitsMap.insert(portrait->id, portrait->name);
     }
 
-    if (!clusterizeWindow) {
+    if (clusterizeWindow) {
+        clusterizeWindow->setPortraits(portraitsMap);
+        clusterizeWindow->raise();
+        clusterizeWindow->activateWindow();
+    } else {
         clusterizeWindow = new ClusterizeWindow();
         widgetsList.append(clusterizeWindow);
         connect(clusterizeWindow, &QObject::destroyed, this, &Workspace::handleWidgetDestroyed);
@@ -728,8 +797,6 @@ void Workspace::clusterizePortraits()
         clusterizeWindow->setDbName(dbName);
     }
     clusterizeWindow->show();
-    clusterizeWindow->raise();
-    clusterizeWindow->activateWindow();
 }
 
 void Workspace::findMatch()
@@ -843,7 +910,9 @@ void Workspace::killChildren()
 void Workspace::handleWidgetDestroyed(QObject *object)
 {
     QWidget *widget = qobject_cast<QWidget *>(object);
-    if (widget == classifyWindow) {
+    if (widget == indexWindow) {
+        indexWindow = nullptr;
+    } else if (widget == classifyWindow) {
         classifyWindow = nullptr;
     } else if (widget == clusterizeWindow) {
         clusterizeWindow = nullptr;

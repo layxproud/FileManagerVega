@@ -141,9 +141,19 @@ public:
     void initPanel(FileSystem *fileSystem, bool isLeft, bool isDB);
     void populatePanel(const QString &arg, bool isDriveDatabase);
     void clearLists();
-    void setIsDB(bool isDB);
-    void setPath(QString path);
+    FileSystem *getFilesystem();
+    QStandardItemModel *getDB();
+    QString getPath();
     bool getIsDB();
+    QModelIndexList &getList();
+    TIPDBShell *getFunctionsDB();
+    std::vector<TIPInfo *> *getItems();
+    std::vector<folderinfo *> *getFolders();
+    folderid getCurrentFolder();
+    std::list<TIPInfo *> &getChosenItems();
+    std::list<folderinfo *> &getChosenFolders();
+    void refreshFS();
+    void refreshDB();
 
 private:
     bool isDB;
@@ -174,6 +184,21 @@ private:
     // Окно для отображения XML файлов
     ViewIP *viewip;
 
+    void setFileSystem(QAbstractItemModel *model);
+    void setPath(QString path);
+    void setIsDB(bool isDB);
+    void setCurrentFolder(folderid folder);
+    void ChangeFolderDB(folderid folder);
+    void setItemData(QStandardItemModel *model, int row, int column, const QVariant &data);
+    void clearPanel();
+    QString cdUp(QString path);
+    void infoToString();
+    void clearInfo();
+    folderinfo *findFolder(folderid folder);
+    TIPInfo *findItem(folderid folder);
+    void PushDB(QModelIndex index);
+    void RemoveDB(QModelIndex index);
+
 signals:
     /* Обновление GUI */
     void showInfo(const QString &);
@@ -183,13 +208,7 @@ signals:
     void changeFolder(bool isLeft, QString path, bool isDB);
 
 public slots:
-    QString getPath();
-    QString getInfo();
-    QModelIndexList &getList();
-    FileSystem *getFilesystem();
-
     void chooseButton();
-    void choose(const QModelIndex &index);
     void changeDirectory(const QModelIndex &index);
     void changeSelectionMode();
     void changeCountChosenFiles(bool isPlus);
@@ -198,33 +217,11 @@ public slots:
     void changeCurrentFolderInfo(
         QString path, long long int sizeCurrentFolder, int filesCount, int foldersCount);
 
-    void setFileSystem(QAbstractItemModel *model);
-    void ChangeFolderDB(folderid folder);
-
-    TIPDBShell *getFunctionsDB();
-    std::vector<TIPInfo *> *getItems();
-    std::vector<folderinfo *> *getFolders();
-    void clearPanel();
-    QStandardItemModel *getDB();
-    folderid getCurrentFolder();
-    void setCurrentFolder(folderid folder);
-    QString cdUp(QString path);
-    folderinfo *findFolder(folderid folder);
-    TIPInfo *findItem(folderid folder);
-    void PushDB(QModelIndex index);
-    void RemoveDB(QModelIndex index);
-    std::list<TIPInfo *> &getChosenItems();
-    std::list<folderinfo *> &getChosenFolders();
-    void onEditFinished(const QModelIndex &index);
-
-    void infoToString();
-    void clearInfo();
-    void arrowUp();
-    void arrowDown();
-    void refreshDB();
-
 private slots:
+    void handleSingleClick(const QModelIndex &index);
+    void choose(const QItemSelection &selected, const QItemSelection &deselected);
     void openFile(const QModelIndex &index);
+    void onEditFinished(const QModelIndex &index);
 };
 
 #endif // PANEL_H

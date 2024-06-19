@@ -15,7 +15,6 @@ public:
     bool copyIndex(QModelIndex index, QString destination);
     void copyFolder(QString sourceFolder, QString destFolder);
     bool removeIndex(QModelIndex index);
-    bool removeFolder(QDir dir, const QDir &rootDir);
 };
 
 #endif // FILESYSTEM_H

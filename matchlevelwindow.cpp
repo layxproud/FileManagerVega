@@ -1,6 +1,7 @@
 #include "matchlevelwindow.h"
 #include "ui_matchlevelwindow.h"
 #include <QDebug>
+#include <QMessageBox>
 
 MatchLevelWindow::MatchLevelWindow(QWidget *parent)
     : QDialog(parent)
@@ -26,8 +27,6 @@ MatchLevelWindow::MatchLevelWindow(QWidget *parent)
 
 MatchLevelWindow::~MatchLevelWindow()
 {
-    delete resultLabel;
-    delete movie;
     delete ui;
 }
 
@@ -40,6 +39,13 @@ void MatchLevelWindow::setPortrait(const QString &name, long id)
 
 void MatchLevelWindow::setMatchPortrait(const QString &name, long id)
 {
+    if (name == inputPortraitName && id == inputPortraitID) {
+        QMessageBox::warning(
+            this,
+            tr("Попытка добавить дубликат"),
+            QString(tr("Нельзя сравнить один и тот же портрет")));
+        return;
+    }
     matchPortraitName = name;
     matchPortraitID = id;
     ui->docName_2->setText(matchPortraitName + " ID: " + QString::number(matchPortraitID));
@@ -58,7 +64,7 @@ void MatchLevelWindow::onMatchLevelComplete(bool success, const QString &res)
     }
 
     bool ok;
-    double numValue = res.toDouble(&ok);
+    double numValue = modifiedRes.toDouble(&ok);
     if (!ok) {
         resultLabel->setStyleSheet("QLabel { font-size: 14px; color : red; }");
         modifiedRes = "Не удалось конвертировать результат в double";

@@ -213,6 +213,8 @@ void NetworkWorker::getAccessToken(const QString &login, const QString &pass)
 void NetworkWorker::indexFiles(
     const QString &dbName, bool calcWeightSim, const QMap<QString, DocumentData> &documents)
 {
+    qDebug() << "Запущена индексация";
+
     if (documents.isEmpty()) {
         qCritical() << "Не передано ни одного файла";
         return;
@@ -229,7 +231,6 @@ void NetworkWorker::indexFiles(
 
     std::string url = "https://vega.mirea.ru/intservice/index/index_files?calc_weight_sim="
                       + std::string(calcWeightSim ? "true" : "false");
-    qDebug() << QString::fromStdString(url);
     //    if (!dbName.isEmpty()) {
     //        url += "&db_name=" + dbName.toStdString();
     //    }
@@ -345,10 +346,14 @@ void NetworkWorker::getXmlFile(const QString &filePath, long id, const QString &
     }
 
     fclose(fp);
+
+    qDebug() << "XML файл успешно загружен";
 }
 
 void NetworkWorker::deleteDbEntry(long id, const QString &dbName)
 {
+    qDebug() << "Удаление портрета " << QString::number(id);
+
     CURL *curl;
     CURLcode res;
 
@@ -359,9 +364,9 @@ void NetworkWorker::deleteDbEntry(long id, const QString &dbName)
     }
 
     std::string url = "https://vega.mirea.ru/intservice/index/delete/" + std::to_string(id);
-    if (!dbName.isEmpty()) {
-        url += "?db_name=" + dbName.toStdString();
-    }
+    //    if (!dbName.isEmpty()) {
+    //        url += "?db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     std::string readBuffer;
@@ -391,7 +396,7 @@ void NetworkWorker::deleteDbEntry(long id, const QString &dbName)
         return;
     }
 
-    qDebug() << "Удаление завершено";
+    qDebug() << "Удаление завершено успешно";
 }
 
 void NetworkWorker::getSummary(const QString &filePath, long id, const QString &dbName)
@@ -409,12 +414,16 @@ void NetworkWorker::classifyPortraits(
 
     curl = curl_easy_init();
     if (!curl) {
-        qCritical() << "Не удалось инициализировать cURL";
-        emit classificationComplete(false, "");
+        QString msgError = tr("ServiceHandler | Не удалось инициализировать cURL");
+        qCritical() << msgError;
+        emit classificationComplete(false, msgError);
         return;
     }
 
     std::string url = "https://vega.mirea.ru/intservice/class_cluster/classification";
+    //    if (!dbName.isEmpty()) {
+    //        url += "?db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     std::string readBuffer;
@@ -455,22 +464,26 @@ void NetworkWorker::classifyPortraits(
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK || httpResponseCode != 200) {
-        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
-                    << QString::fromStdString(curl_easy_strerror(res))
-                    << "Код: " << QString::number(httpResponseCode);
-        emit classificationComplete(false, "");
+        QString msgError = QString(tr("Ошибка в curl_easy_perform(): %1 или код ответа не 200: %2"))
+                               .arg(
+                                   QString::fromStdString(curl_easy_strerror(res)),
+                                   QString::number(httpResponseCode));
+        qCritical() << msgError;
+        emit classificationComplete(false, msgError);
         return;
     }
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(
         QString::fromStdString(readBuffer).toUtf8());
-    if (!jsonResponse.isNull()) {
-        qDebug() << jsonResponse.toJson(QJsonDocument::Indented);
-        emit classificationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
-    } else {
-        qCritical() << "Ошибка при разборе JSON ответа";
-        emit classificationComplete(false, "");
+    if (jsonResponse.isNull()) {
+        QString msgError = tr("ServiceHandler | Ошибка при разборе JSON ответа");
+        qCritical() << msgError;
+        emit classificationComplete(false, msgError);
+        return;
     }
+
+    qDebug() << "Классификация завершена успешно";
+    emit classificationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
 }
 
 void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clustersNum)
@@ -480,8 +493,9 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
 
     curl = curl_easy_init();
     if (!curl) {
-        qCritical() << "Не удалось инициализировать cURL";
-        emit clusterizationComplete(false, "");
+        QString msgError = tr("ServiceHandler | Не удалось инициализировать cURL");
+        qCritical() << msgError;
+        emit clusterizationComplete(false, msgError);
         return;
     }
 
@@ -493,6 +507,9 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
 
     std::string url = "https://vega.mirea.ru/intservice/class_cluster/clustering?input_doc_ids="
                       + idsStr.toStdString() + "&cluster_count=" + std::to_string(clustersNum);
+    //    if (!dbName.isEmpty()) {
+    //        url += "?db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     std::string readBuffer;
@@ -516,21 +533,26 @@ void NetworkWorker::clusterizePortraits(const QList<long> &portraitIDs, int clus
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK || httpResponseCode != 200) {
-        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
-                    << QString::fromStdString(curl_easy_strerror(res))
-                    << "Код: " << QString::number(httpResponseCode);
-        emit clusterizationComplete(false, "");
+        QString msgError = QString(tr("Ошибка в curl_easy_perform(): %1 или код ответа не 200: %2"))
+                               .arg(
+                                   QString::fromStdString(curl_easy_strerror(res)),
+                                   QString::number(httpResponseCode));
+        qCritical() << msgError;
+        emit clusterizationComplete(false, msgError);
         return;
     }
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(
         QString::fromStdString(readBuffer).toUtf8());
-    if (!jsonResponse.isNull()) {
-        emit clusterizationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
-    } else {
-        qCritical() << "Ошибка при разборе JSON ответа";
-        emit clusterizationComplete(false, "");
+    if (jsonResponse.isNull()) {
+        QString msgError = tr("ServiceHandler | Ошибка при разборе JSON ответа");
+        qCritical() << msgError;
+        emit clusterizationComplete(false, msgError);
+        return;
     }
+
+    qDebug() << "Кластеризация завершена успешно";
+    emit clusterizationComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
 }
 
 void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
@@ -542,14 +564,18 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
 
     curl = curl_easy_init();
     if (!curl) {
-        qCritical() << "Не удалось инициализировать cURL";
-        emit matchLevelComplete(false, "Не удалось инициализировать cURL");
+        QString msgError = tr("ServiceHandler | Не удалось инициализировать cURL");
+        qCritical() << msgError;
+        emit matchLevelComplete(false, msgError);
         return;
     }
 
     std::string url = "https://vega.mirea.ru/intservice/search/level_match?input_doc_id="
                       + std::to_string(params.inputDocID)
                       + "&request_type=" + params.requestType.toStdString();
+    //    if (!dbName.isEmpty()) {
+    //        url += "?db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     std::string readBuffer;
@@ -585,13 +611,16 @@ void NetworkWorker::findMatchLevel(const FindMatchLevelParams &params)
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK || httpResponseCode != 200) {
-        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
-                    << QString::fromStdString(curl_easy_strerror(res))
-                    << "Код: " << QString::number(httpResponseCode);
-        emit matchLevelComplete(false, QString("Ошибка %1").arg(QString::number(httpResponseCode)));
+        QString msgError = QString(tr("Ошибка в curl_easy_perform(): %1 или код ответа не 200: %2"))
+                               .arg(
+                                   QString::fromStdString(curl_easy_strerror(res)),
+                                   QString::number(httpResponseCode));
+        qCritical() << msgError;
+        emit matchLevelComplete(false, msgError);
         return;
     }
 
+    qDebug() << "Поиск уровня схожести завершен успешно";
     emit matchLevelComplete(true, QString::fromStdString(readBuffer));
 }
 
@@ -604,8 +633,9 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
 
     curl = curl_easy_init();
     if (!curl) {
-        qCritical() << "Не удалось инициализировать cURL";
-        emit findMatchingComplete(false, "Не удалось инициализировать cURL");
+        QString msgError = tr("ServiceHandler | Не удалось инициализировать cURL");
+        qCritical() << msgError;
+        emit findMatchingComplete(false, msgError);
         return;
     }
 
@@ -614,6 +644,9 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
                       + "&request_type=" + params.requestType.toStdString()
                       + "&search_type=" + params.searchType.toStdString()
                       + "&doc_count=" + std::to_string(params.docCount);
+    //    if (!dbName.isEmpty()) {
+    //        url += "?db_name=" + dbName.toStdString();
+    //    }
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
     std::string readBuffer;
@@ -654,22 +687,25 @@ void NetworkWorker::findMatchingPortraits(const FindMatchParams &params)
 
     res = curl_easy_perform(curl);
     if (res != CURLE_OK || httpResponseCode != 200) {
-        qCritical() << "Ошибка в curl_easy_perform() или код ответа не 200: "
-                    << QString::fromStdString(curl_easy_strerror(res))
-                    << "Код: " << QString::number(httpResponseCode);
-        emit findMatchingComplete(false, QString("Ошибка %1").arg(QString::number(httpResponseCode)));
+        QString msgError = QString(tr("Ошибка в curl_easy_perform(): %1 или код ответа не 200: %2"))
+                               .arg(
+                                   QString::fromStdString(curl_easy_strerror(res)),
+                                   QString::number(httpResponseCode));
+        qCritical() << msgError;
+        emit findMatchingComplete(false, msgError);
         return;
     }
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(
         QString::fromStdString(readBuffer).toUtf8());
-    if (!jsonResponse.isNull()) {
-        qDebug() << jsonResponse;
-        emit findMatchingComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
-    } else {
-        qCritical() << "Ошибка при разборе JSON ответа";
-        emit findMatchingComplete(false, "Ошибка при разборе JSON ответа");
+    if (jsonResponse.isNull()) {
+        QString msgError = tr("ServiceHandler | Ошибка при разборе JSON ответа");
+        qCritical() << msgError;
+        emit findMatchingComplete(false, msgError);
     }
+
+    qDebug() << "Поиск похожих портретов завершен успешно";
+    emit findMatchingComplete(true, jsonResponse.toJson(QJsonDocument::Indented));
 }
 
 QByteArray NetworkWorker::readFileToByteArray(const QString &filePath)

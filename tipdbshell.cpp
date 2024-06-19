@@ -15,15 +15,15 @@ bool TIPDBShell::Init(QString instance)
     TIniFile *ini = new TIniFile("db.ini");
     if (!ini->IsExist()) {
         // Unable to open ini-file
-        qDebug()
+        qCritical()
             << "? ***ERROR: initDb(): Can`t open ini-file for PZ database connection parameters!";
         return false;
     }
 
     char *host = strdup(ini->ReadString(instance.toLocal8Bit().data(), "host", "localhost").c_str()),
-         *dbname = strdup(ini->ReadString(instance.toLocal8Bit().data(), "db", "ip3").c_str()),
-         *user = strdup(ini->ReadString(instance.toLocal8Bit().data(), "user", "postgres").c_str()),
-         *pass = strdup(ini->ReadString(instance.toLocal8Bit().data(), "pass", "123456").c_str());
+        *dbname = strdup(ini->ReadString(instance.toLocal8Bit().data(), "db", "ip3").c_str()),
+            *user = strdup(ini->ReadString(instance.toLocal8Bit().data(), "user", "postgres").c_str()),
+                *pass = strdup(ini->ReadString(instance.toLocal8Bit().data(), "pass", "123456").c_str());
     int port = ini->ReadInteger(instance.toLocal8Bit().data(), "port", 5432);
 
     db = new QSqlDatabase(QSqlDatabase::database(instance));
@@ -31,7 +31,7 @@ bool TIPDBShell::Init(QString instance)
         db = new QSqlDatabase(QSqlDatabase::addDatabase("QPSQL", instance));
     if (!db->isValid()) {
         // Unable to connect DB
-        qDebug() << "? ***ERROR: initDb(): Can`t use or create connection";
+        qCritical() << "? ***ERROR: initDb(): Can`t use or create connection";
         free(host);
         free(dbname);
         free(user);
@@ -50,12 +50,10 @@ bool TIPDBShell::Init(QString instance)
         QSqlError res = db->lastError();
         db = NULL;
         qCritical() << QString("? ***ERROR: initDb(): Can`t connect to PZ database: %1@%2:%3/%4")
-                        .arg(user)
-                        .arg(host)
-                        .arg(port)
-                        .arg(dbname);
-        qCritical() << QString("? ***ERROR: initDb(): %1")
-                        .arg(res.text());
+                           .arg(user)
+                           .arg(host)
+                           .arg(port)
+                           .arg(dbname);
         // LogPrintf("? ***ERROR: initDb(): %s", res.text().toStdString().c_str());
         free(host);
         free(dbname);
@@ -63,7 +61,6 @@ bool TIPDBShell::Init(QString instance)
         free(pass);
         return false;
     }
-    qDebug() << QString("initDb(): Connected to PZ database: %1@%2/%3").arg(user, host, dbname);
     // LogPrintf("initDb(): Connect to PZ database: %s@%s/%s", user, host, dbname);
 
     free(host);
@@ -81,7 +78,7 @@ bool TIPDBShell::Init(QString instance)
 bool TIPDBShell::Init(QString shost, QString sdbname, int iport, QString suser, QString spass)
 {
     const char *host = shost.toLocal8Bit().data(), *dbname = sdbname.toLocal8Bit().data(),
-               *user = suser.toLocal8Bit().data(), *pass = spass.toLocal8Bit().data();
+                                                       *user = suser.toLocal8Bit().data(), *pass = spass.toLocal8Bit().data();
 
     db = new QSqlDatabase(QSqlDatabase::database(shost + "-" + sdbname + "-" + iport + "-" + suser));
     if (!db->isValid())
@@ -481,7 +478,7 @@ bool TIPDBShell::CopyItemBetweenDatabases(
         sourceDB->rollback();
         destinationDB->rollback();
 
-        qDebug() << "Error: " << e.what();
+        qCritical() << "Error: " << e.what();
         return false;
     }
 

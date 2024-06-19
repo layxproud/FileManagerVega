@@ -11,8 +11,13 @@ IndexWindow::IndexWindow(QWidget *parent)
     currFileName = "";
     prevFileName = "";
 
+    filePaths.clear();
+    documentsData.clear();
+
     connect(ui->cancelButton, &QPushButton::clicked, this, &IndexWindow::close);
     connect(ui->applyButton, &QPushButton::clicked, this, &IndexWindow::onApplyButtonClicked);
+    connect(ui->removeButton, &QPushButton::clicked, this, &IndexWindow::onRemoveButtonClicked);
+    connect(ui->addButton, &QPushButton::clicked, this, &IndexWindow::addFilesSignal);
 }
 
 IndexWindow::~IndexWindow()
@@ -22,11 +27,30 @@ IndexWindow::~IndexWindow()
 
 void IndexWindow::setFiles(const QStringList &files)
 {
-    filePaths.clear();
-    documentsData.clear();
+    for (auto &file : files) {
+        if (!filePaths.contains(file)) {
+            filePaths.append(file);
+            addDefaultIndexParams(file);
+        }
+    }
 
-    filePaths = files;
+    populateListWidget();
+}
 
+void IndexWindow::setDbName(const QString &name)
+{
+    dbName = name;
+    ui->dbNameInput->setText(dbName);
+}
+
+void IndexWindow::closeEvent(QCloseEvent *event)
+{
+    deleteLater();
+    event->accept();
+}
+
+void IndexWindow::addDefaultIndexParams(const QString &filePath)
+{
     DocumentData defaultData
         = {"0",
            "аа ",
@@ -48,22 +72,7 @@ void IndexWindow::setFiles(const QStringList &files)
            3,
            "12000"};
 
-    for (const QString &filePath : filePaths) {
-        documentsData[filePath] = defaultData;
-    }
-
-    populateListWidget();
-}
-
-void IndexWindow::setDbName(const QString &name)
-{
-    dbName = name;
-    ui->dbNameInput->setText(dbName);
-}
-
-void IndexWindow::addDocumentData(const QString &filePath, const DocumentData &data)
-{
-    documentsData[filePath] = data;
+    documentsData[filePath] = defaultData;
 }
 
 void IndexWindow::populateListWidget()
@@ -110,12 +119,24 @@ void IndexWindow::updateDocumentData(const QString &fileName)
         if (ok) {
             parts.append(part);
         } else {
-            qDebug() << "Invalid input";
+            qCritical() << "Не удалось обработать части речи";
         }
     }
     data.parts = parts;
     data.shingle_length = ui->shingleLengthInput->text().toInt();
     data.collection_id = ui->collectionIdInput->text();
+}
+
+void IndexWindow::clearScrollArea()
+{
+    QWidget *scrollAreaWidget = ui->scrollArea->widget();
+    if (!scrollAreaWidget)
+        return;
+
+    QList<QLineEdit *> lineEdits = scrollAreaWidget->findChildren<QLineEdit *>();
+    foreach (QLineEdit *lineEdit, lineEdits) {
+        lineEdit->clear();
+    }
 }
 
 void IndexWindow::loadFormData(const DocumentData &data)
@@ -156,6 +177,21 @@ void IndexWindow::onFileSelected(QListWidgetItem *item)
     if (documentsData.contains(filePath)) {
         loadFormData(documentsData[filePath]);
     }
+}
+
+void IndexWindow::onRemoveButtonClicked()
+{
+    QList<QListWidgetItem *> selectedItems = ui->listWidget->selectedItems();
+    foreach (QListWidgetItem *item, selectedItems) {
+        QString fileName = item->text();
+        if (filePaths.contains(fileName)) {
+            filePaths.removeOne(fileName);
+            documentsData.remove(fileName);
+        }
+        delete ui->listWidget->takeItem(ui->listWidget->row(item));
+    }
+    clearScrollArea();
+    ui->listWidget->clearSelection();
 }
 
 void IndexWindow::onApplyButtonClicked()

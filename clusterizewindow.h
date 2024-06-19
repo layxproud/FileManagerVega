@@ -39,6 +39,7 @@ private:
     QTreeView *resultView;
 
     void populateModel(QStandardItemModel *model, const QJsonObject &jsonObject);
+    void writeItem(QTextStream &out, QStandardItem *item, int level);
 
 signals:
     void addPortraitsSignal();
@@ -46,6 +47,7 @@ signals:
 
 private slots:
     void onApplyButtonClicked();
+    void exportDataToFile();
 };
 
 #endif // CLUSTERIZEWINDOW_H

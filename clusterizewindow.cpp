@@ -1,7 +1,9 @@
 #include "clusterizewindow.h"
 #include "ui_clusterizewindow.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QHeaderView>
+#include <QMessageBox>
 
 ClusterizeWindow::ClusterizeWindow(QWidget *parent)
     : QDialog(parent)
@@ -21,6 +23,7 @@ ClusterizeWindow::ClusterizeWindow(QWidget *parent)
         &PortraitListWidget::addPortraitsSignal,
         this,
         &ClusterizeWindow::addPortraitsSignal);
+    connect(ui->exportButton, &QPushButton::clicked, this, &ClusterizeWindow::exportDataToFile);
 }
 
 ClusterizeWindow::~ClusterizeWindow()
@@ -31,7 +34,7 @@ ClusterizeWindow::~ClusterizeWindow()
 
 void ClusterizeWindow::setPortraits(const QMap<long, QString> &p)
 {
-    portraitsWidget->setItems(p);
+    portraitsWidget->setPortraits(p);
 }
 
 void ClusterizeWindow::setDbName(const QString &name)
@@ -43,7 +46,6 @@ void ClusterizeWindow::setDbName(const QString &name)
 void ClusterizeWindow::closeEvent(QCloseEvent *event)
 {
     deleteLater();
-
     event->accept();
 }
 
@@ -53,16 +55,14 @@ void ClusterizeWindow::onClusterizationComplete(bool success, const QString &res
     ui->loadingLabel->clear();
 
     if (!success) {
-        ui->loadingLabel->setText("ОШИБКА");
-        ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+        QMessageBox::warning(this, tr("Ошибка"), res);
     } else {
         ui->loadingLabel->setText("");
 
         QJsonDocument jsonResponse = QJsonDocument::fromJson(res.toUtf8());
         if (jsonResponse.isNull() || !jsonResponse.isObject()) {
             qCritical() << "Ошибка при разборе JSON ответа";
-            ui->loadingLabel->setText("ОШИБКА");
-            ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+            QMessageBox::warning(this, tr("Ошибка"), tr("Ошибка при разборе JSON ответа"));
             return;
         }
 
@@ -99,7 +99,7 @@ void ClusterizeWindow::onClusterizationComplete(bool success, const QString &res
 
 void ClusterizeWindow::populateModel(QStandardItemModel *model, const QJsonObject &jsonObject)
 {
-    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
+    QMap<long, QString> portraitsMap = portraitsWidget->getPortraits();
 
     for (auto clusterIt = jsonObject.begin(); clusterIt != jsonObject.end(); ++clusterIt) {
         QStandardItem *clusterItem = new QStandardItem(clusterIt.key());
@@ -107,7 +107,7 @@ void ClusterizeWindow::populateModel(QStandardItemModel *model, const QJsonObjec
         QJsonObject clusterObject = clusterIt.value().toObject();
 
         // IDs
-        QStandardItem *idsItem = new QStandardItem("IDs");
+        QStandardItem *idsItem = new QStandardItem("Портреты");
         QJsonArray idsArray = clusterObject["ids"].toArray();
         for (const QJsonValue &idValue : idsArray) {
             long id = idValue.toInt();
@@ -119,7 +119,7 @@ void ClusterizeWindow::populateModel(QStandardItemModel *model, const QJsonObjec
         clusterItem->appendRow(idsItem);
 
         // ten_terms
-        QStandardItem *termsItem = new QStandardItem("Terms");
+        QStandardItem *termsItem = new QStandardItem("Топ 10 терминов");
         QJsonArray termsArray = clusterObject["ten_terms"].toArray();
         for (const QJsonValue &termValue : termsArray) {
             QStandardItem *childItem = new QStandardItem(termValue.toString());
@@ -131,15 +131,54 @@ void ClusterizeWindow::populateModel(QStandardItemModel *model, const QJsonObjec
     }
 }
 
+void ClusterizeWindow::writeItem(QTextStream &out, QStandardItem *item, int level)
+{
+    out << QString(level * 3, ' ') << item->text() << "\n";
+
+    for (int i = 0; i < item->rowCount(); ++i) {
+        writeItem(out, item->child(i), level + 1);
+    }
+}
+
+void ClusterizeWindow::exportDataToFile()
+{
+    QString fileName
+        = QFileDialog::getSaveFileName(this, tr("Экспорт результата"), "", tr("Text Files (*.txt)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Error"), tr("Unable to open file for writing"));
+        return;
+    }
+
+    QTextStream out(&file);
+
+    QStandardItemModel *model = static_cast<QStandardItemModel *>(resultView->model());
+    if (!model) {
+        QMessageBox::warning(this, tr("Error"), tr("No model found"));
+        return;
+    }
+
+    for (int i = 0; i < model->rowCount(); ++i) {
+        writeItem(out, model->item(i), 0);
+        out << "\n";
+    }
+
+    file.close();
+}
+
 void ClusterizeWindow::onApplyButtonClicked()
 {
-    if (portraitsWidget->getItems().isEmpty()) {
+    if (portraitsWidget->getPortraits().isEmpty()) {
         qWarning() << "Не выбрано ни одного портрета";
         return;
     }
 
     QList<long> portraitIDs;
-    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
+    QMap<long, QString> portraitsMap = portraitsWidget->getPortraits();
     for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
         portraitIDs.append(it.key());
     }

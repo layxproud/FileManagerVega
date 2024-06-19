@@ -115,6 +115,8 @@ void ViewIP::setData(
         curr++;
     }
 
+    ui->tb_terms->sortByColumn(2, Qt::DescendingOrder);
+    ui->tb_shingles->sortByColumn(2, Qt::DescendingOrder);
     fillRectangle();
 }
 

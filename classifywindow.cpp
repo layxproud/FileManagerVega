@@ -1,7 +1,9 @@
 #include "classifywindow.h"
 #include "ui_classifywindow.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <QHeaderView>
+#include <QMessageBox>
 
 ClassifyWindow::ClassifyWindow(QWidget *parent)
     : QDialog(parent)
@@ -26,6 +28,7 @@ ClassifyWindow::ClassifyWindow(QWidget *parent)
         &ClassifyWindow::addPortraits);
     connect(
         classesWidget, &PortraitListWidget::addPortraitsSignal, this, &ClassifyWindow::addPortraits);
+    connect(ui->exportButton, &QPushButton::clicked, this, &ClassifyWindow::exportDataToFile);
 }
 
 ClassifyWindow::~ClassifyWindow()
@@ -36,12 +39,40 @@ ClassifyWindow::~ClassifyWindow()
 
 void ClassifyWindow::setPortraits(const QMap<long, QString> &p)
 {
-    portraitsWidget->setItems(p);
+    QMap<long, QString> currentClasses = classesWidget->getPortraits();
+    QMap<long, QString> newUniquePortraits;
+
+    for (auto it = p.begin(); it != p.end(); ++it) {
+        if (!currentClasses.contains(it.key())) {
+            newUniquePortraits.insert(it.key(), it.value());
+        } else {
+            QMessageBox::warning(
+                this,
+                tr("Попытка добавить дубликат"),
+                QString(tr("Портрет %1 уже добавлен в список классов")).arg(it.value()));
+        }
+    }
+
+    portraitsWidget->setPortraits(newUniquePortraits);
 }
 
 void ClassifyWindow::setClasses(const QMap<long, QString> &c)
 {
-    classesWidget->setItems(c);
+    QMap<long, QString> currentPortraits = portraitsWidget->getPortraits();
+    QMap<long, QString> newUniqueClasses;
+
+    for (auto it = c.begin(); it != c.end(); ++it) {
+        if (!currentPortraits.contains(it.key())) {
+            newUniqueClasses.insert(it.key(), it.value());
+        } else {
+            QMessageBox::warning(
+                this,
+                tr("Попытка добавить дубликат"),
+                QString(tr("Портрет %1 уже добавлен в список портретов")).arg(it.value()));
+        }
+    }
+
+    classesWidget->setPortraits(newUniqueClasses);
 }
 
 void ClassifyWindow::setDbName(const QString &name)
@@ -62,16 +93,14 @@ void ClassifyWindow::onClassificationComplete(bool success, const QString &res)
     ui->loadingLabel->clear();
 
     if (!success) {
-        ui->loadingLabel->setText("ОШИБКА");
-        ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+        QMessageBox::warning(this, tr("Ошибка"), res);
     } else {
         ui->loadingLabel->setText("");
 
         QJsonDocument jsonResponse = QJsonDocument::fromJson(res.toUtf8());
         if (jsonResponse.isNull() || !jsonResponse.isObject()) {
             qCritical() << "Ошибка при разборе JSON ответа";
-            ui->loadingLabel->setText("ОШИБКА");
-            ui->loadingLabel->setStyleSheet("QLabel { font-size: 20px; color : red; }");
+            QMessageBox::warning(this, tr("Ошибка"), tr("Ошибка при разборе JSON ответа"));
             return;
         }
 
@@ -107,7 +136,7 @@ void ClassifyWindow::onClassificationComplete(bool success, const QString &res)
 
 void ClassifyWindow::populateModel(QStandardItemModel *model, const QJsonObject &jsonObject)
 {
-    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
+    QMap<long, QString> portraitsMap = portraitsWidget->getPortraits();
 
     for (auto it = jsonObject.begin(); it != jsonObject.end(); ++it) {
         QStandardItem *parentItem = new QStandardItem(it.key());
@@ -133,21 +162,60 @@ void ClassifyWindow::addPortraits()
     }
 }
 
+void ClassifyWindow::writeItem(QTextStream &out, QStandardItem *item, int level)
+{
+    out << QString(level * 3, ' ') << item->text() << "\n";
+
+    for (int i = 0; i < item->rowCount(); ++i) {
+        writeItem(out, item->child(i), level + 1);
+    }
+}
+
+void ClassifyWindow::exportDataToFile()
+{
+    QString fileName
+        = QFileDialog::getSaveFileName(this, tr("Экспорт результата"), "", tr("Text Files (*.txt)"));
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Не удалось открыть файл"));
+        return;
+    }
+
+    QTextStream out(&file);
+
+    QStandardItemModel *model = static_cast<QStandardItemModel *>(resultView->model());
+    if (!model) {
+        QMessageBox::warning(this, tr("Ошибка"), tr("Модель не найдена"));
+        return;
+    }
+
+    for (int i = 0; i < model->rowCount(); ++i) {
+        writeItem(out, model->item(i), 0);
+        out << "\n";
+    }
+
+    file.close();
+}
+
 void ClassifyWindow::onApplyButtonClicked()
 {
-    if (portraitsWidget->getItems().isEmpty() || classesWidget->getItems().isEmpty()) {
+    if (portraitsWidget->getPortraits().isEmpty() || classesWidget->getPortraits().isEmpty()) {
         qWarning() << "Не выбрано ни одного класса или портрета";
         return;
     }
 
     QList<long> portraitIDs;
 
-    QMap<long, QString> portraitsMap = portraitsWidget->getItems();
+    QMap<long, QString> portraitsMap = portraitsWidget->getPortraits();
     for (auto it = portraitsMap.begin(); it != portraitsMap.end(); ++it) {
         portraitIDs.append(it.key());
     }
 
-    QMap<long, QString> classesMap = classesWidget->getItems();
+    QMap<long, QString> classesMap = classesWidget->getPortraits();
 
     emit classifyPortraits(portraitIDs, classesMap);
     ui->loadingLabel->setMovie(movie);

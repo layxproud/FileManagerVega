@@ -29,7 +29,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
         QTextStream outputStream(&outputFile);
         outputStream << txt << endl;
     } else {
-        qDebug() << "Failed to open log file";
+        qWarning() << "Не удалось открыть файл логирования";
     }
 }
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
         outputFile.close();
     } else {
-        qDebug() << "Failed to open log file for clearing";
+        qDebug() << "Не удалось открыть файл логирования";
     }
     // qputenv("QT_DEBUG_PLUGINS", QByteArray("1"));
     qInstallMessageHandler(customMessageHandler);
